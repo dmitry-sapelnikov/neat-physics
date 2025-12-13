@@ -76,6 +76,15 @@ int main()
 			visualization->drawWorld(world, drawSettings);
 			visualization->endFrame();
 
+			if (visualization->getInput().leftMouseDown)
+			{
+				world.addBody(
+					boxSize,
+					boxMass,
+					friction,
+					visualization->getCursorPositionWorld());
+			}
+
 			world.doStep(SIMULATION_STEP);
 		}
 		return 0;

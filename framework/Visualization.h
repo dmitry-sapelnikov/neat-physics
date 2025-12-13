@@ -57,6 +57,9 @@ public:
 	/// Sets the camera zoom
 	void setCameraZoom(int zoom);
 
+	/// Returns the cursor position in world coordinates
+	Vec2 getCursorPositionWorld() const;
+
 	/// Draws a physics world
 	void drawWorld(
 		const World& world,

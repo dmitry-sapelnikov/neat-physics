@@ -418,6 +418,14 @@ void Visualization::setCameraZoom(int zoom)
 	updateProjectionMatrix();
 }
 
+Vec2 Visualization::getCursorPositionWorld() const
+{
+	double x;
+	double y;
+	glfwGetCursorPos(mWindow, &x, &y);
+	return cursorToWorld({ static_cast<float>(x), static_cast<float>(y) });
+}
+
 void Visualization::drawWorld(
 	const World& world,
 	const WorldDrawSettings& settings)
