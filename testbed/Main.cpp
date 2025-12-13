@@ -12,6 +12,9 @@ static constexpr uint32_t MAX_BODIES = 1000;
 /// Gravity
 static constexpr float GRAVITY = 10.0f;
 
+/// Simulation step
+static constexpr float SIMULATION_STEP = 1.0f / 60.0f;
+
 /// Creates a 'glass-shaped' container
 void createGlass(
 	nph::World& world,
@@ -46,13 +49,17 @@ int main()
 {
 	try
 	{
-		nph::World world(MAX_BODIES);
+		nph::World world(MAX_BODIES, { 0.0f, -GRAVITY });
 		const nph::Vec2 glassSize{ GRAVITY * 0.5f, GRAVITY };
+		const nph::Vec2 boxSize{ glassSize.x / 8.0f, glassSize.x / 16.0f };
+		const float boxMass = boxSize.x * boxSize.y * 1000.0f;
+		const float friction = 0.5f;
+
 		createGlass(
 			world,
 			glassSize,
 			GRAVITY * 0.05f,
-			0.5f);
+			friction);
 
 		nph::Visualization* visualization = nph::Visualization::getInstance();
 		if (visualization == nullptr)
@@ -68,6 +75,8 @@ int main()
 			visualization->startFrame();
 			visualization->drawWorld(world, drawSettings);
 			visualization->endFrame();
+
+			world.doStep(SIMULATION_STEP);
 		}
 		return 0;
 	}
