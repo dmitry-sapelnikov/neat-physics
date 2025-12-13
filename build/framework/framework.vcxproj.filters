@@ -6,11 +6,20 @@
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
     <Filter Include="src">
-      <UniqueIdentifier>{cb87385e-a4f4-4203-a33f-b2b0879feef9}</UniqueIdentifier>
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\testbed\Main.cpp">
+    <ClInclude Include="..\..\framework\Core.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\Visualization.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\framework\Visualization.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

@@ -11,38 +11,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\testbed\Main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\framework\framework.vcxproj">
-      <Project>{8fddd0a4-918e-412a-b90f-e290ba7026a5}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\glad\glad.vcxproj">
       <Project>{695877f5-161d-454d-9d58-ed32450a1ca0}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\glfw\glfw.vcxproj">
-      <Project>{7276ed78-3ed1-490d-af9c-4e162751489e}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\imgui\imgui.vcxproj">
-      <Project>{b1dc7727-0afc-456e-87dd-185ee1dcac5d}</Project>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\framework\Core.h" />
+    <ClInclude Include="..\..\framework\Visualization.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\framework\Visualization.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{883B318B-9238-4235-9708-E4C0AC567D62}</ProjectGuid>
-    <RootNamespace>testbed</RootNamespace>
+    <ProjectGuid>{8FDDD0A4-918E-412A-B90F-E290BA7026A5}</ProjectGuid>
+    <RootNamespace>framework</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -61,16 +56,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
+    <OutDir>..\lib\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>..\temp\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
+    <OutDir>..\lib\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>..\temp\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
@@ -78,7 +73,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile />
-      <AdditionalIncludeDirectories>../../3rd_party;../../3rd_party/glfw/include;../../3rd_party/imgui;../../framework</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../3rd_party;../../3rd_party/imgui/;../../3rd_party/glfw/include/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -89,7 +84,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -99,7 +94,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile />
-      <AdditionalIncludeDirectories>../../3rd_party;../../3rd_party/glfw/include;../../3rd_party/imgui;../../framework</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../3rd_party;../../3rd_party/imgui/;../../3rd_party/glfw/include/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
