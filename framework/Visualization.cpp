@@ -288,17 +288,18 @@ void drawArrow(
 	const Vec2& start,
 	const Vec2& end,
 	const Color& color,
-	float headSize = 0.2f)
+	float tipSize = 0.3f)
 {
-	assert(headSize > 0.0f);
+	assert(tipSize > 0.0f);
 
 	const Vec2 dir = end - start;
-	const Vec2 orthoLeft = getLeftOrthoVec(dir);
-	const Vec2 leftArrowHead = end - headSize * dir + 0.5f * headSize * orthoLeft;
-	const Vec2 rightArrowHead = end - headSize * dir - 0.5f * headSize * orthoLeft;
+	const Vec2 dirNorm = dir.getNormalized();
+	const Vec2 orthoLeft = getLeftOrthoVec(dirNorm);
+	const Vec2 leftArrowHead = end - tipSize * dirNorm + 0.3f * tipSize * orthoLeft;
+	const Vec2 rightArrowHead = end - tipSize * dirNorm - 0.3f * tipSize * orthoLeft;
 
 	glColor3f(color.r, color.g, color.b);
-	glBegin(GL_LINES);
+	glBegin(GL_LINE_STRIP);
 	// Line
 	glVertex2f(start.x, start.y);
 	glVertex2f(end.x, end.y);
@@ -317,9 +318,9 @@ void drawBody(const Body& body)
 	const Vec2& hs = body.halfSize;
 
 	const Vec2 v1 = pos + rot * Vec2(-hs.x, -hs.y);
-	const Vec2 v2 = pos + rot * Vec2( hs.x, -hs.y);
-	const Vec2 v3 = pos + rot * Vec2( hs.x,  hs.y);
-	const Vec2 v4 = pos + rot * Vec2(-hs.x,  hs.y);
+	const Vec2 v2 = pos + rot * Vec2(hs.x, -hs.y);
+	const Vec2 v3 = pos + rot * Vec2(hs.x, hs.y);
+	const Vec2 v4 = pos + rot * Vec2(-hs.x, hs.y);
 
 	glColor3f(0.8f, 0.8f, 0.8f);
 	glBegin(GL_LINE_LOOP);
@@ -450,7 +451,8 @@ void Visualization::drawWorld(
 			drawArrow(
 				body.position,
 				body.position + body.linearVelocity,
-				{0.0f, 0.0f, 1.0f});
+				{1.0f, 0.0f, 1.0f},
+				settings.arrowsTipSize);
 		}
 	}
 

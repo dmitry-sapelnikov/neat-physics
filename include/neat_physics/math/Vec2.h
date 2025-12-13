@@ -3,6 +3,7 @@
 // Includes
 #include <cassert>
 #include <cmath>
+#include <cfloat>
 
 namespace nph
 {
@@ -42,6 +43,25 @@ struct Vec2
 	[[nodiscard]] float length() const noexcept
 	{
 		return std::sqrt(lengthSquared());
+	}
+
+	/// Returns a normalized version of the vector, or a zero vector
+	/// if the vector length < FLT_EPSILON
+	[[nodiscard]] Vec2 getNormalized() const noexcept
+	{
+		const float len = length();
+		if (len < FLT_EPSILON)
+		{
+			return { 0.0f, 0.0f };
+		}
+		const float invLen = 1.0f / len;
+		return { x * invLen, y * invLen };
+	}
+
+	/// Checks if the vector is normalized
+	[[nodiscard]] bool isNormalized() const noexcept
+	{
+		return std::abs(lengthSquared() - 1.0f) < 100.0f * FLT_EPSILON;
 	}
 
 	/// Indexing operator (const version)

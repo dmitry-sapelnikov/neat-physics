@@ -18,6 +18,7 @@ struct WorldDrawSettings
 {
 	bool bodyVelocities{ false };
 	bool aabbs{ false };
+	float arrowsTipSize{ 0.3f };
 };
 
 /// Singleton class managing the visualization system
