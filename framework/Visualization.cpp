@@ -330,6 +330,18 @@ void drawBody(const Body& body)
 	glEnd();
 }
 
+/// Draw an Aabb
+void drawAabb(const Aabb& aabb)
+{
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glBegin(GL_LINE_LOOP);
+	glVertex2f(aabb.min.x, aabb.min.y);
+	glVertex2f(aabb.max.x, aabb.min.y);
+	glVertex2f(aabb.max.x, aabb.max.y);
+	glVertex2f(aabb.min.x, aabb.max.y);
+	glEnd();
+}
+
 } // anonymous namespace
 
 Visualization::Visualization()
@@ -439,6 +451,17 @@ void Visualization::drawWorld(
 				body.position,
 				body.position + body.linearVelocity,
 				{0.0f, 0.0f, 1.0f});
+		}
+	}
+
+	/// \note AABBs are drawn as they were at
+	/// the beginning of the last simulation step,
+	/// so they may not match the bodies' current positions
+	if (settings.aabbs)
+	{
+		for (const Aabb& aabb :world.getCollision().getBroadPhase().getAabbs())
+		{
+			drawAabb(aabb);
 		}
 	}
 }

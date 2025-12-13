@@ -17,6 +17,7 @@ class World;
 struct WorldDrawSettings
 {
 	bool bodyVelocities{ false };
+	bool aabbs{ false };
 };
 
 /// Singleton class managing the visualization system
