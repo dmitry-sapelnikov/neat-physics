@@ -9,16 +9,27 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="include\math">
+      <UniqueIdentifier>{6c39a08e-d313-448e-b762-7be2ddb49af9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\neat_physics\math\Mat22.h">
-      <Filter>include</Filter>
+      <Filter>include\math</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\neat_physics\math\Rotation.h">
-      <Filter>include</Filter>
+      <Filter>include\math</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\neat_physics\math\Vec2.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\Body.h">
       <Filter>include</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\Body.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
