@@ -5,7 +5,7 @@
 
 // Global macros
 /// Macro to suppress unused variable warnings
-#define UNUSED(x) (void)(x)
+#define NPH_UNUSED(x) (void)(x)
 
 namespace nph
 {
