@@ -10,9 +10,6 @@ namespace nph
 class World
 {
 public:
-	/// Body container type
-	using BodiesType = std::vector<Body>;
-
 	/// Constructor
 	/// \param maxBodies Maximum number of bodies in the world; must be > 0
 	/// \param gravity Gravity vector applied to all bodies
@@ -21,7 +18,7 @@ public:
 		const Vec2& gravity);
 
 	/// Returns the bodies in the world
-	[[nodiscard]] const BodiesType& getBodies() const noexcept
+	[[nodiscard]] const BodyArray& getBodies() const noexcept
 	{
 		return mBodies;
 	}
@@ -53,7 +50,7 @@ private:
 	Vec2 mGravity;
 
 	/// Bodies in the world
-	BodiesType mBodies;
+	BodyArray mBodies;
 };
 
 } // namespace nph

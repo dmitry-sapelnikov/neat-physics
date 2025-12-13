@@ -1,5 +1,7 @@
 #pragma once
 
+// Includes
+#include <vector>
 #include "neat_physics/math/Rotation.h"
 
 namespace nph
@@ -56,6 +58,9 @@ struct Body
 		return mass == 0.0f;
 	}
 };
+
+/// Body array type
+using BodyArray = std::vector<Body>;
 
 // namespace nph
 }
