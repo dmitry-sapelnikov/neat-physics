@@ -3,6 +3,7 @@
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl2.h"
 #include "Core.h"
+#include "neat_physics/World.h"
 
 namespace nph
 {
@@ -10,9 +11,17 @@ namespace nph
 namespace
 {
 
+/// RGB color
+struct Color
+{
+	float r{ 0.0f };
+	float g{ 0.0f };
+	float b{ 0.0f };
+};
+
 /// Window state
-int gWindowWidth = 1024;
-int gWindowHeight = 768;
+int gWindowWidth = (1920 * 3) / 4;
+int gWindowHeight = (1080 * 3) / 4;
 
 /// Camera state
 struct Camera
@@ -228,10 +237,8 @@ GLFWwindow* createWindow()
 	return result;
 }
 
-/**
-	Inits OpenGL using glad
-	\note this must be called after creating an OpenGL context
-*/
+/// Inits OpenGL using glad
+/// \note this must be called after creating an OpenGL context
 bool initOpenGL()
 {
 	if (!gladLoadGL())
@@ -274,6 +281,53 @@ bool initImgui(GLFWwindow& result)
 	io.IniFilename = nullptr;
 
 	return true;
+}
+
+/// Draws an arrow
+void drawArrow(
+	const Vec2& start,
+	const Vec2& end,
+	const Color& color,
+	float headSize = 0.2f)
+{
+	assert(headSize > 0.0f);
+
+	const Vec2 dir = end - start;
+	const Vec2 orthoLeft = getLeftOrthoVec(dir);
+	const Vec2 leftArrowHead = end - headSize * dir + 0.5f * headSize * orthoLeft;
+	const Vec2 rightArrowHead = end - headSize * dir - 0.5f * headSize * orthoLeft;
+
+	glColor3f(color.r, color.g, color.b);
+	glBegin(GL_LINES);
+	// Line
+	glVertex2f(start.x, start.y);
+	glVertex2f(end.x, end.y);
+	// Arrowhead
+	glVertex2f(leftArrowHead.x, leftArrowHead.y);
+	glVertex2f(rightArrowHead.x, rightArrowHead.y);
+	glVertex2f(end.x, end.y);
+	glEnd();
+}
+
+/// Draw a body
+void drawBody(const Body& body)
+{
+	const Mat22& rot = body.rotation.getMat();
+	const Vec2& pos = body.position;
+	const Vec2& hs = body.halfSize;
+
+	const Vec2 v1 = pos + rot * Vec2(-hs.x, -hs.y);
+	const Vec2 v2 = pos + rot * Vec2( hs.x, -hs.y);
+	const Vec2 v3 = pos + rot * Vec2( hs.x,  hs.y);
+	const Vec2 v4 = pos + rot * Vec2(-hs.x,  hs.y);
+
+	glColor3f(0.8f, 0.8f, 0.8f);
+	glBegin(GL_LINE_LOOP);
+	glVertex2f(v1.x, v1.y);
+	glVertex2f(v2.x, v2.y);
+	glVertex2f(v3.x, v3.y);
+	glVertex2f(v4.x, v4.y);
+	glEnd();
 }
 
 } // anonymous namespace
@@ -362,6 +416,23 @@ void Visualization::setCameraZoom(int zoom)
 {
 	gCamera.zoom = zoom;
 	updateProjectionMatrix();
+}
+
+void Visualization::drawWorld(
+	const World& world,
+	const WorldDrawSettings& settings)
+{
+	for (const Body& body : world.getBodies())
+	{
+		drawBody(body);
+		if (settings.bodyVelocities)
+		{
+			drawArrow(
+				body.position,
+				body.position + body.linearVelocity,
+				{0.0f, 0.0f, 1.0f});
+		}
+	}
 }
 
 } // namespace nph

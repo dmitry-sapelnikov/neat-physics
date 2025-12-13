@@ -150,9 +150,21 @@ inline [[nodiscard]] Vec2 operator*(
 }
 
 /// Component-wise absolute value of a vector
-inline [[nodiscard]] Vec2 abs(const Vec2& v) noexcept
+inline [[nodiscard]] Vec2 abs(const Vec2& vec) noexcept
 {
-	return { std::abs(v.x), std::abs(v.y) };
+	return { std::abs(vec.x), std::abs(vec.y) };
+}
+
+/// Returns a vector rotated by 90 degrees counter-clockwise
+inline [[nodiscard]] Vec2 getLeftOrthoVec(const Vec2& vec) noexcept
+{
+	return { -vec.y, vec.x };
+}
+
+/// Returns a vector rotated by 90 degrees clockwise
+inline [[nodiscard]] Vec2 getRightOrthoVec(const Vec2& vec) noexcept
+{
+	return { vec.y, -vec.x };
 }
 
 } // namespace nph

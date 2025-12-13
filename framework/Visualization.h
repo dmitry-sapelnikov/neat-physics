@@ -10,7 +10,15 @@
 namespace nph
 {
 
-// Global classes
+// Forward declarations
+class World;
+
+/// Settings for world visualization
+struct WorldDrawSettings
+{
+	bool bodyVelocities{ false };
+};
+
 /// Singleton class managing the visualization system
 class Visualization
 {
@@ -48,6 +56,11 @@ public:
 
 	/// Sets the camera zoom
 	void setCameraZoom(int zoom);
+
+	/// Draws a physics world
+	void drawWorld(
+		const World& world,
+		const WorldDrawSettings& settings);
 
 private:
 	// Singleton rule of five
