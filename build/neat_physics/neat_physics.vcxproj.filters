@@ -26,9 +26,15 @@
     <ClInclude Include="..\..\include\neat_physics\Body.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\World.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Body.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\World.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
