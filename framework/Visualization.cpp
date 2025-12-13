@@ -1,20 +1,44 @@
+// Includes
 #include "Visualization.h"
-
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl2.h"
-
 #include "Core.h"
 
 namespace nph
 {
 
-// Local functions
 namespace
 {
 
-/// Window dimensions
-constexpr int WINDOW_WIDTH = 1024;
-constexpr int WINDOW_HEIGHT = 768;
+/// Window state
+int gWindowWidth = 1024;
+int gWindowHeight = 768;
+
+/// Camera state
+struct Camera
+{
+	int zoom = 1;
+	Vec2 pan{ 0.0f, 0.0f };
+	Vec2 startPan{ 0.0f, 0.0f };
+	Vec2 startPos{ 0.0f, 0.0f };
+	bool panning = false;
+} gCamera;
+
+/// Input state
+Visualization::Input gInput;
+
+/// Convert cursor position to the world coordinates
+Vec2 cursorToWorld(const Vec2& pos)
+{
+	const float aspect = float(gWindowWidth) / float(gWindowHeight);
+	const float viewWidth = gCamera.zoom * std::min(1.0f, aspect);
+	const float viewHeight = gCamera.zoom / std::max(1.0f, aspect);
+
+	const float worldX = (pos.x / gWindowWidth) * (2.0f * viewWidth) - viewWidth + gCamera.pan.x;
+	const float worldY = -((pos.y / gWindowHeight) * (2.0f * viewHeight) - viewHeight) + gCamera.pan.y;
+
+	return { worldX, worldY };
+}
 
 /// Callback for GLFW errors
 void glfwErrorCallback(
@@ -22,6 +46,119 @@ void glfwErrorCallback(
 	const char* description)
 {
 	logError("GLFW error ", error, ": ", description);
+}
+
+/// Update the OpenGL projection matrix based on the camera state
+void updateProjectionMatrix()
+{
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	const float aspect =
+		static_cast<float>(gWindowWidth) /
+		static_cast<float>(gWindowHeight);
+
+	const float viewWidth = gCamera.zoom * std::min(1.0f, aspect);
+	const float viewHeight = gCamera.zoom / std::max(1.0f, aspect);
+
+	glOrtho(
+		-viewWidth + gCamera.pan.x, // left
+		viewWidth + gCamera.pan.x,  // right
+		-viewHeight + gCamera.pan.y, // bottom
+		viewHeight + gCamera.pan.y, // top
+		-1.0, // near plane
+		1.0   // far plane
+	);
+}
+
+/// Callback for GLFW window resize events
+void windowResizeCallback(
+	GLFWwindow* window,
+	int width,
+	int height)
+{
+	NPH_UNUSED(window);
+	gWindowWidth = width;
+	gWindowHeight = height;
+	glViewport(0, 0, width, height);
+	updateProjectionMatrix();
+}
+
+/// Callback for GLFW cursor position events
+void cursorPosCallback(
+	GLFWwindow* window,
+	double xpos,
+	double ypos)
+{
+	NPH_UNUSED(window);
+	if (gCamera.panning)
+	{
+		const Vec2 currentPos(
+			static_cast<float>(xpos),
+			static_cast<float>(ypos));
+		gCamera.pan =
+			gCamera.startPan +
+			cursorToWorld(gCamera.startPos) - cursorToWorld(currentPos);
+		updateProjectionMatrix();
+	}
+}
+
+/// Callback for GLFW mouse button events
+void mouseButtonCallback(
+	GLFWwindow* window,
+	int button,
+	int action,
+	int mods)
+{
+	NPH_UNUSED(window);
+	NPH_UNUSED(mods);
+
+	switch (button)
+	{
+	case GLFW_MOUSE_BUTTON_LEFT:
+		gInput.leftMouseDown = (action == GLFW_PRESS);
+		break;
+
+	case GLFW_MOUSE_BUTTON_RIGHT:
+		gInput.rightMouseDown = (action == GLFW_PRESS);
+		break;
+
+	case GLFW_MOUSE_BUTTON_MIDDLE:
+		if (action == GLFW_PRESS)
+		{
+			gCamera.panning = true;
+			gCamera.startPan = gCamera.pan;
+			double x;
+			double y;
+			glfwGetCursorPos(window, &x, &y);
+			gCamera.startPos = {
+				static_cast<float>(x),
+				static_cast<float>(y) };
+		}
+		else
+		{
+			gCamera.panning = false;
+		}
+		break;
+	}
+}
+
+/// Callback for GLFW scroll events
+void scrollCallback(
+	GLFWwindow* window,
+	double xoffset,
+	double yoffset)
+{
+	constexpr int MIN_ZOOM = 1;
+	constexpr int ZOOM_SPEED = 2;
+
+	NPH_UNUSED(window);
+	NPH_UNUSED(xoffset);
+	gCamera.zoom = std::max(
+		MIN_ZOOM,
+		gCamera.zoom - static_cast<int>(yoffset * ZOOM_SPEED));
+
+	updateProjectionMatrix();
 }
 
 /// Callback for GLFW keyboard events
@@ -32,9 +169,9 @@ void keyboardCallback(
 	int action,
 	int mods)
 {
-	UNUSED(window);
-	UNUSED(scanCode);
-	UNUSED(mods);
+	NPH_UNUSED(window);
+	NPH_UNUSED(scanCode);
+	NPH_UNUSED(mods);
 
 	if (action != GLFW_PRESS)
 	{
@@ -63,11 +200,11 @@ bool initGlfw()
 }
 
 /// Create the main application window
-GLFWwindow* createWindow(int width, int height)
+GLFWwindow* createWindow()
 {
 	GLFWwindow* result = glfwCreateWindow(
-		width,
-		height,
+		gWindowWidth,
+		gWindowHeight,
 		"Neat Physics",
 		nullptr,
 		nullptr);
@@ -79,10 +216,15 @@ GLFWwindow* createWindow(int width, int height)
 		return nullptr;
 	}
 
+	glfwSetWindowSizeCallback(result, windowResizeCallback);
+	glfwSetMouseButtonCallback(result, mouseButtonCallback);
+	glfwSetCursorPosCallback(result, cursorPosCallback);
+	glfwSetScrollCallback(result, scrollCallback);
 	glfwSetKeyCallback(result, keyboardCallback);
 	glfwMakeContextCurrent(result);
 	// Enable vsync
 	glfwSwapInterval(1);
+
 	return result;
 }
 
@@ -134,33 +276,24 @@ bool initImgui(GLFWwindow& result)
 	return true;
 }
 
-}
+} // anonymous namespace
 
-// Global classes
 Visualization::Visualization()
 {
 	if (!initGlfw())
-	{
 		return;
-	}
 
-	GLFWwindow* result = createWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
-
+	GLFWwindow* result = createWindow();
 	if (result == nullptr)
-	{
 		return;
-	}
 
 	if (!initOpenGL())
-	{
 		return;
-	}
 
 	if (!initImgui(*result))
-	{
 		return;
-	}
 
+	updateProjectionMatrix();
 	mWindow = result;
 }
 
@@ -204,5 +337,31 @@ void Visualization::endFrame()
 	glfwSwapBuffers(mWindow);
 }
 
-// End of nph namespace
+const Visualization::Input& Visualization::getInput() const
+{
+	return gInput;
 }
+
+const Vec2& Visualization::getCameraPan() const
+{
+	return gCamera.pan;
+}
+
+void Visualization::setCameraPan(const Vec2& pan)
+{
+	gCamera.pan = pan;
+	updateProjectionMatrix();
+}
+
+int Visualization::getCameraZoom() const
+{
+	return gCamera.zoom;
+}
+
+void Visualization::setCameraZoom(int zoom)
+{
+	gCamera.zoom = zoom;
+	updateProjectionMatrix();
+}
+
+} // namespace nph

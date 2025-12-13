@@ -78,7 +78,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile />
-      <AdditionalIncludeDirectories>../../3rd_party;../../3rd_party/glfw/include;../../3rd_party/imgui;../../framework</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../3rd_party;../../3rd_party/glfw/include;../../3rd_party/imgui;../../include;../../framework</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -99,7 +99,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile />
-      <AdditionalIncludeDirectories>../../3rd_party;../../3rd_party/glfw/include;../../3rd_party/imgui;../../framework</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../3rd_party;../../3rd_party/glfw/include;../../3rd_party/imgui;../../include;../../framework</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>

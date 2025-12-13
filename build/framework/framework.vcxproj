@@ -73,7 +73,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile />
-      <AdditionalIncludeDirectories>../../3rd_party;../../3rd_party/imgui/;../../3rd_party/glfw/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../3rd_party;../../3rd_party/imgui/;../../3rd_party/glfw/include/;../../include/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -94,7 +94,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile />
-      <AdditionalIncludeDirectories>../../3rd_party;../../3rd_party/imgui/;../../3rd_party/glfw/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../3rd_party;../../3rd_party/imgui/;../../3rd_party/glfw/include/;../../include/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>

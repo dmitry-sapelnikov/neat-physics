@@ -5,6 +5,8 @@
 #include "GLFW/glfw3.h"
 #include "imgui/imgui.h"
 
+#include "neat_physics/math/Vec2.h"
+
 namespace nph
 {
 
@@ -13,6 +15,13 @@ namespace nph
 class Visualization
 {
 public:
+	/// Input state
+	struct Input
+	{
+		bool leftMouseDown = false;
+		bool rightMouseDown = false;
+	};
+
 	/// Instance getter. Returns nullptr if initialization failed
 	static Visualization* getInstance();
 
@@ -24,6 +33,21 @@ public:
 
 	/// End the current frame
 	void endFrame();
+
+	/// Returns the input state
+	const Input& getInput() const;
+
+	/// Gets the camera pan
+	const Vec2& getCameraPan() const;
+
+	/// Sets the camera pan
+	void setCameraPan(const Vec2& pan);
+
+	/// Gets the camera zoom
+	int getCameraZoom() const;
+
+	/// Sets the camera zoom
+	void setCameraZoom(int zoom);
 
 private:
 	// Singleton rule of five
