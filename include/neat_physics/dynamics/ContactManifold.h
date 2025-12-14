@@ -1,0 +1,88 @@
+#pragma once
+
+// Includes
+#include "neat_physics/collision/CollisionManifold.h"
+#include "neat_physics/dynamics/ContactPoint.h"
+
+namespace nph
+{
+
+/// Persistent contact manifold between two bodies
+/// Exploits temporal coherence to improve precision
+class ContactManifold
+{
+public:
+	/// Constructor
+	ContactManifold(
+		Body* bodyA,
+		Body* bodyB,
+		const CollisionManifold& manifold);
+
+	/// Returns the first body
+	const Body& getBodyA() const
+	{
+		return *mBodyA;
+	}
+
+	/// Returns the second body
+	const Body& getBodyB() const
+	{
+		return *mBodyB;
+	}
+
+	/// Returns the contact count
+	inline [[nodiscard]] uint32_t getContactCount() const
+	{
+		return mContactCount;
+	}
+
+	/// Returns the contact at given index
+	inline const ContactPoint& getContact(uint32_t index) const
+	{
+		assert(index < mContactCount);
+		return mContacts[index];
+	}
+
+	/// Returns if the manifold is obsolete
+	[[nodiscard]] bool isObsolete() const noexcept
+	{
+		return mObsolete;
+	}
+
+	/// Marks the manifold as obsolete
+	void markObsolete() noexcept
+	{
+		mObsolete = true;
+	}
+
+	/// Updates the contact manifold with new contacts
+	/// preserving impulses for matching contact points
+	void update(const CollisionManifold& newManifold);
+
+	/// Prepares the contact manifold for velocity solving
+	void prepareToSolve(float invTimeStep);
+
+	/// Solves the contact velocities
+	void solveVelocities();
+
+private:
+	/// First body
+	Body* mBodyA;
+
+	/// Second body
+	Body* mBodyB;
+
+	/// Contact array
+	std::array<ContactPoint, MAX_COLLISION_POINTS> mContacts;
+
+	/// Actual contact count
+	uint32_t mContactCount;
+
+	/// Obsoletion flag
+	bool mObsolete;
+
+	/// Contact pair friction coefficient
+	float mFriction;
+};
+
+}
