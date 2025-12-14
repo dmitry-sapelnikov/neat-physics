@@ -19,6 +19,8 @@ struct WorldDrawSettings
 	bool bodyVelocities{ false };
 	bool aabbs{ false };
 	float arrowsTipSize{ 0.3f };
+	bool contacts{ false };
+	float contactSize{ 5.0f };
 };
 
 /// Singleton class managing the visualization system
@@ -61,6 +63,9 @@ public:
 
 	/// Returns the cursor position in world coordinates
 	Vec2 getCursorPositionWorld() const;
+
+	/// Sets the clear color
+	void setClearColor(float r, float g, float b) const;
 
 	/// Draws a physics world
 	void drawWorld(

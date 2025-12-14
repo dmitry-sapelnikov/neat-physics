@@ -246,7 +246,12 @@ bool initOpenGL()
 		logError("Failed to load OpenGL functions using glad.");
 		return false;
 	}
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClearColor(0.0f, 0.0f, 20.0f / 255.0f, 1.0f);
+
+	// Enable alpha blending for body fill
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	return true;
 }
 
@@ -295,18 +300,22 @@ void drawArrow(
 	const Vec2 dir = end - start;
 	const Vec2 dirNorm = dir.getNormalized();
 	const Vec2 orthoLeft = getLeftOrthoVec(dirNorm);
-	const Vec2 leftArrowHead = end - tipSize * dirNorm + 0.3f * tipSize * orthoLeft;
-	const Vec2 rightArrowHead = end - tipSize * dirNorm - 0.3f * tipSize * orthoLeft;
+	const Vec2 tipEnd = end + tipSize * dirNorm;
+	const Vec2 leftArrowHead = end + 0.3f * tipSize * orthoLeft;
+	const Vec2 rightArrowHead = end - 0.3f * tipSize * orthoLeft;
 
 	glColor3f(color.r, color.g, color.b);
-	glBegin(GL_LINE_STRIP);
+	glBegin(GL_LINES);
 	// Line
 	glVertex2f(start.x, start.y);
 	glVertex2f(end.x, end.y);
 	// Arrowhead
 	glVertex2f(leftArrowHead.x, leftArrowHead.y);
 	glVertex2f(rightArrowHead.x, rightArrowHead.y);
-	glVertex2f(end.x, end.y);
+	glVertex2f(tipEnd.x, tipEnd.y);
+	glVertex2f(leftArrowHead.x, leftArrowHead.y);
+	glVertex2f(tipEnd.x, tipEnd.y);
+	glVertex2f(rightArrowHead.x, rightArrowHead.y);
 	glEnd();
 }
 
@@ -322,7 +331,15 @@ void drawBody(const Body& body)
 	const Vec2 v3 = pos + rot * Vec2(hs.x, hs.y);
 	const Vec2 v4 = pos + rot * Vec2(-hs.x, hs.y);
 
-	glColor3f(0.8f, 0.8f, 0.8f);
+	glColor4f(1.0f, 1.0f, 1.0f, 0.1f);
+	glBegin(GL_TRIANGLE_FAN);
+	glVertex2f(v1.x, v1.y);
+	glVertex2f(v2.x, v2.y);
+	glVertex2f(v3.x, v3.y);
+	glVertex2f(v4.x, v4.y);
+	glEnd();
+
+	glColor3f(0.8f, 0.8f, 0.75f);
 	glBegin(GL_LINE_LOOP);
 	glVertex2f(v1.x, v1.y);
 	glVertex2f(v2.x, v2.y);
@@ -334,12 +351,32 @@ void drawBody(const Body& body)
 /// Draw an Aabb
 void drawAabb(const Aabb& aabb)
 {
-	glColor3f(1.0f, 1.0f, 1.0f);
+	glColor3f(0.0f, 0.5f, 0.0f);
 	glBegin(GL_LINE_LOOP);
 	glVertex2f(aabb.min.x, aabb.min.y);
 	glVertex2f(aabb.max.x, aabb.min.y);
 	glVertex2f(aabb.max.x, aabb.max.y);
 	glVertex2f(aabb.min.x, aabb.max.y);
+	glEnd();
+}
+
+/// Draw contact points
+void drawContacts(const World& world, float pointSize)
+{
+	assert(pointSize > 0.0f);
+
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glPointSize(pointSize);
+	glBegin(GL_POINTS);
+	for (const auto& pair : world.getContactSolver().getManifolds())
+	{
+		const ContactManifold& manifold = pair.second;
+		for (uint32_t i = 0; i < manifold.getContactCount(); ++i)
+		{
+			const CollisionPoint& point = manifold.getContact(i).getPoint();
+			glVertex2f(point.position.x, point.position.y);
+		}
+	}
 	glEnd();
 }
 
@@ -439,10 +476,26 @@ Vec2 Visualization::getCursorPositionWorld() const
 	return cursorToWorld({ static_cast<float>(x), static_cast<float>(y) });
 }
 
+void Visualization::setClearColor(float r, float g, float b) const
+{
+	glClearColor(r, g, b, 1.0f);
+}
+
 void Visualization::drawWorld(
 	const World& world,
 	const WorldDrawSettings& settings)
 {
+	/// \note AABBs are drawn as they were at
+	/// the beginning of the last simulation step,
+	/// so they may not match the bodies' current positions
+	if (settings.aabbs)
+	{
+		for (const Aabb& aabb : world.getCollision().getBroadPhase().getAabbs())
+		{
+			drawAabb(aabb);
+		}
+	}
+
 	for (const Body& body : world.getBodies())
 	{
 		drawBody(body);
@@ -456,15 +509,9 @@ void Visualization::drawWorld(
 		}
 	}
 
-	/// \note AABBs are drawn as they were at
-	/// the beginning of the last simulation step,
-	/// so they may not match the bodies' current positions
-	if (settings.aabbs)
+	if (settings.contacts)
 	{
-		for (const Aabb& aabb :world.getCollision().getBroadPhase().getAabbs())
-		{
-			drawAabb(aabb);
-		}
+		drawContacts(world, settings.contactSize);
 	}
 }
 
