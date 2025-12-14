@@ -5,13 +5,16 @@ namespace nph
 
 World::World(
 	uint32_t maxBodies,
-	const Vec2& gravity) :
+	const Vec2& gravity,
+	uint32_t velocityIterations) :
 
 	mGravity(gravity),
-	mCollision(mBodies)
+	mCollision(mBodies),
+	mContactSolver(mBodies, mCollision.getCollisionManifolds())
 {
 	assert(maxBodies > 0);
 	mBodies.reserve(maxBodies);
+	setVelocityIterations(velocityIterations);
 }
 
 Body* World::addBody(
@@ -35,6 +38,7 @@ Body* World::addBody(
 void World::clear() noexcept
 {
 	mBodies.clear();
+	mContactSolver.clear();
 }
 
 void World::doStep(float timeStep)
@@ -42,6 +46,7 @@ void World::doStep(float timeStep)
 	assert(timeStep > 0.0f);
 	applyForces(timeStep);
 	mCollision.update();
+	mContactSolver.solve(timeStep, mVelocityIterations);
 	integrateVelocities(timeStep);
 }
 
