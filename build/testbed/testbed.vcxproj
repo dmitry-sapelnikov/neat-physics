@@ -26,6 +26,9 @@
     <ProjectReference Include="..\imgui\imgui.vcxproj">
       <Project>{b1dc7727-0afc-456e-87dd-185ee1dcac5d}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\neat_physics\neat_physics.vcxproj">
+      <Project>{d0c65f12-34e4-431c-ab03-526f549dafcb}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

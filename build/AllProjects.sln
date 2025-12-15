@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testbed", "testbed\testbed.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "framework", "framework\framework.vcxproj", "{8FDDD0A4-918E-412A-B90F-E290BA7026A5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "neat_physics", "neat_physics\neat_physics.vcxproj", "{D0C65F12-34E4-431C-AB03-526F549DAFCB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -39,6 +41,10 @@ Global
 		{8FDDD0A4-918E-412A-B90F-E290BA7026A5}.Debug|x64.Build.0 = Debug|x64
 		{8FDDD0A4-918E-412A-B90F-E290BA7026A5}.Release|x64.ActiveCfg = Release|x64
 		{8FDDD0A4-918E-412A-B90F-E290BA7026A5}.Release|x64.Build.0 = Release|x64
+		{D0C65F12-34E4-431C-AB03-526F549DAFCB}.Debug|x64.ActiveCfg = Debug|x64
+		{D0C65F12-34E4-431C-AB03-526F549DAFCB}.Debug|x64.Build.0 = Debug|x64
+		{D0C65F12-34E4-431C-AB03-526F549DAFCB}.Release|x64.ActiveCfg = Release|x64
+		{D0C65F12-34E4-431C-AB03-526F549DAFCB}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
