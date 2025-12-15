@@ -16,11 +16,23 @@ class World;
 /// Settings for world visualization
 struct WorldDrawSettings
 {
-	bool bodyVelocities{ false };
+	/// Draw axis-aligned bounding boxes around bodies
 	bool aabbs{ false };
-	float arrowsTipSize{ 0.3f };
+
+	/// Draw body frames (coordinate axes)
+	bool bodyFrames{ false };
+	/// Size of the body frames
+	float bodyFrameSize{ 0.2f };
+
+	/// Draw contact points
 	bool contacts{ false };
+	/// Size of contact points
 	float contactSize{ 5.0f };
+
+	/// Draw body linear velocities
+	bool bodyVelocities{ false };
+	/// Size of body velocity arrows
+	float bodyVelocityArrowSize{ 0.2f };
 };
 
 /// Singleton class managing the visualization system

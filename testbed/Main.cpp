@@ -1,19 +1,34 @@
+#include <chrono>
 #include "Core.h"
 #include "Visualization.h"
 #include "neat_physics/World.h"
 
-using namespace nph;
+namespace nph
+{
 namespace
 {
 
 /// Maximum number of bodies in the physics world
-static constexpr uint32_t MAX_BODIES = 1000;
+static constexpr uint32_t MAX_BODIES = 10000;
 
 /// Gravity
 static constexpr float GRAVITY = 10.0f;
 
 /// Simulation step
 static constexpr float SIMULATION_STEP = 1.0f / 60.0f;
+
+/// Simulation control parameters
+struct SimulationControl
+{
+	bool resetWorld{ true };
+	float wallFriction{ 0.0f };
+	float friction{ 0.0f };
+	float boxDensity{ 200.0f };
+	float boxSize{ 8.0f };
+	float boxSideRatio{ 0.5f };
+	float timeStepFrequency{ 50.0f };
+	int velocityIterations{ 15 };
+};
 
 /// Creates a 'glass-shaped' container
 void createGlass(
@@ -23,11 +38,13 @@ void createGlass(
 	float friction)
 {
 	// Create a static 'glass' made of 3 bodies: bottom and 2 sides
+	const float bottomSize = glassSize.x * 100.0f;
+	const float bottomThickness = glassThickness * 10.0f;
 	world.addBody(
-		{ glassSize.x + 2.0f * glassThickness, glassThickness },
+		{ bottomSize, bottomThickness },
 		0.0f,
 		friction,
-		{ 0.0f, -glassThickness * 0.5f });
+		{ 0.0f, -bottomThickness * 0.5f });
 
 	world.addBody(
 		{ glassThickness, glassSize.y },
@@ -42,54 +59,188 @@ void createGlass(
 		{ (glassSize.x + glassThickness) * 0.5f, 0.5f * glassSize.y });
 }
 
+void addBoxOnMouseClick(
+	nph::World& world,
+	float glassSize,
+	const nph::SimulationControl& simulationControl)
+{
+	nph::Visualization* visualization = nph::Visualization::getInstance();
+	assert(visualization != nullptr);
+
+	const bool overImgui =
+		ImGui::IsAnyItemFocused() ||
+		ImGui::IsAnyItemHovered() ||
+		ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) ||
+		ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
+
+	if (overImgui || !visualization->getInput().leftMouseDown)
+	{
+		return;
+	}
+
+	const float boxSizeX = glassSize / simulationControl.boxSize;
+	const float boxSizeY = boxSizeX * simulationControl.boxSideRatio;
+	const float boxMass = boxSizeX * boxSizeY * simulationControl.boxDensity;
+
+	world.addBody(
+		{ boxSizeX, boxSizeY },
+		boxMass,
+		simulationControl.friction,
+		visualization->getCursorPositionWorld());
+}
+
 /// Draws ImGui controls
-void drawGui(nph::WorldDrawSettings& drawSettings)
+void drawGui(
+	const nph::World& world,
+	float lastPhysicsStepTime,
+	nph::WorldDrawSettings& drawSettings,
+	SimulationControl& simulationControl)
 {
 	ImGui::SetNextWindowPos(ImVec2(10.0f, 10.0f), ImGuiCond_Once);
-	ImGui::SetNextWindowSize(ImVec2(300.0f, 500.0f), ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(400.0f, 500.0f), ImGuiCond_Once);
 
-	ImGui::Begin("Settings");
-	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
+	ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_NoCollapse);
 
-	if (ImGui::CollapsingHeader(
-		"Visualization",
-		ImGuiTreeNodeFlags_DefaultOpen))
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.4f);
+
+	if (ImGui::CollapsingHeader("Visualization"))
 	{
-		ImGui::Checkbox(
-			"Body Velocities",
-			&drawSettings.bodyVelocities);
 		ImGui::Checkbox(
 			"AABBs",
 			&drawSettings.aabbs);
 
+		ImGui::Checkbox(
+			"Body Frames",
+			&drawSettings.bodyFrames);
+
 		ImGui::SliderFloat(
-			"Arrows Size",
-			&drawSettings.arrowsTipSize,
+			"Body Frame Size",
+			&drawSettings.bodyFrameSize,
 			0.1f,
 			1.0f);
+
+		ImGui::Checkbox(
+			"Contacts",
+			&drawSettings.contacts);
+
+		ImGui::SliderFloat(
+			"Contact Size",
+			&drawSettings.contactSize,
+			2.0f,
+			10.0f);
+
+		ImGui::Checkbox(
+			"Body Velocities",
+			&drawSettings.bodyVelocities);
+
+		ImGui::SliderFloat(
+			"Velocity Arrow Size",
+			&drawSettings.bodyVelocityArrowSize,
+			0.1f,
+			0.5f);
+	}
+
+	if (ImGui::CollapsingHeader("Stats"))
+	{
+		ImGui::Text(
+			"Bodies: %zu",
+			world.getBodies().size());
+
+		ImGui::Text(
+			"Contacts: %zu",
+			world.getContactSolver().getManifolds().size());
+
+		ImGui::Text(
+			"Physics Time: %.3f ms",
+			lastPhysicsStepTime * 1000.0f);
+
+		ImGui::Text(
+			"Physics FPS: %.1f",
+			1.0f / lastPhysicsStepTime);
+	}
+
+	if (ImGui::CollapsingHeader(
+		"Simulation Control",
+		ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::Indent(20.0f);
+
+		// Add 'World' splitter
+		if (ImGui::CollapsingHeader("World", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::SliderFloat(
+				"Time Step Frequency",
+				&simulationControl.timeStepFrequency,
+				30.0f,
+				100.0f,
+				"%.0f Hz");
+
+			ImGui::SliderInt(
+				"Velocity Iterations",
+				&simulationControl.velocityIterations,
+				1,
+				50);
+
+			ImGui::SliderFloat(
+				"Wall Friction",
+				&simulationControl.wallFriction,
+				0.0f,
+				1.0f,
+				"%.2f");
+
+			simulationControl.resetWorld = ImGui::Button("Reset World");
+		}
+
+		if (ImGui::CollapsingHeader(
+			"New Boxes",
+			ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::SliderFloat(
+				"Friction",
+				&simulationControl.friction,
+				0.0f,
+				1.0f,
+				"%.2f");
+
+			ImGui::SliderFloat(
+				"Size",
+				&simulationControl.boxSize,
+				2.0f,
+				20.0f,
+				"1 / %.0f of glass size");
+
+			ImGui::SliderFloat(
+				"Side Ratio",
+				&simulationControl.boxSideRatio,
+				0.1f,
+				1.0f,
+				"%.2f");
+
+			ImGui::SliderFloat(
+				"Density",
+				&simulationControl.boxDensity,
+				100.0f,
+				500.0f,
+				"%.0f");
+		}
+		ImGui::Unindent(20.0f);
 	}
 
 	ImGui::End();
 }
 
 } // anonymous namespace
+} // namespace nph
 
 /// The application entry point
 int main()
 {
 	try
 	{
-		nph::World world(MAX_BODIES, { 0.0f, -GRAVITY }, 15);
-		const nph::Vec2 glassSize{ GRAVITY * 0.5f, GRAVITY };
-		const nph::Vec2 boxSize{ glassSize.x / 8.0f, glassSize.x / 16.0f };
-		const float boxMass = boxSize.x * boxSize.y * 1000.0f;
+		const nph::Vec2 glassSize{ nph::GRAVITY * 0.5f, nph::GRAVITY };
 		const float friction = 0.5f;
 
-		createGlass(
-			world,
-			glassSize,
-			GRAVITY * 0.05f,
-			friction);
+		nph::World world(nph::MAX_BODIES, { 0.0f, -nph::GRAVITY }, 15);
 
 		nph::Visualization* visualization = nph::Visualization::getInstance();
 		if (visualization == nullptr)
@@ -98,27 +249,46 @@ int main()
 		}
 		visualization->setCameraZoom(int(glassSize.x * 2.0f));
 		visualization->setCameraPan(nph::Vec2(0.0f, glassSize.y * 0.5f));
+		ImGuiStyle& style = ImGui::GetStyle();
+		style.ItemSpacing.y = 6.0f;
 
 		nph::WorldDrawSettings drawSettings;
+		nph::SimulationControl simulationControl;
+		std::chrono::duration<float> lastPhyicsStepTime{ 0.0 };
 		while (visualization->isRunning())
 		{
-			visualization->startFrame();
-			visualization->drawWorld(world, drawSettings);
-			drawGui(drawSettings);
-			bool overImgui = ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
-			visualization->endFrame();
-
-			if (visualization->getInput().leftMouseDown && !overImgui)
+			if (simulationControl.resetWorld)
 			{
-				world.addBody(
-					boxSize,
-					boxMass,
-					friction,
-					visualization->getCursorPositionWorld(),
-					0.5f);
+				world.clear();
+				nph::createGlass(
+					world,
+					glassSize,
+					nph::GRAVITY * 0.05f,
+					simulationControl.wallFriction);
+				simulationControl.resetWorld = false;
 			}
 
-			world.doStep(SIMULATION_STEP);
+			nph::addBoxOnMouseClick(
+				world,
+				glassSize.x,
+				simulationControl);
+
+			visualization->startFrame();
+			visualization->drawWorld(world, drawSettings);
+			nph::drawGui(
+				world,
+				lastPhyicsStepTime.count(),
+				drawSettings,
+				simulationControl);
+			visualization->endFrame();
+
+			world.setVelocityIterations(
+				uint32_t(simulationControl.velocityIterations));
+
+			const auto tic = std::chrono::high_resolution_clock::now();
+			world.doStep(1.0f / simulationControl.timeStepFrequency);
+			const auto toc = std::chrono::high_resolution_clock::now();
+			lastPhyicsStepTime = toc - tic;
 		}
 		return 0;
 	}

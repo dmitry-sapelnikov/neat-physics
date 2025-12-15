@@ -360,6 +360,24 @@ void drawAabb(const Aabb& aabb)
 	glEnd();
 }
 
+/// Draws a frame
+void drawFrame(const Vec2& position, const Mat22& rotation, float size)
+{
+	const Vec2 xAxis = position + rotation * Vec2(size, 0.0f);
+	const Vec2 yAxis = position + rotation * Vec2(0.0f, size);
+	drawArrow(
+		position,
+		xAxis,
+		{1.0f, 0.0f, 0.0f},
+		size * 0.2f);
+
+	drawArrow(
+		position,
+		yAxis,
+		{0.0f, 1.0f, 0.0f},
+		size * 0.2f);
+}
+
 /// Draw contact points
 void drawContacts(const World& world, float pointSize)
 {
@@ -505,7 +523,15 @@ void Visualization::drawWorld(
 				body.position,
 				body.position + body.linearVelocity,
 				{1.0f, 0.0f, 1.0f},
-				settings.arrowsTipSize);
+				settings.bodyVelocityArrowSize);
+		}
+
+		if (settings.bodyFrames)
+		{
+			drawFrame(
+				body.position,
+				body.rotation.getMat(),
+				settings.bodyFrameSize);
 		}
 	}
 
