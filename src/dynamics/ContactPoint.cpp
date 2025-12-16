@@ -26,12 +26,12 @@ void applyImpulse(
 	const Vec2& armB,
 	const Vec2& direction) noexcept
 {
-	const float rAd = dot(armA, direction);
-	const float rBd = dot(armB, direction);
+	const float crossA = cross(armA, direction);
+	const float crossB = cross(armB, direction);
 	const float invResult =
-		(bodyA.invMass + bodyB.invMass) +
-		(bodyA.invInertia * (dot(armA, armA) - rAd * rAd) +
-			bodyB.invInertia * (dot(armB, armB) - rBd * rBd));
+		bodyA.invMass + bodyB.invMass +
+		bodyA.invInertia * crossA * crossA +
+		bodyB.invInertia * crossB * crossB;
 	return 1.0f / invResult;
 }
 
