@@ -19,7 +19,8 @@ public:
 	World(
 		uint32_t maxBodies,
 		const Vec2& gravity,
-		uint32_t velocityIterations);
+		uint32_t velocityIterations,
+		uint32_t positionIterations);
 
 	/// Returns the bodies in the world
 	[[nodiscard]] const BodyArray& getBodies() const noexcept
@@ -69,6 +70,18 @@ public:
 		mVelocityIterations = iterations;
 	}
 
+	/// Returns the number of position iterations for constraint solvers
+	[[nodiscard]] uint32_t getPositionIterations() const noexcept
+	{
+		return mPositionIterations;
+	}
+
+	/// Sets the number of position solver iterations for constraint solvers
+	void setPositionIterations(uint32_t iterations)
+	{
+		mPositionIterations = iterations;
+	}
+
 private:
 	/// Applies forces to all bodies
 	void applyForces(float timeStep);
@@ -79,8 +92,11 @@ private:
 	/// Gravity vector
 	Vec2 mGravity;
 
-	/// Number of velocity iterations for constraint constraints
+	/// Number of velocity iterations for constraint solvers
 	uint32_t mVelocityIterations;
+
+	/// Number of position iterations for constraint solvers
+	uint32_t mPositionIterations;
 
 	/// Bodies in the world
 	BodyArray mBodies;

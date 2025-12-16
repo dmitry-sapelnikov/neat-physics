@@ -132,6 +132,7 @@ uint32_t getBoxBoxCollision(
 		-minPenetrationDir;
 
 	// 2. Find the incident edge
+	const uint32_t incidentBoxInd = 1 - clipBoxInd;
 	ClippedEdge edge;
 	{
 		//        e0
@@ -150,7 +151,6 @@ uint32_t getBoxBoxCollision(
 			{  1, -1 }
 		};
 
-		const uint32_t incidentBoxInd = 1 - clipBoxInd;
 		// Clip normal is in the world space,
 		// we need to transform it to the local space of the incident box
 		const Vec2 incidentDir = -(invRotations[incidentBoxInd] * clipNormal);
@@ -229,26 +229,42 @@ uint32_t getBoxBoxCollision(
 
 		for (uint32_t pi = 0; pi < 2; ++pi) // point index
 		{
-			const float penetration = -clipPlane.getDistance(edge[pi].position);
+			ClippedPoint& point = edge[pi];
+			const float penetration = -clipPlane.getDistance(point.position);
 			if (penetration < 0.0f)
 			{
 				continue;
 			}
 
-			CollisionPoint& point = result[resultPointCount++];
-			point = CollisionPoint(
-				edge[pi].position - penetration * clipNormal,
-				minPenetrationDir,
-				edge[pi].featurePair,
-				penetration);
+			Vec2Array2 localPoints;
+			const Vec2 resultPosition =
+				edge[pi].position + penetration * clipNormal;
+
+			localPoints[clipBoxInd] =
+				invRotations[clipBoxInd] *
+				(resultPosition - positions[clipBoxInd]);
+
+			localPoints[incidentBoxInd] =
+				invRotations[incidentBoxInd] *
+				(edge[pi].position - positions[incidentBoxInd]);
 
 			// Keep ordering in case if we have a flip of the
 			// clipping-incident boxes.
-			// This keeps the collision points persistent.
+			// This keeps the collision points persistent
 			if (point.featurePair[1] < point.featurePair[0])
 			{
 				std::swap(point.featurePair[0], point.featurePair[1]);
 			}
+
+			result[resultPointCount++] = CollisionPoint(
+				resultPosition,
+				minPenetrationDir,
+				penetration,
+				point.featurePair,
+				clipBoxInd,
+				localPoints,
+				invRotations[clipBoxInd] * clipNormal
+			);
 		}
 	}
 	return resultPointCount;

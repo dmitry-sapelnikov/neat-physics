@@ -382,17 +382,27 @@ void drawFrame(const Vec2& position, const Mat22& rotation, float size)
 void drawContacts(const World& world, float pointSize)
 {
 	assert(pointSize > 0.0f);
-
-	glColor3f(1.0f, 0.0f, 0.0f);
 	glPointSize(pointSize);
 	glBegin(GL_POINTS);
 	for (const auto& pair : world.getContactSolver().getManifolds())
 	{
 		const ContactManifold& manifold = pair.second;
+		const Body& bodyA = manifold.getBodyA();
+		const Body& bodyB = manifold.getBodyB();
+
 		for (uint32_t i = 0; i < manifold.getContactCount(); ++i)
 		{
 			const CollisionPoint& point = manifold.getContact(i).getPoint();
-			glVertex2f(point.position.x, point.position.y);
+			const Vec2 point1 = bodyA.position + bodyA.rotation.getMat() * point.localPoints[0];
+			const Vec2 point2 = bodyB.position + bodyB.rotation.getMat() * point.localPoints[1];
+
+			// Draw contact point on body A
+			glColor3f(1.0f, 0.0f, 0.0f);
+			glVertex2f(point1.x, point1.y);
+
+			glColor3f(0.0f, 1.0f, 0.0f);
+			// Draw contact point on body B
+			glVertex2f(point2.x, point2.y);
 		}
 	}
 	glEnd();

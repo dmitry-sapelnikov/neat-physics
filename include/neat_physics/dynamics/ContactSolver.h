@@ -32,8 +32,14 @@ public:
 		return mManifolds;
 	}
 
-	/// Solves the contact constraints
-	void solve(float timeStep, uint32_t velocityIterations);
+	/// Prepares the contact solver for velocity solving
+	void prepareToSolve(float timeStep);
+
+	/// Solves the contact velocities
+	void solveVelocities(uint32_t velocityIterations);
+
+	/// Solves the contact positions (penetration)
+	void solvePositions(uint32_t positionIterations);
 
 private:
 	/// Updates the persistent contact manifolds

@@ -52,6 +52,15 @@ struct CollisionPoint
 	/// Penetration depth
 	float penetration;
 
+	/// Index of the clipping box
+	uint32_t clipBoxIndex;
+
+	/// The collision point in the box local frames 
+	std::array<Vec2, 2> localPoints;
+
+	/// Contact normal in the clipping box frame
+	Vec2 localContactNormal;
+
 	/// A pair of features yielding this contact point
 	GeometryFeaturePair featurePair;
 
@@ -65,16 +74,25 @@ struct CollisionPoint
 	CollisionPoint(
 		const Vec2& inPosition,
 		const Vec2& inNormal,
+		float inPenetration,
 		const GeometryFeaturePair& inFeaturePair,
-		float inPenetration) noexcept :
+		uint32_t inClipBoxIndex,
+		const std::array<Vec2, 2>& inLocalPoints,
+		const Vec2& inLocalContactNormal
+		) noexcept :
 
 		position(inPosition),
 		normal(inNormal),
+		penetration(inPenetration),
 		featurePair(inFeaturePair),
-		penetration(inPenetration)
+		clipBoxIndex(inClipBoxIndex),
+		localPoints(inLocalPoints),
+		localContactNormal(inLocalContactNormal)
 	{
 		assert(normal.isNormalized());
 		assert(penetration >= 0.0f);
+		assert(clipBoxIndex == 0 || clipBoxIndex == 1);
+		assert(localContactNormal.isNormalized());
 	}
 };
 
