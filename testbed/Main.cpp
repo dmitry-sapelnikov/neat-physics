@@ -21,7 +21,6 @@ static constexpr float SIMULATION_STEP = 1.0f / 60.0f;
 struct SimulationControl
 {
 	bool resetWorld{ true };
-	float wallFriction{ 0.0f };
 	float friction{ 0.0f };
 	float boxDensity{ 200.0f };
 	float boxSize{ 8.0f };
@@ -38,7 +37,7 @@ void createGlass(
 	float friction)
 {
 	// Create a static 'glass' made of 3 bodies: bottom and 2 sides
-	const float bottomSize = glassSize.x * 100.0f;
+	const float bottomSize = glassSize.x * 20.0f;
 	const float bottomThickness = glassThickness * 10.0f;
 	world.addBody(
 		{ bottomSize, bottomThickness },
@@ -101,7 +100,7 @@ void drawGui(
 
 	ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_NoCollapse);
 
-	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.4f);
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
 
 	if (ImGui::CollapsingHeader("Visualization"))
 	{
@@ -168,6 +167,8 @@ void drawGui(
 		// Add 'World' splitter
 		if (ImGui::CollapsingHeader("World", ImGuiTreeNodeFlags_DefaultOpen))
 		{
+			simulationControl.resetWorld = ImGui::Button("Reset");
+
 			ImGui::SliderFloat(
 				"Time Step Frequency",
 				&simulationControl.timeStepFrequency,
@@ -182,13 +183,11 @@ void drawGui(
 				50);
 
 			ImGui::SliderFloat(
-				"Wall Friction",
-				&simulationControl.wallFriction,
+				"Friction (Created Walls & Boxes)",
+				&simulationControl.friction,
 				0.0f,
 				1.0f,
-				"%.2f");
-
-			simulationControl.resetWorld = ImGui::Button("Reset World");
+				"%.1f");
 		}
 
 		if (ImGui::CollapsingHeader(
@@ -196,18 +195,11 @@ void drawGui(
 			ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			ImGui::SliderFloat(
-				"Friction",
-				&simulationControl.friction,
-				0.0f,
-				1.0f,
-				"%.2f");
-
-			ImGui::SliderFloat(
 				"Size",
 				&simulationControl.boxSize,
 				2.0f,
-				20.0f,
-				"1 / %.0f of glass size");
+				16.0f,
+				"1 / %.0f of glass");
 
 			ImGui::SliderFloat(
 				"Side Ratio",
@@ -238,8 +230,6 @@ int main()
 	try
 	{
 		const nph::Vec2 glassSize{ nph::GRAVITY * 0.5f, nph::GRAVITY };
-		const float friction = 0.5f;
-
 		nph::World world(nph::MAX_BODIES, { 0.0f, -nph::GRAVITY }, 15, 5);
 
 		nph::Visualization* visualization = nph::Visualization::getInstance();
@@ -264,7 +254,7 @@ int main()
 					world,
 					glassSize,
 					nph::GRAVITY * 0.05f,
-					simulationControl.wallFriction);
+					simulationControl.friction);
 				simulationControl.resetWorld = false;
 			}
 
