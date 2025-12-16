@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "neat_physics/Body.h"
+#include "neat_physics/collision/CollisionSystem.h"
 
 namespace nph
 {
@@ -21,6 +22,12 @@ public:
 	[[nodiscard]] const BodyArray& getBodies() const noexcept
 	{
 		return mBodies;
+	}
+
+	/// Returns the collision system
+	[[nodiscard]] const CollisionSystem& getCollision() const noexcept
+	{
+		return mCollision;
 	}
 
 	/// Adds a body to the world
@@ -51,6 +58,9 @@ private:
 
 	/// Bodies in the world
 	BodyArray mBodies;
+
+	/// Collision system
+	CollisionSystem mCollision;
 };
 
 } // namespace nph

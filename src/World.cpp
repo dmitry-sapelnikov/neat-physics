@@ -7,7 +7,8 @@ World::World(
 	uint32_t maxBodies,
 	const Vec2& gravity) :
 
-	mGravity(gravity)
+	mGravity(gravity),
+	mCollision(mBodies)
 {
 	assert(maxBodies > 0);
 	mBodies.reserve(maxBodies);
@@ -40,6 +41,7 @@ void World::doStep(float timeStep)
 {
 	assert(timeStep > 0.0f);
 	applyForces(timeStep);
+	mCollision.update();
 	integrateVelocities(timeStep);
 }
 
