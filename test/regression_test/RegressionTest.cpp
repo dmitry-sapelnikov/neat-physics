@@ -98,7 +98,7 @@ int wmain(int argc, wchar_t** argv)
 			return -1;
 		}
 
-		World world(MAX_BODIES, Vec2(0.0f, -10.0f), 15);
+		World world(MAX_BODIES, Vec2(0.0f, -10.0f), 15, 5);
 		createTestScene(world);
 
 		Visualization* visualization{ nullptr };
