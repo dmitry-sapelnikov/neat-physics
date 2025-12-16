@@ -79,7 +79,7 @@ int main()
 {
 	try
 	{
-		nph::World world(MAX_BODIES, { 0.0f, -GRAVITY });
+		nph::World world(MAX_BODIES, { 0.0f, -GRAVITY }, 15);
 		const nph::Vec2 glassSize{ GRAVITY * 0.5f, GRAVITY };
 		const nph::Vec2 boxSize{ glassSize.x / 8.0f, glassSize.x / 16.0f };
 		const float boxMass = boxSize.x * boxSize.y * 1000.0f;
