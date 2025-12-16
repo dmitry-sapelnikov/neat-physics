@@ -20,11 +20,13 @@
     <ClInclude Include="..\..\include\neat_physics\math\Vec2.h" />
     <ClInclude Include="..\..\include\neat_physics\World.h" />
     <ClInclude Include="..\..\include\neat_physics\collision\Aabb.h" />
+    <ClInclude Include="..\..\src\collision\NarrowPhase.h" />
     <ClInclude Include="..\..\src\collision\Plane.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Body.cpp" />
     <ClCompile Include="..\..\src\collision\BroadPhase.cpp" />
+    <ClCompile Include="..\..\src\collision\NarrowPhase.cpp" />
     <ClCompile Include="..\..\src\World.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
