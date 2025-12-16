@@ -53,6 +53,9 @@
     <ClInclude Include="..\..\src\collision\NarrowPhase.h">
       <Filter>src\collision</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\collision\CollisionSystem.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Body.cpp">
@@ -65,6 +68,9 @@
       <Filter>src\collision</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\collision\NarrowPhase.cpp">
+      <Filter>src\collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\collision\CollisionSystem.cpp">
       <Filter>src\collision</Filter>
     </ClCompile>
   </ItemGroup>
