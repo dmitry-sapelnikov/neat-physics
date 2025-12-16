@@ -2,6 +2,7 @@
 
 // Includes
 #include "neat_physics/collision/CollisionPoint.h"
+#include "neat_physics/math/Rotation.h"
 
 namespace nph
 {
