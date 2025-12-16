@@ -21,16 +21,19 @@ struct WorldDrawSettings
 
 	/// Draw body frames (coordinate axes)
 	bool bodyFrames{ false };
+
 	/// Size of the body frames
 	float bodyFrameSize{ 0.2f };
 
 	/// Draw contact points
 	bool contacts{ false };
+
 	/// Size of contact points
 	float contactSize{ 5.0f };
 
 	/// Draw body linear velocities
 	bool bodyVelocities{ false };
+
 	/// Size of body velocity arrows
 	float bodyVelocityArrowSize{ 0.2f };
 };
@@ -43,6 +46,7 @@ public:
 	struct Input
 	{
 		bool leftMouseDown = false;
+		bool leftMouseClicked = false;
 		bool rightMouseDown = false;
 	};
 
@@ -74,10 +78,19 @@ public:
 	void setCameraZoom(int zoom);
 
 	/// Returns the cursor position in world coordinates
-	Vec2 getCursorPositionWorld() const;
+	[[nodiscard]] Vec2 getCursorPositionWorld() const;
 
 	/// Sets the clear color
 	void setClearColor(float r, float g, float b) const;
+
+	/// Returns if VSync is enabled
+	[[nodiscard]] bool isVSyncEnabled() const
+	{
+		return mVSyncEnabled;
+	}
+
+	/// Set VSync
+	void setVSyncEnabled(bool enabled);
 
 	/// Draws a physics world
 	void drawWorld(
@@ -94,6 +107,9 @@ private:
 
 	/// GLFW window pointer
 	GLFWwindow* mWindow{ nullptr };
+
+	/// VSync enabled flag
+	bool mVSyncEnabled{ false };
 };
 
 // End of nph namespace

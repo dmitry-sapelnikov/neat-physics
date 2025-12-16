@@ -9,7 +9,7 @@ namespace
 {
 
 /// Maximum number of bodies in the physics world
-static constexpr uint32_t MAX_BODIES = 10000;
+static constexpr uint32_t MAX_BODIES = 5000;
 
 /// Gravity
 static constexpr float GRAVITY = 10.0f;
@@ -20,13 +20,15 @@ static constexpr float SIMULATION_STEP = 1.0f / 60.0f;
 /// Simulation control parameters
 struct SimulationControl
 {
+	bool vSync{ true };
 	bool resetWorld{ true };
 	float friction{ 0.0f };
 	float boxDensity{ 200.0f };
 	float boxSize{ 8.0f };
 	float boxSideRatio{ 0.5f };
 	float timeStepFrequency{ 50.0f };
-	int velocityIterations{ 15 };
+	int velocityIterations{ 20 };
+	int positionIterations{ 10 };
 };
 
 /// Creates a 'glass-shaped' container
@@ -67,12 +69,12 @@ void addBoxOnMouseClick(
 	assert(visualization != nullptr);
 
 	const bool overImgui =
-		ImGui::IsAnyItemFocused() ||
 		ImGui::IsAnyItemHovered() ||
-		ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) ||
 		ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
 
-	if (overImgui || !visualization->getInput().leftMouseDown)
+	if (overImgui ||
+		!visualization->getInput().leftMouseClicked &&
+		!visualization->getInput().rightMouseDown)
 	{
 		return;
 	}
@@ -93,14 +95,15 @@ void drawGui(
 	const nph::World& world,
 	float lastPhysicsStepTime,
 	nph::WorldDrawSettings& drawSettings,
+	float bottomSize,
 	SimulationControl& simulationControl)
 {
 	ImGui::SetNextWindowPos(ImVec2(10.0f, 10.0f), ImGuiCond_Once);
-	ImGui::SetNextWindowSize(ImVec2(400.0f, 500.0f), ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(400.0f, 700.0f), ImGuiCond_Once);
 
 	ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_NoCollapse);
 
-	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.33f);
 
 	if (ImGui::CollapsingHeader("Visualization"))
 	{
@@ -156,6 +159,35 @@ void drawGui(
 		ImGui::Text(
 			"Physics FPS: %.1f",
 			1.0f / lastPhysicsStepTime);
+
+		float maxPenetration = 0.0f;
+		for (const auto& manifold : world.getContactSolver().getManifolds())
+		{
+			for (uint32_t i = 0; i < manifold.second.getContactCount(); ++i)
+			{
+				const auto& contact = manifold.second.getContact(i);
+				if (contact.getPoint().penetration > maxPenetration)
+				{
+					maxPenetration = contact.getPoint().penetration;
+				}
+			}
+		}
+
+		float maxAllowedPenetration = 0.1f * (bottomSize / 8.0f);
+
+		// Set text color based on penetration
+		ImGui::PushStyleColor(
+			ImGuiCol_Text,
+			maxPenetration > maxAllowedPenetration ?
+				ImVec4(1.0f, 0.0f, 0.0f, 1.0f) :
+				ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+
+		ImGui::Text(
+			"Max Penetration: %.4f / %.4f",
+			maxPenetration,
+			maxAllowedPenetration);
+
+		ImGui::PopStyleColor();
 	}
 
 	if (ImGui::CollapsingHeader(
@@ -163,6 +195,10 @@ void drawGui(
 		ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent(20.0f);
+
+		ImGui::Checkbox(
+			"VSync",
+			&simulationControl.vSync);
 
 		// Add 'World' splitter
 		if (ImGui::CollapsingHeader("World", ImGuiTreeNodeFlags_DefaultOpen))
@@ -182,8 +218,14 @@ void drawGui(
 				1,
 				50);
 
+			ImGui::SliderInt(
+				"Position Iterations",
+				&simulationControl.positionIterations,
+				0,
+				50);
+
 			ImGui::SliderFloat(
-				"Friction (Created Walls & Boxes)",
+				"New Bodies Friction",
 				&simulationControl.friction,
 				0.0f,
 				1.0f,
@@ -197,8 +239,8 @@ void drawGui(
 			ImGui::SliderFloat(
 				"Size",
 				&simulationControl.boxSize,
-				2.0f,
-				16.0f,
+				1.0f,
+				20.0f,
 				"1 / %.0f of glass");
 
 			ImGui::SliderFloat(
@@ -230,7 +272,7 @@ int main()
 	try
 	{
 		const nph::Vec2 glassSize{ nph::GRAVITY * 0.5f, nph::GRAVITY };
-		nph::World world(nph::MAX_BODIES, { 0.0f, -nph::GRAVITY }, 15, 5);
+		nph::World world(nph::MAX_BODIES, { 0.0f, -nph::GRAVITY }, 1, 1);
 
 		nph::Visualization* visualization = nph::Visualization::getInstance();
 		if (visualization == nullptr)
@@ -269,11 +311,17 @@ int main()
 				world,
 				lastPhyicsStepTime.count(),
 				drawSettings,
+				glassSize.x,
 				simulationControl);
 			visualization->endFrame();
 
+			visualization->setVSyncEnabled(simulationControl.vSync);
+
 			world.setVelocityIterations(
 				uint32_t(simulationControl.velocityIterations));
+
+			world.setPositionIterations(
+				uint32_t(simulationControl.positionIterations));
 
 			const auto tic = std::chrono::high_resolution_clock::now();
 			world.doStep(1.0f / simulationControl.timeStepFrequency);

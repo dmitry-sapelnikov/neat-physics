@@ -125,7 +125,13 @@ void mouseButtonCallback(
 	switch (button)
 	{
 	case GLFW_MOUSE_BUTTON_LEFT:
-		gInput.leftMouseDown = (action == GLFW_PRESS);
+		{
+			gInput.leftMouseDown = (action == GLFW_PRESS);
+			if (action == GLFW_PRESS)
+			{
+				gInput.leftMouseClicked = true;
+			}
+		}
 		break;
 
 	case GLFW_MOUSE_BUTTON_RIGHT:
@@ -231,9 +237,6 @@ GLFWwindow* createWindow()
 	glfwSetScrollCallback(result, scrollCallback);
 	glfwSetKeyCallback(result, keyboardCallback);
 	glfwMakeContextCurrent(result);
-	// Enable vsync
-	glfwSwapInterval(1);
-
 	return result;
 }
 
@@ -331,7 +334,7 @@ void drawBody(const Body& body)
 	const Vec2 v3 = pos + rot * Vec2(hs.x, hs.y);
 	const Vec2 v4 = pos + rot * Vec2(-hs.x, hs.y);
 
-	glColor4f(1.0f, 1.0f, 1.0f, 0.1f);
+	glColor4f(1.0f, 1.0f, 0.9f, body.isStatic() ? 0.3f : 0.15f);
 	glBegin(GL_TRIANGLE_FAN);
 	glVertex2f(v1.x, v1.y);
 	glVertex2f(v2.x, v2.y);
@@ -425,6 +428,7 @@ Visualization::Visualization()
 	if (!initImgui(*result))
 		return;
 
+	setVSyncEnabled(true);
 	updateProjectionMatrix();
 	mWindow = result;
 }
@@ -465,6 +469,7 @@ void Visualization::endFrame()
 	ImGui::Render();
 	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 
+	gInput.leftMouseClicked = false;
 	glfwPollEvents();
 	glfwSwapBuffers(mWindow);
 }
@@ -507,6 +512,15 @@ Vec2 Visualization::getCursorPositionWorld() const
 void Visualization::setClearColor(float r, float g, float b) const
 {
 	glClearColor(r, g, b, 1.0f);
+}
+
+void Visualization::setVSyncEnabled(bool enabled)
+{
+	if (enabled != mVSyncEnabled)
+	{
+		mVSyncEnabled = enabled;
+		glfwSwapInterval(mVSyncEnabled);
+	}
 }
 
 void Visualization::drawWorld(
