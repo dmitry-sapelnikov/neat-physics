@@ -16,6 +16,9 @@
     <ClInclude Include="..\..\include\neat_physics\collision\CollisionManifold.h" />
     <ClInclude Include="..\..\include\neat_physics\collision\CollisionPoint.h" />
     <ClInclude Include="..\..\include\neat_physics\collision\CollisionSystem.h" />
+    <ClInclude Include="..\..\include\neat_physics\dynamics\ContactManifold.h" />
+    <ClInclude Include="..\..\include\neat_physics\dynamics\ContactPoint.h" />
+    <ClInclude Include="..\..\include\neat_physics\dynamics\ContactSolver.h" />
     <ClInclude Include="..\..\include\neat_physics\math\Mat22.h" />
     <ClInclude Include="..\..\include\neat_physics\math\Rotation.h" />
     <ClInclude Include="..\..\include\neat_physics\math\Vec2.h" />
@@ -29,6 +32,9 @@
     <ClCompile Include="..\..\src\collision\BroadPhase.cpp" />
     <ClCompile Include="..\..\src\collision\CollisionSystem.cpp" />
     <ClCompile Include="..\..\src\collision\NarrowPhase.cpp" />
+    <ClCompile Include="..\..\src\dynamics\ContactManifold.cpp" />
+    <ClCompile Include="..\..\src\dynamics\ContactPoint.cpp" />
+    <ClCompile Include="..\..\src\dynamics\ContactSolver.cpp" />
     <ClCompile Include="..\..\src\World.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
