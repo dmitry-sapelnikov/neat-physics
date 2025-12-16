@@ -240,7 +240,7 @@ int main()
 		const nph::Vec2 glassSize{ nph::GRAVITY * 0.5f, nph::GRAVITY };
 		const float friction = 0.5f;
 
-		nph::World world(nph::MAX_BODIES, { 0.0f, -nph::GRAVITY }, 15);
+		nph::World world(nph::MAX_BODIES, { 0.0f, -nph::GRAVITY }, 15, 5);
 
 		nph::Visualization* visualization = nph::Visualization::getInstance();
 		if (visualization == nullptr)

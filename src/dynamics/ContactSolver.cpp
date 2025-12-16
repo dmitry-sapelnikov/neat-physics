@@ -18,9 +18,7 @@ void ContactSolver::clear() noexcept
 	mManifolds.clear();
 }
 
-void ContactSolver::solve(
-	float timeStep,
-	uint32_t velocityIterations)
+void ContactSolver::prepareToSolve(float timeStep)
 {
 	updateManifolds();
 
@@ -29,12 +27,26 @@ void ContactSolver::solve(
 	{
 		manifold.prepareToSolve(invTimeStep);
 	}
+}
 
+void ContactSolver::solveVelocities(uint32_t velocityIterations)
+{
 	for (uint32_t i = 0; i < velocityIterations; ++i)
 	{
 		for (auto& [key, manifold] : mManifolds)
 		{
 			manifold.solveVelocities();
+		}
+	}
+}
+
+void ContactSolver::solvePositions(uint32_t positionIterations)
+{
+	for (uint32_t i = 0; i < positionIterations; ++i)
+	{
+		for (auto& [key, manifold] : mManifolds)
+		{
+			manifold.solvePositions();
 		}
 	}
 }

@@ -65,6 +65,9 @@ public:
 	/// Solves the contact velocities
 	void solveVelocities();
 
+	/// Solves the contact positions (penetration)
+	void solvePositions();
+
 private:
 	/// First body
 	Body* mBodyA;

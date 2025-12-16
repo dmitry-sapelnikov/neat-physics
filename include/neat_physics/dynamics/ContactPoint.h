@@ -46,6 +46,9 @@ public:
 		Body& bodyA,
 		Body& bodyB,
 		float friction);
+
+	/// Solves the contact position (penetration)
+	void solvePositions(Body& bodyA, Body& bodyB);
 	
 private:
 	/// Returns the relative velocity at the contact point
@@ -53,17 +56,19 @@ private:
 		const Body& bodyA,
 		const Body& bodyB) const noexcept;
 
-	/// Computes the effective mass for a given contact and direction
-	[[nodiscard]] float getEffectiveMass(
-		const Body& bodyA,
-		const Body& bodyB,
-		const Vec2& direction) const noexcept;
-
 	/// Applies an impulse at the contact point
 	void applyImpulse(
 		Body& bodyA,
 		Body& bodyB,
 		const Vec2& impulse) const noexcept;
+
+	/// Gets the transformed contact data
+	void getTransformedContact(
+		const Body& bodyA,
+		const Body& bodyB,
+		Vec2& normal,
+		Vec2& planePoint,
+		float& penetration) const;
 
 	/// Collision point
 	CollisionPoint mPoint;
@@ -88,9 +93,6 @@ private:
 
 	/// Accumulated tangent (friction) impulse
 	float mTangentImpulse;
-
-	/// Normal bias for position correction
-	float mNormalBias;
 };
 
 }

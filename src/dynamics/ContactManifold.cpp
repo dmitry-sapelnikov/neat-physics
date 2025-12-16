@@ -73,4 +73,14 @@ void ContactManifold::solveVelocities()
 	}
 }
 
+void ContactManifold::solvePositions()
+{
+	for (ContactPoint* contact = mContacts.data();
+		contact < mContacts.data() + mContactCount;
+		++contact)
+	{
+		contact->solvePositions(*mBodyA, *mBodyB);
+	}
+}
+
 } // namespace nph

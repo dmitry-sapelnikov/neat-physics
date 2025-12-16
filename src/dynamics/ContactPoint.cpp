@@ -9,13 +9,30 @@ namespace
 {
 
 /// Applies impulse at a point relative to the center of mass
-static void applyImpulse(
+void applyImpulse(
 	Body& body,
 	const Vec2& localPoint,
 	const Vec2& impulse)
 {
 	body.linearVelocity += body.invMass * impulse;
 	body.angularVelocity += body.invInertia * cross(localPoint, impulse);
+}
+
+/// Computes the effective mass for a given contact and direction
+[[nodiscard]] float getEffectiveMass(
+	const Body& bodyA,
+	const Body& bodyB,
+	const Vec2& armA,
+	const Vec2& armB,
+	const Vec2& direction) noexcept
+{
+	const float rAd = dot(armA, direction);
+	const float rBd = dot(armB, direction);
+	const float invResult =
+		(bodyA.invMass + bodyB.invMass) +
+		(bodyA.invInertia * (dot(armA, armA) - rAd * rAd) +
+			bodyB.invInertia * (dot(armB, armB) - rBd * rBd));
+	return 1.0f / invResult;
 }
 
 } // anonymous namespace
@@ -31,25 +48,16 @@ void ContactPoint::prepareToSolve(
 	Body& bodyB,
 	float invTimeStep)
 {
-	// Baumgarte stabilization factor
-	static constexpr float BAUMGARTE_STAB = 0.2f;
-
-	// Allowed penetration between geometries
-	static constexpr float ALLOWED_PENETRATION = 0.01f;
-
 	assert(invTimeStep > 0.0f);
 
 	mOffsetA = mPoint.position - bodyA.position;
 	mOffsetB = mPoint.position - bodyB.position;
 
 	// Precompute normal mass, tangent mass, and bias.
-	mNormalMass = getEffectiveMass(bodyA, bodyB, mPoint.normal);
+	mNormalMass = getEffectiveMass(bodyA, bodyB, mOffsetA, mOffsetB, mPoint.normal);
 
 	mTangent = cross(mPoint.normal, 1.0f);
-	mTangentMass = getEffectiveMass(bodyA, bodyB, mTangent);
-
-	mNormalBias = BAUMGARTE_STAB * invTimeStep *
-		std::max(0.0f, mPoint.penetration - ALLOWED_PENETRATION);
+	mTangentMass = getEffectiveMass(bodyA, bodyB, mOffsetA, mOffsetB, mTangent);
 
 	// Apply the warm starting impulse
 	applyImpulse(
@@ -67,11 +75,10 @@ void ContactPoint::solveVelocities(
 
 	// Normal impulse
 	{
-		float impulse = mNormalMass * (
-			-dot(getVelocityAtContact(bodyA, bodyB), mPoint.normal) +
-			mNormalBias);
+		const float impulse =
+			mNormalMass * -dot(getVelocityAtContact(bodyA, bodyB), mPoint.normal);
 
-		float oldAccImpulse = mNormalImpulse;
+		const float oldAccImpulse = mNormalImpulse;
 		mNormalImpulse = std::max(0.0f, oldAccImpulse + impulse);
 		applyImpulse(
 			bodyA,
@@ -81,13 +88,12 @@ void ContactPoint::solveVelocities(
 
 	// Dry friction impulse
 	{
-		Vec2 tangent = cross(mPoint.normal, 1.0f);
-		float maxFriction = friction * mNormalImpulse;
+		const float maxFriction = friction * mNormalImpulse;
 
-		float impulse = (-mTangentMass) *
-			dot(getVelocityAtContact(bodyA, bodyB), tangent);
+		const float impulse = (-mTangentMass) *
+			dot(getVelocityAtContact(bodyA, bodyB), mTangent);
 
-		float oldAccImpulse = mTangentImpulse;
+		const float oldAccImpulse = mTangentImpulse;
 		mTangentImpulse = std::clamp(
 			oldAccImpulse + impulse,
 			-maxFriction,
@@ -96,10 +102,52 @@ void ContactPoint::solveVelocities(
 		applyImpulse(
 			bodyA,
 			bodyB,
-			(mTangentImpulse - oldAccImpulse) * tangent);
+			(mTangentImpulse - oldAccImpulse) * mTangent);
 	}
 }
 
+void ContactPoint::solvePositions(Body& bodyA, Body& bodyB)
+{
+	// This method is similar to the position based dynamics (PBD) approach :
+	// we directly modify the positions and rotations of the bodies
+
+	// Baumgarte stabilization factor
+	static constexpr float BAUMGARTE_STAB = 0.2f;
+
+	// Allowed penetration between geometries
+	static constexpr float ALLOWED_PENETRATION = 0.001f;
+
+	Vec2 normal;
+	float penetration;
+	Vec2 planePoint;
+	getTransformedContact(bodyA, bodyB, normal, planePoint, penetration);
+
+	const float biasFactor = std::max(
+		0.0f,
+		BAUMGARTE_STAB * (penetration - ALLOWED_PENETRATION));
+
+	const Vec2 offsetA = planePoint - bodyA.position;
+	const Vec2 offsetB = planePoint - bodyB.position;
+
+	// Compute the effective mass
+	const float effMass =
+		getEffectiveMass(bodyA, bodyB, offsetA, offsetB, normal);
+
+	// Compute the penetration resolution impulse
+	const Vec2 penetrationImpulse =
+		std::max(0.0f, biasFactor * effMass) * normal;
+
+	// Directly integrate positions and rotations
+	bodyA.position -= bodyA.invMass * penetrationImpulse;
+	bodyA.rotation.setAngle(bodyA.rotation.getAngle() -
+		bodyA.invInertia * cross(offsetA, penetrationImpulse));
+
+	bodyB.position += bodyB.invMass * penetrationImpulse;
+	bodyB.rotation.setAngle(bodyB.rotation.getAngle() +
+		bodyB.invInertia * cross(offsetB, penetrationImpulse));
+}
+
+/// Returns the relative velocity at the contact point
 [[nodiscard]] Vec2 ContactPoint::getVelocityAtContact(
 	const Body& bodyA,
 	const Body& bodyB) const noexcept
@@ -109,20 +157,7 @@ void ContactPoint::solveVelocities(
 		bodyA.linearVelocity - cross(bodyA.angularVelocity, mOffsetA);
 }
 
-[[nodiscard]] float ContactPoint::getEffectiveMass(
-	const Body& bodyA,
-	const Body& bodyB,
-	const Vec2& direction) const noexcept
-{
-	const float dotA = dot(mOffsetA, direction);
-	const float dotB = dot(mOffsetB, direction);
-	const float invResult =
-		(bodyA.invMass + bodyB.invMass) +
-		(bodyA.invInertia * (mOffsetA.lengthSquared() - dotA * dotA) +
-		 bodyB.invInertia * (mOffsetB.lengthSquared() - dotB * dotB));
-	return 1.0f / invResult;
-}
-
+/// Applies an impulse at the contact point
 void ContactPoint::applyImpulse(
 	Body& bodyA,
 	Body& bodyB,
@@ -130,6 +165,41 @@ void ContactPoint::applyImpulse(
 {
 	nph::applyImpulse(bodyA, mOffsetA, -impulse);
 	nph::applyImpulse(bodyB, mOffsetB,  impulse);
+}
+
+void ContactPoint::getTransformedContact(
+	const Body& bodyA,
+	const Body& bodyB,
+	Vec2& normal,
+	Vec2& planePoint,
+	float& penetration) const
+{
+	const std::array<Vec2, 2> positions{
+		bodyA.position,
+		bodyB.position };
+
+	const std::array<Mat22, 2> rotations{
+		bodyA.rotation.getMat(),
+		bodyB.rotation.getMat() };
+
+	const CollisionPoint& contact = mPoint;
+	const uint32_t ind1 = contact.clipBoxIndex;
+	const uint32_t ind2 = 1 - ind1;
+
+	const Vec2 clipPoint =
+		positions[ind2] +
+		rotations[ind2] * contact.localPoints[ind2];
+
+	normal = rotations[ind1] * contact.localContactNormal;
+
+	planePoint =
+		positions[ind1] +
+		rotations[ind1] * contact.localPoints[ind1];
+
+	penetration = dot(planePoint - clipPoint, normal);
+
+	// Normal must point from A to B
+	normal = (ind1 == 0) ? normal : -normal;
 }
 
 } // namespace nph
