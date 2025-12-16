@@ -44,6 +44,9 @@
     <ClInclude Include="..\..\include\neat_physics\collision\CollisionPoint.h">
       <Filter>include\collision</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\collision\BroadPhase.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Body.cpp">
@@ -51,6 +54,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\World.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\collision\BroadPhase.cpp">
+      <Filter>src\collision</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
