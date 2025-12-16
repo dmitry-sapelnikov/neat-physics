@@ -390,6 +390,7 @@ void drawContacts(const World& world, float pointSize)
 {
 	assert(pointSize > 0.0f);
 	glPointSize(pointSize);
+	glColor3f(1.0f, 0.0f, 0.0f);
 	glBegin(GL_POINTS);
 	for (const auto& pair : world.getContactSolver().getManifolds())
 	{
@@ -404,10 +405,8 @@ void drawContacts(const World& world, float pointSize)
 			const Vec2 point2 = bodyB.position + bodyB.rotation.getMat() * point.localPoints[1];
 
 			// Draw contact point on body A
-			glColor3f(1.0f, 0.0f, 0.0f);
 			glVertex2f(point1.x, point1.y);
 
-			glColor3f(0.0f, 1.0f, 0.0f);
 			// Draw contact point on body B
 			glVertex2f(point2.x, point2.y);
 		}

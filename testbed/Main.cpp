@@ -210,6 +210,13 @@ void drawGui(
 			simulationControl.resetWorld = ImGui::Button("Reset");
 
 			ImGui::SliderFloat(
+				"New Bodies Friction",
+				&simulationControl.friction,
+				0.0f,
+				1.0f,
+				"%.1f");
+
+			ImGui::SliderFloat(
 				"Time Step Frequency",
 				&simulationControl.timeStepFrequency,
 				30.0f,
@@ -227,13 +234,6 @@ void drawGui(
 				&simulationControl.positionIterations,
 				0,
 				50);
-
-			ImGui::SliderFloat(
-				"New Bodies Friction",
-				&simulationControl.friction,
-				0.0f,
-				1.0f,
-				"%.1f");
 		}
 
 		if (ImGui::CollapsingHeader(
