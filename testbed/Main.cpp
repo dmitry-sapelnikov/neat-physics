@@ -1,3 +1,7 @@
+// A minimalistic 2D physics engine (https://github.com/dmitry-sapelnikov/neat-physics)
+// SPDX-FileCopyrightText: 2025 Dmitry Sapelnikov
+// SPDX-License-Identifier: MIT
+
 #include <chrono>
 #include "Core.h"
 #include "Visualization.h"
