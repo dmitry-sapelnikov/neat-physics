@@ -90,7 +90,7 @@ void createTestScene(World& world)
 int wmain(int argc, wchar_t** argv)
 {
 	constexpr float TIME_STEP = 1.0f / 60.0f;
-	constexpr uint32_t MAX_BODIES = 4096;
+	constexpr uint32_t MAX_BODIES = 2048;
 	constexpr bool USE_VISUALIZATION = false;
 
 	try
