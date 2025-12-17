@@ -53,19 +53,19 @@ void createTestScene(World& world)
 	std::mt19937 gen(42);
 	std::uniform_real_distribution<> distrib(0.5, 1.0);
 
-	const Vec2 boxDensity = {
+	const Vec2 boxSize = {
 		BOTTOM_SIZE * 0.5f * BOX_BOTTOM_RATIO,
 		BOTTOM_SIZE * 0.5f * BOX_BOTTOM_RATIO };
 
-	float startY = boxDensity.y * 4.0f;
-	float startX = -((COLUMN_COUNT - 1) * boxDensity.x) / 2.0f;
+	float startY = boxSize.y * 4.0f;
+	float startX = -((COLUMN_COUNT - 1) * boxSize.x) / 2.0f;
 	for (int row = 0; row < ROW_COUNT; ++row)
 	{
 		for (int col = 0; col < COLUMN_COUNT; ++col)
 		{
 			const Vec2 randomizedSize(
-				boxDensity.x * static_cast<float>(distrib(gen)),
-				boxDensity.y * static_cast<float>(distrib(gen)));
+				boxSize.x * static_cast<float>(distrib(gen)),
+				boxSize.y * static_cast<float>(distrib(gen)));
 
 			const float randomizedMass =
 				randomizedSize.x * randomizedSize.y * 1000.0f;
@@ -73,8 +73,8 @@ void createTestScene(World& world)
 			const float randomizeFriction =
 				std::lerp(0.4f, 0.6f, static_cast<float>(distrib(gen)));
 
-			const float x = startX + col * boxDensity.x;
-			const float y = startY + row * boxDensity.y;
+			const float x = startX + col * boxSize.x;
+			const float y = startY + row * boxSize.y;
 			world.addBody(
 				randomizedSize,
 				randomizedMass,
