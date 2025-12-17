@@ -39,7 +39,7 @@ struct WorldDrawSettings
 	bool bodyVelocities{ false };
 
 	/// Size of body velocity arrows
-	float bodyVelocityArrowSize{ 0.2f };
+	float bodyVelocityArrowSize{ 0.1f };
 };
 
 /// Singleton class managing the visualization system

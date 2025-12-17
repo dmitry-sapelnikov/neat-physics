@@ -47,8 +47,11 @@ Vec2 cursorToWorld(const Vec2& pos)
 	const float viewWidth = gCamera.zoom * std::min(1.0f, aspect);
 	const float viewHeight = gCamera.zoom / std::max(1.0f, aspect);
 
-	const float worldX = (pos.x / gWindowWidth) * (2.0f * viewWidth) - viewWidth + gCamera.pan.x;
-	const float worldY = -((pos.y / gWindowHeight) * (2.0f * viewHeight) - viewHeight) + gCamera.pan.y;
+	const float worldX = gCamera.pan.x +
+		(pos.x / gWindowWidth) * (2.0f * viewWidth) - viewWidth;
+
+	const float worldY = gCamera.pan.y -
+		((pos.y / gWindowHeight) * (2.0f * viewHeight) - viewHeight);
 
 	return { worldX, worldY };
 }
@@ -76,11 +79,11 @@ void updateProjectionMatrix()
 
 	glOrtho(
 		-viewWidth + gCamera.pan.x, // left
-		viewWidth + gCamera.pan.x,  // right
+		viewWidth + gCamera.pan.x, // right
 		-viewHeight + gCamera.pan.y, // bottom
 		viewHeight + gCamera.pan.y, // top
 		-1.0, // near plane
-		1.0   // far plane
+		 1.0 // far plane
 	);
 }
 
@@ -129,14 +132,14 @@ void mouseButtonCallback(
 	switch (button)
 	{
 	case GLFW_MOUSE_BUTTON_LEFT:
+	{
+		gInput.leftMouseDown = (action == GLFW_PRESS);
+		if (action == GLFW_PRESS)
 		{
-			gInput.leftMouseDown = (action == GLFW_PRESS);
-			if (action == GLFW_PRESS)
-			{
-				gInput.leftMouseClicked = true;
-			}
+			gInput.leftMouseClicked = true;
 		}
-		break;
+	}
+	break;
 
 	case GLFW_MOUSE_BUTTON_RIGHT:
 		gInput.rightMouseDown = (action == GLFW_PRESS);
@@ -299,17 +302,19 @@ bool initImgui(GLFWwindow& result)
 void drawArrow(
 	const Vec2& start,
 	const Vec2& end,
-	const Color& color,
-	float tipSize = 0.3f)
+	float tipSize,
+	const Color& color)
 {
+	/// The ratio between the tip height and side length
+	static constexpr float TIP_SIDE_FACTOR = 0.3f;
 	assert(tipSize > 0.0f);
 
 	const Vec2 dir = end - start;
 	const Vec2 dirNorm = dir.getNormalized();
 	const Vec2 orthoLeft = getLeftOrthoVec(dirNorm);
 	const Vec2 tipEnd = end + tipSize * dirNorm;
-	const Vec2 leftArrowHead = end + 0.3f * tipSize * orthoLeft;
-	const Vec2 rightArrowHead = end - 0.3f * tipSize * orthoLeft;
+	const Vec2 leftArrowHead =  end + TIP_SIDE_FACTOR * tipSize * orthoLeft;
+	const Vec2 rightArrowHead = end - TIP_SIDE_FACTOR * tipSize * orthoLeft;
 
 	glColor3f(color.r, color.g, color.b);
 	glBegin(GL_LINES);
@@ -375,14 +380,14 @@ void drawFrame(const Vec2& position, const Mat22& rotation, float size)
 	drawArrow(
 		position,
 		xAxis,
-		{1.0f, 0.0f, 0.0f},
-		size * 0.2f);
+		size * 0.2f,
+		{ 1.0f, 0.0f, 0.0f });
 
 	drawArrow(
 		position,
 		yAxis,
-		{0.0f, 1.0f, 0.0f},
-		size * 0.2f);
+		size * 0.2f,
+		{ 0.0f, 1.0f, 0.0f });
 }
 
 /// Draw contact points
@@ -549,8 +554,8 @@ void Visualization::drawWorld(
 			drawArrow(
 				body.position,
 				body.position + body.linearVelocity,
-				{1.0f, 0.0f, 1.0f},
-				settings.bodyVelocityArrowSize);
+				settings.bodyVelocityArrowSize,
+				{ 1.0f, 0.0f, 1.0f });
 		}
 
 		if (settings.bodyFrames)
