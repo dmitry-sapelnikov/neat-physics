@@ -107,7 +107,25 @@ void drawGui(
 
 	ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_NoCollapse);
 
-	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.33f);
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.4f);
+
+	if (ImGui::CollapsingHeader("Help"))
+	{
+		ImGui::Text("Controls:");
+		ImGui::BulletText("Middle mouse button - pan");
+		ImGui::BulletText("Mouse wheel - zoom");
+		ImGui::BulletText("Left mouse button - add a single box");
+		ImGui::BulletText("Right mouse button - add multiple boxes");
+		ImGui::Separator();
+		ImGui::Text("Notes:");
+		ImGui::BulletText(
+			"Friction parameter applies only \n"
+			"to the newly created objects.");
+		ImGui::BulletText(
+			"To create walls with nonzero friction,\n"
+			"set friction first, then press Reset.");
+		ImGui::BulletText("Disable VSync to speed up the simulation.");
+	}
 
 	if (ImGui::CollapsingHeader("Visualization"))
 	{
@@ -207,7 +225,9 @@ void drawGui(
 		// Add 'World' splitter
 		if (ImGui::CollapsingHeader("World", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			simulationControl.resetWorld = ImGui::Button("Reset");
+			simulationControl.resetWorld = ImGui::Button(
+				"Reset",
+				{ ImGui::GetWindowWidth() * 0.4f, 0.0f });
 
 			ImGui::SliderFloat(
 				"New Bodies Friction",
