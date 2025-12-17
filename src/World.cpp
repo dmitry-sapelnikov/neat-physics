@@ -15,7 +15,7 @@ World::World(
 
 	mGravity(gravity),
 	mCollision(mBodies),
-	mContactSolver(mBodies, mCollision.getCollisionManifolds())
+	mContactSolver(mBodies)
 {
 	assert(maxBodies > 0);
 	mBodies.reserve(maxBodies);
@@ -51,7 +51,11 @@ void World::doStep(float timeStep)
 {
 	assert(timeStep > 0.0f);
 	applyForces(timeStep);
-	mCollision.update();
+
+	mContactSolver.prepareManifoldsUpdate();
+	mCollision.update(mContactSolver);
+	mContactSolver.finishManifoldsUpdate();
+
 	mContactSolver.prepareToSolve(timeStep);
 	mContactSolver.solveVelocities(mVelocityIterations);
 	integrateVelocities(timeStep);

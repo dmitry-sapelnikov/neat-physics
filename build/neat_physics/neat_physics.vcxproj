@@ -13,8 +13,10 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\neat_physics\Body.h" />
     <ClInclude Include="..\..\include\neat_physics\collision\BroadPhase.h" />
+    <ClInclude Include="..\..\include\neat_physics\collision\BroadPhaseCallback.h" />
     <ClInclude Include="..\..\include\neat_physics\collision\CollisionManifold.h" />
     <ClInclude Include="..\..\include\neat_physics\collision\CollisionPoint.h" />
+    <ClInclude Include="..\..\include\neat_physics\collision\CollisionCallback.h" />
     <ClInclude Include="..\..\include\neat_physics\collision\CollisionSystem.h" />
     <ClInclude Include="..\..\include\neat_physics\dynamics\ContactManifold.h" />
     <ClInclude Include="..\..\include\neat_physics\dynamics\ContactPoint.h" />

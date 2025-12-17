@@ -6,35 +6,39 @@
 
 // Includes
 #include <unordered_map>
+#include "neat_physics/collision/CollisionCallback.h"
 #include "neat_physics/dynamics/ContactManifold.h"
-#include "neat_physics/Body.h"
 
 namespace nph
 {
 
 /// Solver for contact constraints between bodies
-class ContactSolver
+class ContactSolver : public CollisionCallback
 {
 public:
-	/// Collision manifold container type
-	using CollisionManifoldsType = std::vector<CollisionManifold>;
-
 	/// Contact manifold container type
-	using ContactManifoldsType = std::unordered_map<uint64_t, ContactManifold>;
+	using ContactManifoldsMap = std::unordered_map<uint64_t, ContactManifold>;
 
 	/// Constructor
-	ContactSolver(
-		BodyArray& bodies,
-		const CollisionManifoldsType& collisionManifolds);
+	ContactSolver(BodyArray& bodies);
 
 	/// Clear all contact manifolds
 	void clear() noexcept;
 
 	/// Returns the contact manifolds
-	[[nodiscard]] const ContactManifoldsType& getManifolds() const noexcept
+	[[nodiscard]] const ContactManifoldsMap& getManifolds() const noexcept
 	{
 		return mManifolds;
 	}
+
+	/// Prepares the contact manifolds update
+	void prepareManifoldsUpdate();
+
+	/// Update a contact manifold
+	void onCollision(const CollisionManifold& collisionManifold);
+
+	/// Finishes the contact manifolds update
+	void finishManifoldsUpdate();
 
 	/// Prepares the contact solver for velocity solving
 	void prepareToSolve(float timeStep);
@@ -46,17 +50,11 @@ public:
 	void solvePositions(uint32_t positionIterations);
 
 private:
-	/// Updates the persistent contact manifolds
-	void updateManifolds();
-
 	/// Reference to the body array
 	BodyArray& mBodies;
 
-	/// Reference to the contact manifolds
-	const CollisionManifoldsType& mCollisionManifolds;
-
 	/// Persistent contact manifolds
-	ContactManifoldsType mManifolds;
+	ContactManifoldsMap mManifolds;
 };
 
 }

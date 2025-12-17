@@ -8,12 +8,8 @@
 namespace nph
 {
 
-ContactSolver::ContactSolver(
-	BodyArray& bodies,
-	const CollisionManifoldsType& collisionManifolds) :
-
-	mBodies(bodies),
-	mCollisionManifolds(collisionManifolds)
+ContactSolver::ContactSolver(BodyArray& bodies) :
+	mBodies(bodies)
 {
 }
 
@@ -24,8 +20,6 @@ void ContactSolver::clear() noexcept
 
 void ContactSolver::prepareToSolve(float timeStep)
 {
-	updateManifolds();
-
 	const float invTimeStep = 1.0f / timeStep;
 	for (auto& [key, manifold] : mManifolds)
 	{
@@ -55,34 +49,37 @@ void ContactSolver::solvePositions(uint32_t positionIterations)
 	}
 }
 
-void ContactSolver::updateManifolds()
+void ContactSolver::prepareManifoldsUpdate()
 {
 	for (auto& pair : mManifolds)
 	{
 		pair.second.markObsolete();
 	}
+}
 
+void ContactSolver::onCollision(const CollisionManifold& manifold)
+{
 	Body* start = mBodies.data();
-	for (const auto& manifold : mCollisionManifolds)
+	Body* bodyA = start + manifold.bodyIndA;
+	Body* bodyB = start + manifold.bodyIndB;
+
+	const uint64_t key =
+		(static_cast<uint64_t>(manifold.bodyIndA) << 32) |
+		manifold.bodyIndB;
+
+	if (auto iter = mManifolds.find(key);
+		iter != mManifolds.end())
 	{
-		Body* bodyA = start + manifold.bodyIndA;
-		Body* bodyB = start + manifold.bodyIndB;
-
-		const uint64_t key =
-			(static_cast<uint64_t>(manifold.bodyIndA) << 32) |
-			manifold.bodyIndB;
-
-		if (auto iter = mManifolds.find(key);
-			iter != mManifolds.end())
-		{
-			iter->second.update(manifold);
-		}
-		else
-		{
-			mManifolds.try_emplace(key, bodyA, bodyB, manifold);
-		}
+		iter->second.update(manifold);
 	}
+	else
+	{
+		mManifolds.try_emplace(key, bodyA, bodyB, manifold);
+	}
+}
 
+void ContactSolver::finishManifoldsUpdate()
+{
 	// Remove obsolete manifolds
 	std::erase_if(
 		mManifolds,

@@ -8,6 +8,7 @@
 #include <vector>
 #include "neat_physics/Body.h"
 #include "neat_physics/collision/Aabb.h"
+#include "neat_physics/collision/BroadPhaseCallback.h"
 
 namespace nph
 {
@@ -31,12 +32,6 @@ public:
 	{
 	}
 
-	/// Returns the pairs of bodies which AABBs are overlapping
-	[[nodiscard]] const BodyIndexPairArray& getCollidingPairs() const
-	{
-		return mCollidingPairs;
-	}
-
 	/// Returns the AABBs of the bodies
 	[[nodiscard]] const AabbArray& getAabbs() const noexcept
 	{
@@ -44,7 +39,7 @@ public:
 	}
 
 	/// Updates the pairs of bodies which AABBs are overlapping
-	void update();
+	void update(BroadPhaseCallback& callback);
 
 private:
 	/// Endpoint of a segment
@@ -71,7 +66,7 @@ private:
 	};
 
 	/// Sweeps the AABBs along the X axis
-	void sweepAxis();
+	void sweepAxis(BroadPhaseCallback& callback);
 
 	/// Reference to the bodies
 	const BodyArray& mBodies;
@@ -81,9 +76,6 @@ private:
 
 	/// Endpoints for the sweep-and-prune algorithm
 	std::vector<Endpoint> mEndpoints;
-
-	/// Colliding pairs found in the last update
-	BodyIndexPairArray mCollidingPairs;
 
 	/// Active set of segment indices during the pruning phase
 	std::vector<uint32_t> mActivePoints;

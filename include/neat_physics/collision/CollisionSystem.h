@@ -5,19 +5,17 @@
 #pragma once
 
 // Includes
-#include "neat_physics/collision/CollisionManifold.h"
+#include <functional>
 #include "neat_physics/collision/BroadPhase.h"
+#include "neat_physics/collision/CollisionCallback.h"
 
 namespace nph
 {
 
 /// Collision system, computes contact manifolds between geometries
-class CollisionSystem
+class CollisionSystem : private BroadPhaseCallback
 {
 public:
-	/// Collision manifold container type
-	using CollisionManifoldArray = std::vector<CollisionManifold>;
-
 	/// Constructor
 	CollisionSystem(const BodyArray& bodies) noexcept :
 		mBodies(bodies),
@@ -31,24 +29,20 @@ public:
 		return mBroadPhase;
 	}
 
-	/// Returns the collision manifolds computed in the last update
-	[[nodiscard]] const CollisionManifoldArray& getCollisionManifolds() noexcept
-	{
-		return mManifolds;
-	}
-
 	/// Updates the collision manifolds
-	void update();
+	void update(CollisionCallback& callback);
 
 private:
+	void onCollision(uint32_t bodyIndA, uint32_t bodyIndB) override;
+
 	/// Reference to the bodies
 	const BodyArray& mBodies;
 
 	/// Broad-phase collision detector
 	BroadPhase mBroadPhase;
 
-	/// Contact manifolds
-	CollisionManifoldArray mManifolds;
+	/// A temporary pointer to the collision callback
+	CollisionCallback* mCallback{ nullptr };
 };
 
 } // namespace nph

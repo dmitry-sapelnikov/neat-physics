@@ -29,7 +29,7 @@ Aabb getAabb(const Body& body)
 
 } // anonymous namespace
 
-void BroadPhase::update()
+void BroadPhase::update(BroadPhaseCallback& callback)
 {
 	// Reserve-emplace because Aabb is immutable
 	mAabbs.clear();
@@ -66,12 +66,11 @@ void BroadPhase::update()
 
 	// \todo Explicitly use the insertion sort
 	std::sort(mEndpoints.begin(), mEndpoints.end());
-	sweepAxis();
+	sweepAxis(callback);
 }
 
-void BroadPhase::sweepAxis()
+void BroadPhase::sweepAxis(BroadPhaseCallback& callback)
 {
-	mCollidingPairs.clear();
 	mActivePoints.clear();
 
 	const Body* bodyStart = mBodies.data();
@@ -101,11 +100,11 @@ void BroadPhase::sweepAxis()
 
 				if (i1 < i2)
 				{
-					mCollidingPairs.emplace_back(i1, i2);
+					callback.onCollision(i1, i2);
 				}
 				else
 				{
-					mCollidingPairs.emplace_back(i2, i1);
+					callback.onCollision(i2, i1);
 				}
 			}
 			mActiveMapping[endpoint.index] = static_cast<uint32_t>(mActivePoints.size());

@@ -9,32 +9,28 @@
 namespace nph
 {
 
-void CollisionSystem::update()
+void CollisionSystem::update(CollisionCallback& callback)
 {
-	mManifolds.clear();
-	mBroadPhase.update();
+	mCallback = &callback;
+	mBroadPhase.update(*this);
+	mCallback = nullptr;
+}
 
-	const Body* start = mBodies.data();
-	for (const auto& [indA, indB] : mBroadPhase.getCollidingPairs())
+void CollisionSystem::onCollision(uint32_t bodyIndA, uint32_t bodyIndB)
+{
+	const Body& bodyA = mBodies[bodyIndA];
+	const Body& bodyB = mBodies[bodyIndB];
+
+	CollisionManifold manifold(bodyIndA, bodyIndB);
+	manifold.pointsCount = getBoxBoxCollision(
+		{ bodyA.position, bodyB.position },
+		{ bodyA.rotation, bodyB.rotation },
+		{ bodyA.halfSize, bodyB.halfSize },
+		manifold.points);
+
+	if (manifold.pointsCount > 0)
 	{
-		const Body* bodyA = start + indA;
-		const Body* bodyB = start + indB;
-
-		const Vec2Array2 positions { bodyA->position, bodyB->position };
-		const RotationArray2 rotations { bodyA->rotation, bodyB->rotation };
-		const Vec2Array2 halfSizes { bodyA->halfSize, bodyB->halfSize };
-
-		CollisionManifold manifold(indA, indB);
-		manifold.pointsCount = getBoxBoxCollision(
-			positions,
-			rotations,
-			halfSizes,
-			manifold.points);
-
-		if (manifold.pointsCount > 0)
-		{
-			mManifolds.push_back(manifold);
-		}
+		mCallback->onCollision(manifold);
 	}
 }
 
