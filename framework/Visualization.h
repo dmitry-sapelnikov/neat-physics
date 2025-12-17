@@ -49,12 +49,18 @@ public:
 	/// Input state
 	struct Input
 	{
+		/// Left mouse down flag
 		bool leftMouseDown = false;
+
+		/// Left mouse clicked flag
 		bool leftMouseClicked = false;
+
+		/// Right mouse down flag
 		bool rightMouseDown = false;
 	};
 
-	/// Instance getter. Returns nullptr if initialization failed
+	/// Visualization instance getter
+	/// \return nullptr if initialization failed
 	static Visualization* getInstance();
 
 	/// Checks if the visualization is running
@@ -93,7 +99,7 @@ public:
 		return mVSyncEnabled;
 	}
 
-	/// Set VSync
+	/// Set VSync enabled / disabled
 	void setVSyncEnabled(bool enabled);
 
 	/// Draws a physics world

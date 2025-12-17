@@ -40,7 +40,7 @@ struct Camera
 /// Input state
 Visualization::Input gInput;
 
-/// Convert cursor position to the world coordinates
+/// Converts cursor position to the world coordinates
 Vec2 cursorToWorld(const Vec2& pos)
 {
 	const float aspect = float(gWindowWidth) / float(gWindowHeight);
@@ -326,7 +326,7 @@ void drawArrow(
 	glEnd();
 }
 
-/// Draw a body
+/// Draws a body
 void drawBody(const Body& body)
 {
 	const Mat22& rot = body.rotation.getMat();
@@ -355,7 +355,7 @@ void drawBody(const Body& body)
 	glEnd();
 }
 
-/// Draw an Aabb
+/// Draws an Aabb
 void drawAabb(const Aabb& aabb)
 {
 	glColor3f(0.0f, 0.5f, 0.0f);

@@ -16,7 +16,7 @@ struct Mat22
 	/// Column #1, intentionally uninitialized
 	Vec2 col1;
 
-	/// Column #2k, intentionally uninitialized
+	/// Column #2, intentionally uninitialized
 	Vec2 col2;
 
 	/// Default constructor (no initialization)

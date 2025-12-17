@@ -140,11 +140,11 @@ uint32_t getBoxBoxCollision(
 	ClippedEdge edge;
 	{
 		//        e0
-		//    v1      v0
+		//    v1 ---- v0
 		//    |        |
 		// e1 |        | e3
 		//    |        |
-		//    v2      v3
+		//    v2 ---- v3
 		//        e2
 
 		// Vertex signs for box vertices

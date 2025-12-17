@@ -22,7 +22,7 @@ struct Aabb
 	/// Default constructor (no initialization)
 	Aabb() noexcept = default;
 
-	/// Min-max point constructor. Asserts that min <= max
+	/// Min-max point constructor; asserts that min <= max
 	Aabb(
 		const Vec2& inMin,
 		const Vec2& inMax) noexcept :
