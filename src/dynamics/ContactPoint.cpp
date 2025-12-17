@@ -16,7 +16,7 @@ namespace
 void applyImpulse(
 	Body& body,
 	const Vec2& localPoint,
-	const Vec2& impulse)
+	const Vec2& impulse) noexcept
 {
 	body.linearVelocity += body.invMass * impulse;
 	body.angularVelocity += body.invInertia * cross(localPoint, impulse);
@@ -50,7 +50,7 @@ void ContactPoint::updateFrom(const ContactPoint& other) noexcept
 void ContactPoint::prepareToSolve(
 	Body& bodyA,
 	Body& bodyB,
-	float invTimeStep)
+	float invTimeStep) noexcept
 {
 	assert(invTimeStep > 0.0f);
 
@@ -73,7 +73,7 @@ void ContactPoint::prepareToSolve(
 void ContactPoint::solveVelocities(
 	Body& bodyA,
 	Body& bodyB,
-	float friction)
+	float friction) noexcept
 {
 	assert(0.0f <= friction && friction <= 1.0f);
 
@@ -110,7 +110,9 @@ void ContactPoint::solveVelocities(
 	}
 }
 
-void ContactPoint::solvePositions(Body& bodyA, Body& bodyB)
+void ContactPoint::solvePositions(
+	Body& bodyA,
+	Body& bodyB) noexcept
 {
 	// This method is similar to the position based dynamics (PBD) approach :
 	// we directly modify the positions and rotations of the bodies

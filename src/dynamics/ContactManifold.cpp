@@ -13,7 +13,7 @@ namespace nph
 ContactManifold::ContactManifold(
 	Body* bodyA,
 	Body* bodyB,
-	const CollisionManifold& manifold) :
+	const CollisionManifold& manifold) noexcept :
 
 	mBodyA(bodyA),
 	mBodyB(bodyB),
@@ -28,7 +28,7 @@ ContactManifold::ContactManifold(
 	assert(0 < mContactCount && mContactCount <= MAX_COLLISION_POINTS);
 }
 
-void ContactManifold::update(const CollisionManifold& newManifold)
+void ContactManifold::update(const CollisionManifold& newManifold) noexcept
 {
 	// Make a backup of old contacts
 	ContactPoint oldContacts[MAX_COLLISION_POINTS];
@@ -57,7 +57,7 @@ void ContactManifold::update(const CollisionManifold& newManifold)
 	mObsolete = false;
 }
 
-void ContactManifold::prepareToSolve(float invTimeStep)
+void ContactManifold::prepareToSolve(float invTimeStep) noexcept
 {
 	for (ContactPoint* contact = mContacts.data();
 		contact < mContacts.data() + mContactCount;
@@ -67,7 +67,7 @@ void ContactManifold::prepareToSolve(float invTimeStep)
 	}
 }
 
-void ContactManifold::solveVelocities()
+void ContactManifold::solveVelocities() noexcept
 {
 	for (ContactPoint* contact = mContacts.data();
 		contact < mContacts.data() + mContactCount;
@@ -77,7 +77,7 @@ void ContactManifold::solveVelocities()
 	}
 }
 
-void ContactManifold::solvePositions()
+void ContactManifold::solvePositions() noexcept
 {
 	for (ContactPoint* contact = mContacts.data();
 		contact < mContacts.data() + mContactCount;

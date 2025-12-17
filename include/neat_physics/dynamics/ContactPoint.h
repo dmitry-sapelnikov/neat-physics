@@ -17,10 +17,10 @@ class ContactPoint
 {
 public:
 	/// Default Constructor (non-initializing)
-	ContactPoint() = default;
+	ContactPoint() noexcept = default;
 
 	/// Constructor
-	ContactPoint(const CollisionPoint& inPoint) :
+	ContactPoint(const CollisionPoint& inPoint) noexcept :
 		mPoint(inPoint),
 		mNormalImpulse(0.0f),
 		mTangentImpulse(0.0f)
@@ -42,17 +42,17 @@ public:
 	void prepareToSolve(
 		Body& bodyA,
 		Body& bodyB,
-		float invTimeStep);
+		float invTimeStep) noexcept;
 	
 	/// Solves the contact velocities
 	/// asserts that friction is in [0, 1]
 	void solveVelocities(
 		Body& bodyA,
 		Body& bodyB,
-		float friction);
+		float friction) noexcept;
 
 	/// Solves the contact position (penetration)
-	void solvePositions(Body& bodyA, Body& bodyB);
+	void solvePositions(Body& bodyA, Body& bodyB) noexcept;
 	
 private:
 	/// Returns the relative velocity at the contact point

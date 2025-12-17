@@ -20,7 +20,7 @@ public:
 	using ContactManifoldsMap = std::unordered_map<uint64_t, ContactManifold>;
 
 	/// Constructor
-	ContactSolver(BodyArray& bodies);
+	ContactSolver(BodyArray& bodies) noexcept;
 
 	/// Clear all contact manifolds
 	void clear() noexcept;
@@ -32,7 +32,7 @@ public:
 	}
 
 	/// Prepares the contact manifolds update
-	void prepareManifoldsUpdate();
+	void prepareManifoldsUpdate() noexcept;
 
 	/// Update a contact manifold
 	void onCollision(const CollisionManifold& collisionManifold);
@@ -41,13 +41,13 @@ public:
 	void finishManifoldsUpdate();
 
 	/// Prepares the contact solver for velocity solving
-	void prepareToSolve(float timeStep);
+	void prepareToSolve(float timeStep) noexcept;
 
 	/// Solves the contact velocities
-	void solveVelocities(uint32_t velocityIterations);
+	void solveVelocities(uint32_t velocityIterations) noexcept;
 
 	/// Solves the contact positions (penetration)
-	void solvePositions(uint32_t positionIterations);
+	void solvePositions(uint32_t positionIterations) noexcept;
 
 private:
 	/// Reference to the body array

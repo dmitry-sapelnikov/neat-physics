@@ -14,7 +14,7 @@ namespace
 {
 
 /// Computes the AABB for a box-shaped body
-Aabb getAabb(const Body& body)
+Aabb getAabb(const Body& body) noexcept
 {
 	const Mat22 absRotation = abs(body.rotation.getMat());
 	const Vec2 extents =

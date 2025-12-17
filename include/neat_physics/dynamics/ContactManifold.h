@@ -20,28 +20,28 @@ public:
 	ContactManifold(
 		Body* bodyA,
 		Body* bodyB,
-		const CollisionManifold& manifold);
+		const CollisionManifold& manifold) noexcept;
 
 	/// Returns the first body
-	const Body& getBodyA() const
+	const Body& getBodyA() const noexcept
 	{
 		return *mBodyA;
 	}
 
 	/// Returns the second body
-	const Body& getBodyB() const
+	const Body& getBodyB() const noexcept
 	{
 		return *mBodyB;
 	}
 
 	/// Returns the contact count
-	inline [[nodiscard]] uint32_t getContactCount() const
+	inline [[nodiscard]] uint32_t getContactCount() const noexcept
 	{
 		return mContactCount;
 	}
 
 	/// Returns the contact at given index
-	inline const ContactPoint& getContact(uint32_t index) const
+	inline const ContactPoint& getContact(uint32_t index) const noexcept
 	{
 		assert(index < mContactCount);
 		return mContacts[index];
@@ -61,16 +61,16 @@ public:
 
 	/// Updates the contact manifold with new contacts
 	/// preserving impulses for matching contact points
-	void update(const CollisionManifold& newManifold);
+	void update(const CollisionManifold& newManifold) noexcept;
 
 	/// Prepares the contact manifold for velocity solving
-	void prepareToSolve(float invTimeStep);
+	void prepareToSolve(float invTimeStep) noexcept;
 
 	/// Solves the contact velocities
-	void solveVelocities();
+	void solveVelocities() noexcept;
 
 	/// Solves the contact positions (penetration)
-	void solvePositions();
+	void solvePositions() noexcept;
 
 private:
 	/// First body

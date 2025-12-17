@@ -8,7 +8,7 @@
 namespace nph
 {
 
-ContactSolver::ContactSolver(BodyArray& bodies) :
+ContactSolver::ContactSolver(BodyArray& bodies) noexcept :
 	mBodies(bodies)
 {
 }
@@ -18,7 +18,7 @@ void ContactSolver::clear() noexcept
 	mManifolds.clear();
 }
 
-void ContactSolver::prepareToSolve(float timeStep)
+void ContactSolver::prepareToSolve(float timeStep) noexcept
 {
 	const float invTimeStep = 1.0f / timeStep;
 	for (auto& [key, manifold] : mManifolds)
@@ -27,7 +27,7 @@ void ContactSolver::prepareToSolve(float timeStep)
 	}
 }
 
-void ContactSolver::solveVelocities(uint32_t velocityIterations)
+void ContactSolver::solveVelocities(uint32_t velocityIterations) noexcept
 {
 	for (uint32_t i = 0; i < velocityIterations; ++i)
 	{
@@ -38,7 +38,7 @@ void ContactSolver::solveVelocities(uint32_t velocityIterations)
 	}
 }
 
-void ContactSolver::solvePositions(uint32_t positionIterations)
+void ContactSolver::solvePositions(uint32_t positionIterations) noexcept
 {
 	for (uint32_t i = 0; i < positionIterations; ++i)
 	{
@@ -49,7 +49,7 @@ void ContactSolver::solvePositions(uint32_t positionIterations)
 	}
 }
 
-void ContactSolver::prepareManifoldsUpdate()
+void ContactSolver::prepareManifoldsUpdate() noexcept
 {
 	for (auto& pair : mManifolds)
 	{
