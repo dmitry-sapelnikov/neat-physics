@@ -54,15 +54,19 @@ private:
 		float position;
 
 		/// Segment index
-		/// (1-based, positive for entry, negative for exit point)
-		int64_t index;
+		uint32_t index;
+
+		/// Start point flag
+		bool isStart;
 
 		/// Operator < for sorting
 		bool operator<(const Endpoint& other) const noexcept
 		{
 			return position != other.position ?
 				position < other.position :
-				index < other.index;
+				// We need to use > to let start points with the same position come first
+				// in order to detect 'touch' intersections
+				isStart > other.isStart;
 		}
 	};
 

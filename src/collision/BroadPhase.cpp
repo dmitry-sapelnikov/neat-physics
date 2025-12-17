@@ -52,16 +52,16 @@ void BroadPhase::update()
 	for (int32_t i = static_cast<int32_t>(mEndpoints.size() >> 1);
 		 i < static_cast<int32_t>(mBodies.size()); ++i)
 	{
-		mEndpoints.emplace_back(0.0f, i + 1);
-		mEndpoints.emplace_back(0.0f, -(i + 1));
+		mEndpoints.emplace_back(0.0f, i, true);
+		mEndpoints.emplace_back(0.0f, i, false);
 	}
 
 	// Update endpoint positions
 	for (auto& endpoint : mEndpoints)
 	{
-		endpoint.position = endpoint.index > 0 ?
-			mAabbs[ endpoint.index - 1].min.x :
-			mAabbs[ -endpoint.index - 1].max.x;
+		endpoint.position = endpoint.isStart ?
+			mAabbs[ endpoint.index ].min.x :
+			mAabbs[ endpoint.index ].max.x;
 	}
 
 	// \todo Explicitly use the insertion sort
@@ -78,9 +78,9 @@ void BroadPhase::sweepAxis()
 	const Aabb* aabbStart = mAabbs.data();
 	for (const auto& endpoint : mEndpoints)
 	{
-		if (endpoint.index > 0)
+		if (endpoint.isStart)
 		{
-			const uint32_t i1 = static_cast<uint32_t>(endpoint.index - 1);
+			const uint32_t i1 = endpoint.index;
 			const Body* bodyA = bodyStart + i1;
 			const Aabb* aabbA = aabbStart + i1;
 
@@ -108,13 +108,13 @@ void BroadPhase::sweepAxis()
 					mCollidingPairs.emplace_back(i2, i1);
 				}
 			}
-			mActiveMapping[endpoint.index - 1] = static_cast<uint32_t>(mActivePoints.size());
+			mActiveMapping[endpoint.index] = static_cast<uint32_t>(mActivePoints.size());
 			mActivePoints.push_back(i1);
 		}
 		else
 		{
 			// Swap and pop
-			const uint32_t idx = mActiveMapping[-endpoint.index - 1];
+			const uint32_t idx = mActiveMapping[endpoint.index];
 			const uint32_t last = mActivePoints.back();
 			mActivePoints[idx] = last;
 			mActiveMapping[last] = idx;
