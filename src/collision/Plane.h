@@ -22,7 +22,7 @@ struct Plane
 	/// Default constructor (no initialization)
 	Plane() noexcept = default;
 
-	/// Construct plane from normal and offset
+	/// Constructs plane from normal and offset
 	Plane(
 		const Vec2& inNormal,
 		float inOffset) noexcept :
@@ -33,7 +33,7 @@ struct Plane
 		assert(normal.isNormalized());
 	}
 
-	/// Construct plane from normal and a point on the plane
+	/// Constructs plane from normal and a point on the plane
 	Plane(
 		const Vec2& inNormal,
 		const Vec2& inOrigin) noexcept :
@@ -42,7 +42,7 @@ struct Plane
 	{
 	}
 
-	/// Construct plane from normal, point on the plane + extra offset
+	/// Constructs plane from normal, a point on the plane + extra offset
 	Plane(
 		const Vec2& inNormal,
 		const Vec2& inOrigin,

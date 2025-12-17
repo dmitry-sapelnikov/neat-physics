@@ -135,7 +135,7 @@ uint32_t getBoxBoxCollision(
 		minPenetrationDir :
 		-minPenetrationDir;
 
-	// 2. Find the incident edge
+	// Step 2: find the incident edge
 	const uint32_t incidentBoxInd = 1 - clipBoxInd;
 	ClippedEdge edge;
 	{
@@ -223,7 +223,7 @@ uint32_t getBoxBoxCollision(
 		}
 	}
 
-	// Step 4: Create the collision points
+	// Step 4: create the collision points
 	uint32_t resultPointCount = 0;
 	{
 		const Plane clipPlane(

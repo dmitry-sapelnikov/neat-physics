@@ -45,7 +45,7 @@ public:
 		float invTimeStep);
 	
 	/// Solves the contact velocities
-	/// asserts that friction in [0, 1]
+	/// asserts that friction is in [0, 1]
 	void solveVelocities(
 		Body& bodyA,
 		Body& bodyB,
@@ -86,10 +86,10 @@ private:
 	/// Vector from the body B center of mass to the contact point
 	Vec2 mOffsetB;
 
-	/// Effective mass in normal direction
+	/// Effective mass in the normal direction
 	float mNormalMass;
 
-	/// Effective mass in tangent direction
+	/// Effective mass in the tangent direction
 	float mTangentMass;
 
 	/// Accumulated normal impulse
