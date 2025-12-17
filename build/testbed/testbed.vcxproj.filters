@@ -10,7 +10,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\testbed\Main.cpp">
+    <ClCompile Include="..\..\testbed\TestbedMain.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

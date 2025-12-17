@@ -10,7 +10,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\test\regression_test\RegressionTest.cpp">
+    <ClCompile Include="..\..\test\regression_test\RegressionTestMain.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

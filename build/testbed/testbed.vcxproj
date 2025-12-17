@@ -11,9 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\testbed\Main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\framework\framework.vcxproj">
       <Project>{8fddd0a4-918e-412a-b90f-e290ba7026a5}</Project>
     </ProjectReference>
@@ -29,6 +26,9 @@
     <ProjectReference Include="..\neat_physics\neat_physics.vcxproj">
       <Project>{d0c65f12-34e4-431c-ab03-526f549dafcb}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\testbed\TestbedMain.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
