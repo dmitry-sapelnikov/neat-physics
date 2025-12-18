@@ -87,14 +87,17 @@ void ContactSolver::finishManifoldsUpdate()
 {
 	// Remove obsolete manifolds, rewire the contact pairs map
 	size_t mi = 0;
-	while (mi < mManifolds.size())
+	while (mi != mManifolds.size())
 	{
 		if (mManifolds[mi].second.isObsolete())
 		{
 			mContactPairs.erase(mManifolds[mi].first);
 			// Swap and pop
-			mManifolds[mi] = std::move(mManifolds.back());
-			mManifolds[mi].first->second = static_cast<uint32_t>(mi);
+			if (mi != mManifolds.size() - 1)
+			{
+				mManifolds[mi] = std::move(mManifolds.back());
+				mManifolds[mi].first->second = static_cast<uint32_t>(mi);
+			}
 			mManifolds.pop_back();
 		}
 		else
