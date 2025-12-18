@@ -23,7 +23,7 @@ struct Color
 	float b{ 0.0f };
 };
 
-/// Window state
+/// Initial window size
 int gWindowWidth = (1920 * 3) / 4;
 int gWindowHeight = (1080 * 3) / 4;
 
@@ -40,18 +40,26 @@ struct Camera
 /// Input state
 Visualization::Input gInput;
 
+/// Computes the half-size of the view matrix based
+/// on the current camera state
+Vec2 getViewHalfSize()
+{
+	const float aspect = float(gWindowWidth) / float(gWindowHeight);
+	return Vec2(
+		gCamera.zoom * std::min(1.0f, aspect),
+		gCamera.zoom / std::max(1.0f, aspect)
+	);
+}
+
 /// Converts cursor position to the world coordinates
 Vec2 cursorToWorld(const Vec2& pos)
 {
-	const float aspect = float(gWindowWidth) / float(gWindowHeight);
-	const float viewWidth = gCamera.zoom * std::min(1.0f, aspect);
-	const float viewHeight = gCamera.zoom / std::max(1.0f, aspect);
-
+	const Vec2 viewHalfSize = getViewHalfSize();
 	const float worldX = gCamera.pan.x +
-		(pos.x / gWindowWidth) * (2.0f * viewWidth) - viewWidth;
+		viewHalfSize.x * (2.0f * pos.x / gWindowWidth - 1.0f);
 
-	const float worldY = gCamera.pan.y -
-		((pos.y / gWindowHeight) * (2.0f * viewHeight) - viewHeight);
+	const float worldY = gCamera.pan.y +
+		viewHalfSize.y * (1.0f - 2.0f * pos.y / gWindowHeight);
 
 	return { worldX, worldY };
 }
@@ -64,26 +72,20 @@ void glfwErrorCallback(
 	logError("GLFW error ", error, ": ", description);
 }
 
-/// Update the OpenGL projection matrix based on the camera state
+/// Updates the OpenGL projection matrix based on the camera state
 void updateProjectionMatrix()
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	const float aspect =
-		static_cast<float>(gWindowWidth) /
-		static_cast<float>(gWindowHeight);
-
-	const float viewWidth = gCamera.zoom * std::min(1.0f, aspect);
-	const float viewHeight = gCamera.zoom / std::max(1.0f, aspect);
-
+	const Vec2 viewHalfSize = getViewHalfSize();
 	glOrtho(
-		-viewWidth + gCamera.pan.x, // left
-		viewWidth + gCamera.pan.x, // right
-		-viewHeight + gCamera.pan.y, // bottom
-		viewHeight + gCamera.pan.y, // top
-		-1.0, // near plane
-		 1.0 // far plane
+		-viewHalfSize.x + gCamera.pan.x, // left
+		 viewHalfSize.x + gCamera.pan.x, // right
+		-viewHalfSize.y + gCamera.pan.y, // bottom
+		 viewHalfSize.y + gCamera.pan.y, // top
+		-1.0f, // near plane
+		1.0f // far plane
 	);
 }
 
@@ -171,7 +173,10 @@ void scrollCallback(
 	double xoffset,
 	double yoffset)
 {
+	/// Min zoom value
 	constexpr int MIN_ZOOM = 1;
+
+	/// Zoom speed factor
 	constexpr int ZOOM_SPEED = 2;
 
 	NPH_UNUSED(window);
@@ -287,12 +292,13 @@ bool initImgui(GLFWwindow& result)
 		return false;
 	}
 
-	float xscale{ 0.0 };
-	float yscale{ 0.0 };
-	glfwGetWindowContentScale(&result, &xscale, &yscale);
+	float xScale{ 0.0f };
+	float yScale{ 0.0f };
+	glfwGetWindowContentScale(&result, &xScale, &yScale);
 
 	ImGuiIO& io = ImGui::GetIO();
-	io.FontGlobalScale = xscale;
+	io.FontGlobalScale = xScale;
+	// Disable creation of the .ini file
 	io.IniFilename = nullptr;
 
 	return true;
@@ -313,7 +319,7 @@ void drawArrow(
 	const Vec2 dirNorm = dir.getNormalized();
 	const Vec2 orthoLeft = getLeftOrthoVec(dirNorm);
 	const Vec2 tipEnd = end + tipSize * dirNorm;
-	const Vec2 leftArrowHead =  end + TIP_SIDE_FACTOR * tipSize * orthoLeft;
+	const Vec2 leftArrowHead = end + TIP_SIDE_FACTOR * tipSize * orthoLeft;
 	const Vec2 rightArrowHead = end - TIP_SIDE_FACTOR * tipSize * orthoLeft;
 
 	glColor3f(color.r, color.g, color.b);
@@ -406,8 +412,11 @@ void drawContacts(const World& world, float pointSize)
 		for (uint32_t i = 0; i < manifold.getContactCount(); ++i)
 		{
 			const CollisionPoint& point = manifold.getContact(i).getPoint();
-			const Vec2 point1 = bodyA.position + bodyA.rotation.getMat() * point.localPoints[0];
-			const Vec2 point2 = bodyB.position + bodyB.rotation.getMat() * point.localPoints[1];
+			const Vec2 point1 =
+				bodyA.position + bodyA.rotation.getMat() * point.localPoints[0];
+
+			const Vec2 point2 =
+				bodyB.position + bodyB.rotation.getMat() * point.localPoints[1];
 
 			// Draw contact point on body A
 			glVertex2f(point1.x, point1.y);
@@ -514,7 +523,10 @@ Vec2 Visualization::getCursorPositionWorld() const
 	double x;
 	double y;
 	glfwGetCursorPos(mWindow, &x, &y);
-	return cursorToWorld({ static_cast<float>(x), static_cast<float>(y) });
+	return cursorToWorld({
+		static_cast<float>(x),
+		static_cast<float>(y)
+		});
 }
 
 void Visualization::setClearColor(float r, float g, float b) const
