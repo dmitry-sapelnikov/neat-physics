@@ -31,7 +31,7 @@ ContactManifold::ContactManifold(
 void ContactManifold::update(const CollisionManifold& newManifold) noexcept
 {
 	// Make a backup of old contacts
-	ContactPoint oldContacts[MAX_COLLISION_POINTS];
+	std::array<ContactPoint, MAX_COLLISION_POINTS> oldContacts;
 	const uint32_t oldCount = mContactCount;
 	for (uint32_t i = 0; i < mContactCount; ++i)
 	{
@@ -41,8 +41,8 @@ void ContactManifold::update(const CollisionManifold& newManifold) noexcept
 	for (uint32_t i = 0; i < newManifold.pointsCount; ++i)
 	{
 		mContacts[i] = ContactPoint(newManifold.points[i]);
-		for (ContactPoint* oldContact = oldContacts;
-			oldContact < oldContacts + oldCount;
+		for (ContactPoint* oldContact = oldContacts.data();
+			oldContact < oldContacts.data() + oldCount;
 			++oldContact)
 		{
 			if (newManifold.points[i].featurePair ==

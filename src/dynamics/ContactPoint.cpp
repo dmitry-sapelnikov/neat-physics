@@ -90,34 +90,34 @@ void ContactPoint::solveVelocities(
 
 	// Normal impulse
 	{
-		const float impulse =
-			mNormalMass * (-dot(getVelocityAtContact(bodyA, bodyB), mPoint.normal));
+		const float impulse = -mNormalMass *
+			dot(getVelocityAtContact(bodyA, bodyB), mPoint.normal);
 
-		const float oldAccImpulse = mNormalImpulse;
-		mNormalImpulse = std::max(0.0f, oldAccImpulse + impulse);
+		const float oldImpulse = mNormalImpulse;
+		mNormalImpulse = std::max(0.0f, oldImpulse + impulse);
 		applyImpulse(
 			bodyA,
 			bodyB,
-			(mNormalImpulse - oldAccImpulse) * mPoint.normal);
+			(mNormalImpulse - oldImpulse) * mPoint.normal);
 	}
 
 	// Dry friction impulse
 	{
 		const float maxFriction = friction * mNormalImpulse;
 
-		const float impulse = (-mTangentMass) *
+		const float impulse = -mTangentMass *
 			dot(getVelocityAtContact(bodyA, bodyB), mTangent);
 
-		const float oldAccImpulse = mTangentImpulse;
+		const float oldImpulse = mTangentImpulse;
 		mTangentImpulse = std::clamp(
-			oldAccImpulse + impulse,
+			oldImpulse + impulse,
 			-maxFriction,
 			maxFriction);
 
 		applyImpulse(
 			bodyA,
 			bodyB,
-			(mTangentImpulse - oldAccImpulse) * mTangent);
+			(mTangentImpulse - oldImpulse) * mTangent);
 	}
 }
 
