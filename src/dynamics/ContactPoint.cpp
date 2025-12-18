@@ -52,6 +52,12 @@ void ContactPoint::prepareToSolve(
 	Body& bodyB,
 	float invTimeStep) noexcept
 {
+	// Position correction factor
+	static constexpr float POSITION_CORRECTION_FACTOR = 0.2f;
+
+	// Allowed penetration between geometries
+	static constexpr float ALLOWED_PENETRATION = 0.001f;
+
 	assert(invTimeStep > 0.0f);
 
 	mOffsetA = mPoint.position - bodyA.position;
@@ -59,9 +65,14 @@ void ContactPoint::prepareToSolve(
 
 	// Precompute normal mass, tangent mass, and bias.
 	mNormalMass = getEffectiveMass(bodyA, bodyB, mOffsetA, mOffsetB, mPoint.normal);
+	mNormalBias =
+		POSITION_CORRECTION_FACTOR * invTimeStep *
+		std::max(0.0f, mPoint.penetration - ALLOWED_PENETRATION);
 
 	mTangent = cross(mPoint.normal, 1.0f);
 	mTangentMass = getEffectiveMass(bodyA, bodyB, mOffsetA, mOffsetB, mTangent);
+
+	mSplitImpulse = 0.0f;
 
 	// Apply the warm starting impulse
 	applyImpulse(
@@ -80,7 +91,7 @@ void ContactPoint::solveVelocities(
 	// Normal impulse
 	{
 		const float impulse =
-			mNormalMass * -dot(getVelocityAtContact(bodyA, bodyB), mPoint.normal);
+			mNormalMass * (-dot(getVelocityAtContact(bodyA, bodyB), mPoint.normal));
 
 		const float oldAccImpulse = mNormalImpulse;
 		mNormalImpulse = std::max(0.0f, oldAccImpulse + impulse);
@@ -114,43 +125,22 @@ void ContactPoint::solvePositions(
 	Body& bodyA,
 	Body& bodyB) noexcept
 {
-	// This method is similar to the position based dynamics (PBD) approach :
-	// we directly modify the positions and rotations of the bodies
+	const Vec2 velocityAtContact =
+		bodyB.splitLinearVelocity + cross(bodyB.splitAngularVelocity, mOffsetB) -
+		bodyA.splitLinearVelocity - cross(bodyA.splitAngularVelocity, mOffsetA);
 
-	// Baumgarte stabilization factor
-	static constexpr float BAUMGARTE_STAB = 0.2f;
+	const float impulse =
+		mNormalMass * (mNormalBias - dot(velocityAtContact, mPoint.normal));
 
-	// Allowed penetration between geometries
-	static constexpr float ALLOWED_PENETRATION = 0.001f;
+	const float oldAccImpulse = mSplitImpulse;
+	mSplitImpulse = std::max(0.0f, oldAccImpulse + impulse);
+	const Vec2 impulseVec = (mSplitImpulse - oldAccImpulse) * mPoint.normal;
 
-	Vec2 normal;
-	float penetration;
-	Vec2 planePoint;
-	getTransformedContact(bodyA, bodyB, normal, planePoint, penetration);
+	bodyA.splitLinearVelocity += bodyA.invMass * -impulseVec;
+	bodyA.splitAngularVelocity += bodyA.invInertia * cross(mOffsetA, -impulseVec);
 
-	const float biasFactor = std::max(
-		0.0f,
-		BAUMGARTE_STAB * (penetration - ALLOWED_PENETRATION));
-
-	const Vec2 offsetA = planePoint - bodyA.position;
-	const Vec2 offsetB = planePoint - bodyB.position;
-
-	// Compute the effective mass
-	const float effMass =
-		getEffectiveMass(bodyA, bodyB, offsetA, offsetB, normal);
-
-	// Compute the penetration resolution impulse
-	const Vec2 penetrationImpulse =
-		std::max(0.0f, biasFactor * effMass) * normal;
-
-	// Directly integrate positions and rotations
-	bodyA.position -= bodyA.invMass * penetrationImpulse;
-	bodyA.rotation.setAngle(bodyA.rotation.getAngle() -
-		bodyA.invInertia * cross(offsetA, penetrationImpulse));
-
-	bodyB.position += bodyB.invMass * penetrationImpulse;
-	bodyB.rotation.setAngle(bodyB.rotation.getAngle() +
-		bodyB.invInertia * cross(offsetB, penetrationImpulse));
+	bodyB.splitLinearVelocity += bodyB.invMass * impulseVec;
+	bodyB.splitAngularVelocity += bodyB.invInertia * cross(mOffsetB, impulseVec);
 }
 
 /// Returns the relative velocity at the contact point

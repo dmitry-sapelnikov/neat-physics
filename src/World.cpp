@@ -58,8 +58,8 @@ void World::doStep(float timeStep)
 
 	mContactSolver.prepareToSolve(timeStep);
 	mContactSolver.solveVelocities(mVelocityIterations);
-	integrateVelocities(timeStep);
 	mContactSolver.solvePositions(mPositionIterations);
+	integrateVelocities(timeStep);
 }
 
 void World::applyForces(float timeStep)
@@ -74,9 +74,18 @@ void World::integrateVelocities(float timeStep)
 {
 	for (auto& body : mBodies)
 	{
+		float angle = body.rotation.getAngle();
+
 		body.position += timeStep * body.linearVelocity;
-		body.rotation.setAngle(
-			body.rotation.getAngle() + timeStep * body.angularVelocity);
+		angle += timeStep * body.angularVelocity;
+
+		body.position += timeStep * body.splitLinearVelocity;
+		angle += timeStep * body.splitAngularVelocity;
+
+		body.rotation.setAngle(angle);
+
+		body.splitLinearVelocity = Vec2{ 0.0f, 0.0f };
+		body.splitAngularVelocity = 0.0f;
 	}
 }
 

@@ -47,6 +47,12 @@ struct Body
 	/// Angular velocity
 	float angularVelocity{ 0.0f };
 
+	/// Split linear velocity
+	Vec2 splitLinearVelocity{ 0.0f, 0.0f };
+
+	/// Split ngular velocity
+	float splitAngularVelocity{ 0.0f };
+
 	/// Constructor
 	/// \param inSize Body size; must be > 0 in both dimensions
 	/// \param inMass Body mass; if 0, the body is static; must be >= 0

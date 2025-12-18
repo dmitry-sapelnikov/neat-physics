@@ -89,6 +89,8 @@ private:
 	/// Effective mass in the normal direction
 	float mNormalMass;
 
+	float mNormalBias{ 0.0f };
+
 	/// Effective mass in the tangent direction
 	float mTangentMass;
 
@@ -97,6 +99,9 @@ private:
 
 	/// Accumulated tangent (friction) impulse
 	float mTangentImpulse;
+
+	/// Accumulated split impulse
+	float mSplitImpulse{ 0.0f };
 };
 
 }
