@@ -17,13 +17,13 @@ namespace
 Aabb getAabb(const Body& body) noexcept
 {
 	const Mat22 absRotation = abs(body.rotation.getMat());
-	const Vec2 extents =
+	const Vec2 halfExtents =
 		body.halfSize.x * absRotation.col1 +
 		body.halfSize.y * absRotation.col2;
 
 	return {
-		body.position - extents,
-		body.position + extents
+		body.position - halfExtents,
+		body.position + halfExtents
 	};
 }
 
@@ -49,11 +49,11 @@ void BroadPhase::update(BroadPhaseCallback& callback)
 
 	// Add endpoints for bodies that have been added since the last update
 	assert(mEndpoints.size() % 2 == 0);
-	for (int32_t i = static_cast<int32_t>(mEndpoints.size() >> 1);
-		 i < static_cast<int32_t>(mBodies.size()); ++i)
+	for (int32_t ei = static_cast<int32_t>(mEndpoints.size() >> 1);
+		ei < static_cast<int32_t>(mBodies.size()); ++ei) // Endpoint index
 	{
-		mEndpoints.emplace_back(0.0f, i, true);
-		mEndpoints.emplace_back(0.0f, i, false);
+		mEndpoints.emplace_back(0.0f, ei, true);
+		mEndpoints.emplace_back(0.0f, ei, false);
 	}
 
 	// Update endpoint positions
@@ -72,28 +72,25 @@ void BroadPhase::update(BroadPhaseCallback& callback)
 void BroadPhase::sweepAxis(BroadPhaseCallback& callback)
 {
 	mActivePoints.clear();
-
-	const Body* bodyStart = mBodies.data();
-	const Aabb* aabbStart = mAabbs.data();
 	for (const auto& endpoint : mEndpoints)
 	{
 		if (endpoint.isStart)
 		{
 			const uint32_t i1 = endpoint.index;
-			const Body* bodyA = bodyStart + i1;
-			const Aabb* aabbA = aabbStart + i1;
+			const Body& bodyA = mBodies[i1];
+			const Aabb& aabbA = mAabbs[i1];
 
 			for (uint32_t i2 : mActivePoints)
 			{
-				if (bodyA->isStatic() && (bodyStart + i2)->isStatic())
+				if (bodyA.isStatic() && mBodies[i2].isStatic())
 				{
 					continue;
 				}
 
 				// If y-axes don't intersect
-				const Aabb* aabbB = aabbStart + i2;
-				if (aabbA->max.y < aabbB->min.y || 
-					aabbB->max.y < aabbA->min.y)
+				const Aabb& aabbB = mAabbs[i2];
+				if (aabbA.max.y < aabbB.min.y ||
+					aabbB.max.y < aabbA.min.y)
 				{
 					continue;
 				}
