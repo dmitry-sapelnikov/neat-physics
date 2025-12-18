@@ -22,7 +22,7 @@ public:
 	/// Constructor
 	ContactSolver(BodyArray& bodies) noexcept;
 
-	/// Clear all contact manifolds
+	/// Clears all contact manifolds
 	void clear() noexcept;
 
 	/// Returns the contact manifolds
@@ -34,7 +34,7 @@ public:
 	/// Prepares the contact manifolds update
 	void prepareManifoldsUpdate() noexcept;
 
-	/// Update a contact manifold
+	/// Collision callback
 	void onCollision(const CollisionManifold& collisionManifold);
 
 	/// Finishes the contact manifolds update

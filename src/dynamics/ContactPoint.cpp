@@ -76,34 +76,34 @@ void ContactPoint::solveVelocities(
 
 	// Normal impulse
 	{
-		const float impulse =
-			mNormalMass * -dot(getVelocityAtContact(bodyA, bodyB), mPoint.normal);
+		const float impulse = -mNormalMass *
+			dot(getVelocityAtContact(bodyA, bodyB), mPoint.normal);
 
-		const float oldAccImpulse = mNormalImpulse;
-		mNormalImpulse = std::max(0.0f, oldAccImpulse + impulse);
+		const float oldImpulse = mNormalImpulse;
+		mNormalImpulse = std::max(0.0f, oldImpulse + impulse);
 		applyImpulse(
 			bodyA,
 			bodyB,
-			(mNormalImpulse - oldAccImpulse) * mPoint.normal);
+			(mNormalImpulse - oldImpulse) * mPoint.normal);
 	}
 
 	// Dry friction impulse
 	{
 		const float maxFriction = friction * mNormalImpulse;
 
-		const float impulse = (-mTangentMass) *
+		const float impulse = -mTangentMass *
 			dot(getVelocityAtContact(bodyA, bodyB), mTangent);
 
-		const float oldAccImpulse = mTangentImpulse;
+		const float oldImpulse = mTangentImpulse;
 		mTangentImpulse = std::clamp(
-			oldAccImpulse + impulse,
+			oldImpulse + impulse,
 			-maxFriction,
 			maxFriction);
 
 		applyImpulse(
 			bodyA,
 			bodyB,
-			(mTangentImpulse - oldAccImpulse) * mTangent);
+			(mTangentImpulse - oldImpulse) * mTangent);
 	}
 }
 
@@ -132,15 +132,12 @@ void ContactPoint::solvePositions(
 	const Vec2 offsetA = planePoint - bodyA.position;
 	const Vec2 offsetB = planePoint - bodyB.position;
 
-	// Compute the effective mass
-	const float effMass =
+	const float effectiveMass =
 		getEffectiveMass(bodyA, bodyB, offsetA, offsetB, normal);
 
-	// Compute the penetration resolution impulse
-	const Vec2 penetrationImpulse =
-		std::max(0.0f, biasFactor * effMass) * normal;
+	const Vec2 penetrationImpulse = std::max(0.0f, effectiveMass * biasFactor) * normal;
 
-	// Directly integrate positions and rotations
+	// Directly integrate positions and rotations of the bodies in contact
 	bodyA.position -= bodyA.invMass * penetrationImpulse;
 	bodyA.rotation.setAngle(bodyA.rotation.getAngle() -
 		bodyA.invInertia * cross(offsetA, penetrationImpulse));
