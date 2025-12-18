@@ -167,7 +167,7 @@ void ContactPoint::getTransformedContact(
 	const Body& bodyA,
 	const Body& bodyB,
 	Vec2& normal,
-	Vec2& planePoint,
+	Vec2& clippedPoint,
 	float& penetration) const
 {
 	const std::array<Vec2, 2> positions{
@@ -182,17 +182,17 @@ void ContactPoint::getTransformedContact(
 	const uint32_t ind1 = contact.clipBoxIndex;
 	const uint32_t ind2 = 1 - ind1;
 
-	const Vec2 clipPoint =
+	clippedPoint =
 		positions[ind2] +
 		rotations[ind2] * contact.localPoints[ind2];
 
 	normal = rotations[ind1] * contact.localContactNormal;
 
-	planePoint =
+	const Vec2 planePoint =
 		positions[ind1] +
 		rotations[ind1] * contact.localPoints[ind1];
 
-	penetration = dot(planePoint - clipPoint, normal);
+	penetration = dot(planePoint - clippedPoint, normal);
 
 	// Normal must point from A to B
 	normal = (ind1 == 0) ? normal : -normal;
