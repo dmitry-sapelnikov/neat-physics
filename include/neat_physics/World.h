@@ -90,8 +90,8 @@ private:
 	/// Applies forces to all bodies
 	void applyForces(float timeStep);
 
-	/// Integrates velocities of all bodies
-	void integrateVelocities(float timeStep);
+	/// Integrates positions of all bodies
+	void integratePositions(float timeStep);
 
 	/// Gravity vector
 	Vec2 mGravity;
