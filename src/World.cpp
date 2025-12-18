@@ -59,7 +59,7 @@ void World::doStep(float timeStep)
 	mContactSolver.prepareToSolve(timeStep);
 	mContactSolver.solveVelocities(mVelocityIterations);
 	mContactSolver.solvePositions(mPositionIterations);
-	integrateVelocities(timeStep);
+	integratePositions(timeStep);
 }
 
 void World::applyForces(float timeStep)
@@ -70,7 +70,7 @@ void World::applyForces(float timeStep)
 	}
 }
 
-void World::integrateVelocities(float timeStep)
+void World::integratePositions(float timeStep)
 {
 	for (auto& body : mBodies)
 	{
