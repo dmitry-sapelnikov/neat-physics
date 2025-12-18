@@ -58,34 +58,50 @@ void ContactSolver::prepareManifoldsUpdate() noexcept
 
 void ContactSolver::onCollision(const CollisionManifold& manifold)
 {
-	Body* start = mBodies.data();
-	Body* bodyA = start + manifold.bodyIndA;
-	Body* bodyB = start + manifold.bodyIndB;
-
 	const uint64_t key =
 		(static_cast<uint64_t>(manifold.bodyIndA) << 32) |
 		manifold.bodyIndB;
 
-	if (auto iter = mManifolds.find(key);
-		iter != mManifolds.end())
+	if (auto iter = mContactPairs.find(key);
+		iter != mContactPairs.end())
 	{
-		iter->second.update(manifold);
+		mManifolds[iter->second].second.update(manifold);
 	}
 	else
 	{
-		mManifolds.try_emplace(key, bodyA, bodyB, manifold);
+		size_t manifoldCount = mManifolds.size();
+		assert(manifoldCount <= std::numeric_limits<uint32_t>::max());
+		const uint32_t index = static_cast<uint32_t>(manifoldCount);
+		mManifolds.emplace_back(
+			std::piecewise_construct,
+			std::forward_as_tuple(mContactPairs.try_emplace(key, index).first),
+			std::forward_as_tuple(
+				&mBodies[manifold.bodyIndA],
+				&mBodies[manifold.bodyIndB],
+				manifold)
+		);
 	}
 }
 
 void ContactSolver::finishManifoldsUpdate()
 {
-	// Remove obsolete manifolds
-	std::erase_if(
-		mManifolds,
-		[](const auto& pair)
+	// Remove obsolete manifolds, rewire the contact pairs map
+	size_t mi = 0;
+	while (mi < mManifolds.size())
+	{
+		if (mManifolds[mi].second.isObsolete())
 		{
-			return pair.second.isObsolete();
-		});
+			mContactPairs.erase(mManifolds[mi].first);
+			// Swap and pop
+			mManifolds[mi] = std::move(mManifolds.back());
+			mManifolds[mi].first->second = static_cast<uint32_t>(mi);
+			mManifolds.pop_back();
+		}
+		else
+		{
+			++mi;
+		}
+	}
 }
 
 } // namespace nph
