@@ -38,11 +38,9 @@ public:
 	void updateFrom(const ContactPoint& other) noexcept;
 
 	/// Prepares the contact point for velocity solving;
-	/// asserts that invTimeStep > 0
 	void prepareToSolve(
 		Body& bodyA,
-		Body& bodyB,
-		float invTimeStep) noexcept;
+		Body& bodyB) noexcept;
 	
 	/// Solves the contact velocities
 	/// asserts that friction is in [0, 1]

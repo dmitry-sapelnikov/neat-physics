@@ -41,7 +41,7 @@ public:
 	void finishManifoldsUpdate();
 
 	/// Prepares the contact solver for velocity solving
-	void prepareToSolve(float timeStep) noexcept;
+	void prepareToSolve() noexcept;
 
 	/// Solves the contact velocities
 	void solveVelocities(uint32_t velocityIterations) noexcept;

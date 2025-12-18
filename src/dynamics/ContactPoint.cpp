@@ -49,11 +49,8 @@ void ContactPoint::updateFrom(const ContactPoint& other) noexcept
 
 void ContactPoint::prepareToSolve(
 	Body& bodyA,
-	Body& bodyB,
-	float invTimeStep) noexcept
+	Body& bodyB) noexcept
 {
-	assert(invTimeStep > 0.0f);
-
 	mOffsetA = mPoint.position - bodyA.position;
 	mOffsetB = mPoint.position - bodyB.position;
 

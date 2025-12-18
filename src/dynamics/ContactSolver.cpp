@@ -18,12 +18,11 @@ void ContactSolver::clear() noexcept
 	mManifolds.clear();
 }
 
-void ContactSolver::prepareToSolve(float timeStep) noexcept
+void ContactSolver::prepareToSolve() noexcept
 {
-	const float invTimeStep = 1.0f / timeStep;
 	for (auto& [key, manifold] : mManifolds)
 	{
-		manifold.prepareToSolve(invTimeStep);
+		manifold.prepareToSolve();
 	}
 }
 

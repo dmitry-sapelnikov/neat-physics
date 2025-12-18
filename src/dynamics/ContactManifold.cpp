@@ -57,13 +57,13 @@ void ContactManifold::update(const CollisionManifold& newManifold) noexcept
 	mObsolete = false;
 }
 
-void ContactManifold::prepareToSolve(float invTimeStep) noexcept
+void ContactManifold::prepareToSolve() noexcept
 {
 	for (ContactPoint* contact = mContacts.data();
 		contact < mContacts.data() + mContactCount;
 		++contact)
 	{
-		contact->prepareToSolve(*mBodyA, *mBodyB, invTimeStep);
+		contact->prepareToSolve(*mBodyA, *mBodyB);
 	}
 }
 

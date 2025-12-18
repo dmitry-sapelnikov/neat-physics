@@ -64,7 +64,7 @@ public:
 	void update(const CollisionManifold& newManifold) noexcept;
 
 	/// Prepares the contact manifold for velocity solving
-	void prepareToSolve(float invTimeStep) noexcept;
+	void prepareToSolve() noexcept;
 
 	/// Solves the contact velocities
 	void solveVelocities() noexcept;
