@@ -59,9 +59,7 @@ private:
 		{
 			return position != other.position ?
 				position < other.position :
-				// We need to use > to let start points with the same position come first
-				// in order to detect 'touch' intersections
-				isStart > other.isStart;
+				isStart < other.isStart;
 		}
 	};
 
