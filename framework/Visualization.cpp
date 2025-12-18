@@ -261,7 +261,6 @@ bool initOpenGL()
 		logError("Failed to load OpenGL functions using glad.");
 		return false;
 	}
-	glClearColor(0.0f, 0.0f, 20.0f / 255.0f, 1.0f);
 
 	// Enable alpha blending for body fill
 	glEnable(GL_BLEND);
@@ -446,6 +445,7 @@ Visualization::Visualization()
 		return;
 
 	setVSyncEnabled(true);
+	setClearColor(0.0f, 0.0f, 20.0f / 255.0f);
 	updateProjectionMatrix();
 	mWindow = result;
 }
@@ -552,7 +552,8 @@ void Visualization::drawWorld(
 	/// so they may not match the bodies' current positions
 	if (settings.aabbs)
 	{
-		for (const Aabb& aabb : world.getCollision().getBroadPhase().getAabbs())
+		for (const Aabb& aabb :
+			world.getCollision().getBroadPhase().getAabbs())
 		{
 			drawAabb(aabb);
 		}
