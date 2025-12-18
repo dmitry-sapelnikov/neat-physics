@@ -71,7 +71,7 @@ private:
 		const Body& bodyA,
 		const Body& bodyB,
 		Vec2& normal,
-		Vec2& planePoint,
+		Vec2& clippedPoint,
 		float& penetration) const;
 
 	/// Collision point

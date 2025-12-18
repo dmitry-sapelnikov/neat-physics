@@ -240,17 +240,17 @@ uint32_t getBoxBoxCollision(
 				continue;
 			}
 
-			Vec2Array2 localPoints;
-			const Vec2 resultPosition =
-				edge[pi].position + penetration * clipNormal;
+			const Vec2& clippedPoint = edge[pi].position;
+			const Vec2 planePoint = clippedPoint + penetration * clipNormal;
 
+			Vec2Array2 localPoints;
 			localPoints[clipBoxInd] =
 				invRotations[clipBoxInd] *
-				(resultPosition - positions[clipBoxInd]);
+				(planePoint - positions[clipBoxInd]);
 
 			localPoints[incidentBoxInd] =
 				invRotations[incidentBoxInd] *
-				(edge[pi].position - positions[incidentBoxInd]);
+				(clippedPoint - positions[incidentBoxInd]);
 
 			// Keep ordering in case if we have a flip of the
 			// clipping-incident boxes.
@@ -261,7 +261,7 @@ uint32_t getBoxBoxCollision(
 			}
 
 			result[resultPointCount++] = CollisionPoint(
-				resultPosition,
+				clippedPoint,
 				minPenetrationDir,
 				penetration,
 				point.featurePair,
