@@ -18,9 +18,6 @@ static constexpr uint32_t MAX_BODIES = 5000;
 /// Gravity
 static constexpr float GRAVITY = 10.0f;
 
-/// Simulation step
-static constexpr float SIMULATION_STEP = 1.0f / 60.0f;
-
 /// Simulation control parameters
 struct SimulationControl
 {
@@ -31,7 +28,7 @@ struct SimulationControl
 	float boxSize{ 8.0f };
 	float boxSideRatio{ 0.5f };
 	float timeStepFrequency{ 50.0f };
-	int velocityIterations{ 20 };
+	int velocityIterations{ 30 };
 	int positionIterations{ 10 };
 };
 
