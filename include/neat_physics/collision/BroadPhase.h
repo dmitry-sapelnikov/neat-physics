@@ -39,9 +39,18 @@ public:
 	}
 
 	/// Updates the pairs of bodies which AABBs are overlapping
-	void update(BroadPhaseCallback& callback);
+	template <typename Callback>
+	void update(Callback callback)
+	{
+		// Reserve-emplace because Aabb is immutable
+		prepareSweep();
+		sweepAxis(callback);
+	}
 
 private:
+	/// Prepares for the sweep-and-prune algorithm
+	void prepareSweep();
+
 	/// Endpoint of a segment
 	struct Endpoint
 	{
@@ -64,7 +73,56 @@ private:
 	};
 
 	/// Sweeps the AABBs along the X axis
-	void sweepAxis(BroadPhaseCallback& callback);
+	template <typename Callback>
+	void sweepAxis(Callback callback)
+	{
+		mActivePoints.clear();
+		for (const auto& endpoint : mEndpoints)
+		{
+			if (endpoint.isStart)
+			{
+				const uint32_t i1 = endpoint.index;
+				const Body& bodyA = mBodies[i1];
+				const Aabb& aabbA = mAabbs[i1];
+
+				for (uint32_t i2 : mActivePoints)
+				{
+					if (bodyA.isStatic() && mBodies[i2].isStatic())
+					{
+						continue;
+					}
+
+					// If y-axes don't intersect
+					const Aabb& aabbB = mAabbs[i2];
+					if (aabbA.max.y < aabbB.min.y ||
+						aabbB.max.y < aabbA.min.y)
+					{
+						continue;
+					}
+
+					if (i1 < i2)
+					{
+						callback(i1, i2);
+					}
+					else
+					{
+						callback(i2, i1);
+					}
+				}
+				mActiveMapping[endpoint.index] = static_cast<uint32_t>(mActivePoints.size());
+				mActivePoints.push_back(i1);
+			}
+			else
+			{
+				// Swap and pop
+				const uint32_t idx = mActiveMapping[endpoint.index];
+				const uint32_t last = mActivePoints.back();
+				mActivePoints[idx] = last;
+				mActiveMapping[last] = idx;
+				mActivePoints.pop_back();
+			}
+		}
+	}
 
 	/// Reference to the bodies
 	const BodyArray& mBodies;

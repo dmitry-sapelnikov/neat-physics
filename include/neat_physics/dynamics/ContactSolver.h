@@ -13,7 +13,7 @@ namespace nph
 {
 
 /// Solver for contact constraints between bodies
-class ContactSolver : public CollisionCallback
+class ContactSolver
 {
 public:
 	/// Map of contact pairs.
@@ -44,8 +44,8 @@ public:
 	/// Prepares the contact manifolds update
 	void prepareManifoldsUpdate() noexcept;
 
-	/// Collision callback
-	void onCollision(const CollisionManifold& collisionManifold);
+	/// Adds a collision manifold
+	void addManifold(const CollisionManifold& collisionManifold);
 
 	/// Finishes the contact manifolds update
 	void finishManifoldsUpdate();

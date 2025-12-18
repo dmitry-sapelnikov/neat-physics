@@ -53,7 +53,13 @@ void World::doStep(float timeStep)
 	applyForces(timeStep);
 
 	mContactSolver.prepareManifoldsUpdate();
-	mCollision.update(mContactSolver);
+
+	auto collisionCallback = [this](const CollisionManifold& manifold)
+	{
+		mContactSolver.addManifold(manifold);
+	};
+
+	mCollision.update(collisionCallback);
 	mContactSolver.finishManifoldsUpdate();
 
 	mContactSolver.prepareToSolve();

@@ -13,7 +13,7 @@ namespace nph
 {
 
 /// Collision system, computes contact manifolds between geometries
-class CollisionSystem : private BroadPhaseCallback
+class CollisionSystem
 {
 public:
 	/// Constructor
@@ -30,10 +30,24 @@ public:
 	}
 
 	/// Updates the collision manifolds
-	void update(CollisionCallback& callback);
+	template <typename CollisionCallback>
+	void update(CollisionCallback callback)
+	{
+		mBroadPhase.update([this, callback](
+			uint32_t bodyIndA,
+			uint32_t bodyIndB)
+			{
+				const CollisionManifold manifold =
+					getManifold(bodyIndA, bodyIndB);
+				if (manifold.pointsCount > 0)
+				{
+					callback(manifold);
+				}
+			});
+	}
 
 private:
-	void onCollision(uint32_t bodyIndA, uint32_t bodyIndB) override;
+	CollisionManifold getManifold(uint32_t bodyIndA, uint32_t bodyIndB) const;
 
 	/// Reference to the bodies
 	const BodyArray& mBodies;

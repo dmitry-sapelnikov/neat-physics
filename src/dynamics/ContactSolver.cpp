@@ -56,7 +56,7 @@ void ContactSolver::prepareManifoldsUpdate() noexcept
 	}
 }
 
-void ContactSolver::onCollision(const CollisionManifold& manifold)
+void ContactSolver::addManifold(const CollisionManifold& manifold)
 {
 	const uint64_t key =
 		(static_cast<uint64_t>(manifold.bodyIndA) << 32) |

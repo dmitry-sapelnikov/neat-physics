@@ -9,14 +9,9 @@
 namespace nph
 {
 
-void CollisionSystem::update(CollisionCallback& callback)
-{
-	mCallback = &callback;
-	mBroadPhase.update(*this);
-	mCallback = nullptr;
-}
-
-void CollisionSystem::onCollision(uint32_t bodyIndA, uint32_t bodyIndB)
+CollisionManifold CollisionSystem::getManifold(
+	uint32_t bodyIndA,
+	uint32_t bodyIndB) const
 {
 	const Body& bodyA = mBodies[bodyIndA];
 	const Body& bodyB = mBodies[bodyIndB];
@@ -27,11 +22,7 @@ void CollisionSystem::onCollision(uint32_t bodyIndA, uint32_t bodyIndB)
 		{ bodyA.rotation, bodyB.rotation },
 		{ bodyA.halfSize, bodyB.halfSize },
 		manifold.points);
-
-	if (manifold.pointsCount > 0)
-	{
-		mCallback->onCollision(manifold);
-	}
+	return manifold;
 }
 
 // End of namespace nph
