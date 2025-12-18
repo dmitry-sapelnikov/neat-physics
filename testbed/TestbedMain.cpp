@@ -21,14 +21,34 @@ static constexpr float GRAVITY = 10.0f;
 /// Simulation control parameters
 struct SimulationControl
 {
+	/// V-Sync flag
 	bool vSync{ true };
+
+	/// Reset world flag
 	bool resetWorld{ true };
+
+	/// Simulation running flag
+	bool simulationRunning{ true };
+
+	/// Friction for newly created bodies
 	float friction{ 0.0f };
+
+	/// Density of newly created boxes
 	float boxDensity{ 200.0f };
+
+	/// Number of boxes along the glass width
 	float boxSize{ 8.0f };
+
+	/// Box side ratio (height / width)
 	float boxSideRatio{ 0.5f };
+
+	/// Time step frequency
 	float timeStepFrequency{ 50.0f };
+
+	/// Velocity solver iterations
 	int velocityIterations{ 30 };
+
+	/// Position solver iterations
 	int positionIterations{ 10 };
 };
 
@@ -220,11 +240,22 @@ void drawGui(
 			&simulationControl.vSync);
 
 		// Add 'World' splitter
-		if (ImGui::CollapsingHeader("World", ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::CollapsingHeader(
+			"World",
+			ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			simulationControl.resetWorld = ImGui::Button(
-				"Reset",
-				{ ImGui::GetWindowWidth() * 0.4f, 0.0f });
+			const ImVec2 buttonsSize{
+				ImGui::GetWindowWidth() * 0.4f,
+				0.0f };
+			simulationControl.resetWorld = ImGui::Button("Reset", buttonsSize);
+
+			if (ImGui::Button(
+				simulationControl.simulationRunning ? "Pause" : "Resume",
+				buttonsSize))
+			{
+				simulationControl.simulationRunning = 
+					!simulationControl.simulationRunning;
+			}
 
 			ImGui::SliderFloat(
 				"New Bodies Friction",
@@ -280,7 +311,6 @@ void drawGui(
 		}
 		ImGui::Unindent(20.0f);
 	}
-
 	ImGui::End();
 }
 
@@ -344,10 +374,13 @@ int main()
 			world.setPositionIterations(
 				uint32_t(simulationControl.positionIterations));
 
-			const auto tic = std::chrono::high_resolution_clock::now();
-			world.doStep(1.0f / simulationControl.timeStepFrequency);
-			const auto toc = std::chrono::high_resolution_clock::now();
-			lastPhyicsStepTime = toc - tic;
+			if (simulationControl.simulationRunning)
+			{
+				const auto tic = std::chrono::high_resolution_clock::now();
+				world.doStep(1.0f / simulationControl.timeStepFrequency);
+				const auto toc = std::chrono::high_resolution_clock::now();
+				lastPhyicsStepTime = toc - tic;
+			}
 		}
 		return 0;
 	}
