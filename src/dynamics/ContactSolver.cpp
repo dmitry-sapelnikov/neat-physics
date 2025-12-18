@@ -20,9 +20,9 @@ void ContactSolver::clear() noexcept
 
 void ContactSolver::prepareToSolve() noexcept
 {
-	for (auto& [key, manifold] : mManifolds)
+	for (auto& pair : mManifolds)
 	{
-		manifold.prepareToSolve();
+		pair.second.prepareToSolve();
 	}
 }
 
@@ -30,9 +30,9 @@ void ContactSolver::solveVelocities(uint32_t velocityIterations) noexcept
 {
 	for (uint32_t i = 0; i < velocityIterations; ++i)
 	{
-		for (auto& [key, manifold] : mManifolds)
+		for (auto& pair : mManifolds)
 		{
-			manifold.solveVelocities();
+			pair.second.solveVelocities();
 		}
 	}
 }
@@ -41,9 +41,9 @@ void ContactSolver::solvePositions(uint32_t positionIterations) noexcept
 {
 	for (uint32_t i = 0; i < positionIterations; ++i)
 	{
-		for (auto& [key, manifold] : mManifolds)
+		for (auto& pair : mManifolds)
 		{
-			manifold.solvePositions();
+			pair.second.solvePositions();
 		}
 	}
 }
