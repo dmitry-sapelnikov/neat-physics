@@ -59,6 +59,11 @@ public:
 	/// Solves the contact positions (penetration)
 	void solvePositions(uint32_t positionIterations) noexcept;
 
+	/// Called when bodies are reallocated
+	/// \param memoryOffset the offset in BYTES between the previously allocated
+	/// and newly allocated body arrays
+	void onBodiesReallocation(std::ptrdiff_t memoryOffsetInBytes) noexcept;
+
 private:
 	/// Reference to the body array
 	BodyArray& mBodies;

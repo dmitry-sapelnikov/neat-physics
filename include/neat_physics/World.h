@@ -21,10 +21,13 @@ public:
 	/// \param gravity Gravity vector applied to all bodies
 	/// \param velocityIterations Velocity iterations for constraint solvers; asserted to be > 0
 	World(
-		uint32_t maxBodies,
 		const Vec2& gravity,
 		uint32_t velocityIterations,
 		uint32_t positionIterations);
+
+	/// Reserves memory for bodies
+	/// \note The number of bodies is intentionally limited to uint32_t
+	void reserveBodies(uint32_t maxBodies);
 
 	/// Returns the bodies in the world
 	[[nodiscard]] const BodyArray& getBodies() const noexcept
@@ -46,7 +49,7 @@ public:
 
 	/// Adds a body to the world
 	/// \return the added body or nullptr if the body could not be added
-	/// (e.g., maximum number of bodies reached)
+	/// (e.g., when the number of bodies == uint32_t max value)
 	Body* addBody(
 		const Vec2& size,
 		float mass,

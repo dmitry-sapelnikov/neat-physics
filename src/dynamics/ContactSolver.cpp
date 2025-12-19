@@ -19,6 +19,14 @@ void ContactSolver::clear() noexcept
 	mManifolds.clear();
 }
 
+void ContactSolver::onBodiesReallocation(std::ptrdiff_t memoryOffsetInBytes) noexcept
+{
+	for (auto& pair : mManifolds)
+	{
+		pair.second.onBodiesReallocation(memoryOffsetInBytes);
+	}
+}
+
 void ContactSolver::prepareToSolve() noexcept
 {
 	for (auto& pair : mManifolds)
@@ -77,8 +85,8 @@ void ContactSolver::onCollision(const CollisionManifold& manifold)
 			std::piecewise_construct,
 			std::forward_as_tuple(mContactPairs.try_emplace(key, index).first),
 			std::forward_as_tuple(
-				&mBodies[manifold.bodyIndA],
-				&mBodies[manifold.bodyIndB],
+				mBodies[manifold.bodyIndA],
+				mBodies[manifold.bodyIndB],
 				manifold)
 		);
 	}
