@@ -15,6 +15,7 @@ ContactSolver::ContactSolver(BodyArray& bodies) noexcept :
 
 void ContactSolver::clear() noexcept
 {
+	mContactPairs.clear();
 	mManifolds.clear();
 }
 
