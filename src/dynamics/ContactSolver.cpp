@@ -85,8 +85,8 @@ void ContactSolver::onCollision(const CollisionManifold& manifold)
 			std::piecewise_construct,
 			std::forward_as_tuple(mContactPairs.try_emplace(key, index).first),
 			std::forward_as_tuple(
-				&mBodies[manifold.bodyIndA],
-				&mBodies[manifold.bodyIndB],
+				mBodies[manifold.bodyIndA],
+				mBodies[manifold.bodyIndB],
 				manifold)
 		);
 	}

@@ -18,8 +18,8 @@ class ContactManifold
 public:
 	/// Constructor
 	ContactManifold(
-		Body* bodyA,
-		Body* bodyB,
+		Body& bodyA,
+		Body& bodyB,
 		const CollisionManifold& manifold) noexcept;
 
 	/// Returns the first body

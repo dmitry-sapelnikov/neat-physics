@@ -11,12 +11,12 @@ namespace nph
 
 // Global classes
 ContactManifold::ContactManifold(
-	Body* bodyA,
-	Body* bodyB,
+	Body& bodyA,
+	Body& bodyB,
 	const CollisionManifold& manifold) noexcept :
 
-	mBodyA(bodyA),
-	mBodyB(bodyB),
+	mBodyA(&bodyA),
+	mBodyB(&bodyB),
 	mContacts{ manifold.points[0], manifold.points[1] },
 	mContactCount(manifold.pointsCount),
 	mObsolete(false),
