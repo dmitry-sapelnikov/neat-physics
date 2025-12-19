@@ -87,4 +87,14 @@ void ContactManifold::solvePositions() noexcept
 	}
 }
 
+void ContactManifold::onBodiesReallocation(
+	std::ptrdiff_t memoryOffsetInBytes) noexcept
+{
+	mBodyA = reinterpret_cast<Body*>(
+		reinterpret_cast<std::byte*>(mBodyA) + memoryOffsetInBytes);
+
+	mBodyB = reinterpret_cast<Body*>(
+		reinterpret_cast<std::byte*>(mBodyB) + memoryOffsetInBytes);
+}
+
 } // namespace nph

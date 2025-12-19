@@ -19,6 +19,14 @@ void ContactSolver::clear() noexcept
 	mManifolds.clear();
 }
 
+void ContactSolver::onBodiesReallocation(std::ptrdiff_t memoryOffsetInBytes) noexcept
+{
+	for (auto& pair : mManifolds)
+	{
+		pair.second.onBodiesReallocation(memoryOffsetInBytes);
+	}
+}
+
 void ContactSolver::prepareToSolve() noexcept
 {
 	for (auto& pair : mManifolds)
