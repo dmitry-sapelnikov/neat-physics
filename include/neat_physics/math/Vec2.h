@@ -11,10 +11,6 @@
 namespace nph
 {
 
-/// Generic vector template
-template <uint16_t D>
-struct Vec;
-
 /// 2-dimensional vector
 template <>
 struct Vec<2>

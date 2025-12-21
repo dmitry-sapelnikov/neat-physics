@@ -8,7 +8,6 @@
 // Includes
 #include <cassert>
 #include <cmath>
-#include <cfloat>
 
 namespace nph
 {
