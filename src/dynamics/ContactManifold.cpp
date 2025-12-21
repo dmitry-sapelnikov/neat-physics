@@ -31,7 +31,7 @@ ContactManifold::ContactManifold(
 void ContactManifold::update(const CollisionManifold<2>& newManifold) noexcept
 {
 	// Make a backup of old contacts
-	std::array<ContactPoint, CollisionPoint<2>::MAX_POINTS> oldContacts;
+	std::array<ContactPoint<2>, CollisionPoint<2>::MAX_POINTS> oldContacts;
 	const uint32_t oldCount = mContactCount;
 	for (uint32_t i = 0; i < mContactCount; ++i)
 	{
@@ -40,8 +40,8 @@ void ContactManifold::update(const CollisionManifold<2>& newManifold) noexcept
 
 	for (uint32_t i = 0; i < newManifold.pointsCount; ++i)
 	{
-		mContacts[i] = ContactPoint(newManifold.points[i]);
-		for (ContactPoint* oldContact = oldContacts.data();
+		mContacts[i] = ContactPoint<2>(newManifold.points[i]);
+		for (ContactPoint<2>* oldContact = oldContacts.data();
 			oldContact < oldContacts.data() + oldCount;
 			++oldContact)
 		{
@@ -59,7 +59,7 @@ void ContactManifold::update(const CollisionManifold<2>& newManifold) noexcept
 
 void ContactManifold::prepareToSolve() noexcept
 {
-	for (ContactPoint* contact = mContacts.data();
+	for (ContactPoint<2>* contact = mContacts.data();
 		contact < mContacts.data() + mContactCount;
 		++contact)
 	{
@@ -69,7 +69,7 @@ void ContactManifold::prepareToSolve() noexcept
 
 void ContactManifold::solveVelocities() noexcept
 {
-	for (ContactPoint* contact = mContacts.data();
+	for (ContactPoint<2>* contact = mContacts.data();
 		contact < mContacts.data() + mContactCount;
 		++contact)
 	{
@@ -79,7 +79,7 @@ void ContactManifold::solveVelocities() noexcept
 
 void ContactManifold::solvePositions() noexcept
 {
-	for (ContactPoint* contact = mContacts.data();
+	for (ContactPoint<2>* contact = mContacts.data();
 		contact < mContacts.data() + mContactCount;
 		++contact)
 	{

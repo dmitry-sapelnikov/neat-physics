@@ -91,9 +91,6 @@
     <ClCompile Include="..\..\src\collision\NarrowPhase.cpp">
       <Filter>src\collision</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\dynamics\ContactPoint.cpp">
-      <Filter>src\dynamics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\dynamics\ContactManifold.cpp">
       <Filter>src\dynamics</Filter>
     </ClCompile>

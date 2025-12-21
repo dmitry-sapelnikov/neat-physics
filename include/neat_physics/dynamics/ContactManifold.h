@@ -41,7 +41,7 @@ public:
 	}
 
 	/// Returns the contact at given index
-	inline const ContactPoint& getContact(uint32_t index) const noexcept
+	inline const ContactPoint<2>& getContact(uint32_t index) const noexcept
 	{
 		assert(index < mContactCount);
 		return mContacts[index];
@@ -86,7 +86,7 @@ private:
 	Body<2>* mBodyB;
 
 	/// Contact array
-	std::array<ContactPoint, CollisionPoint<2>::MAX_POINTS> mContacts;
+	std::array<ContactPoint<2>, CollisionPoint<2>::MAX_POINTS> mContacts;
 
 	/// Actual contact count
 	uint32_t mContactCount;
