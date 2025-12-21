@@ -8,7 +8,7 @@
 namespace nph
 {
 
-ContactSolver::ContactSolver(BodyArray& bodies) noexcept :
+ContactSolver::ContactSolver(BodyArray<2>& bodies) noexcept :
 	mBodies(bodies)
 {
 }

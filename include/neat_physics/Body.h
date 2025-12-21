@@ -18,7 +18,7 @@ namespace nph
 /// To achieve this, we use struct with public members
 /// while keeping all members with value constraints constant
 template <uint16_t D>
-struct BodyTemplate
+struct Body
 {
 	/// Half size (width / 2, height / 2)
 	const Vec<D> halfSize;
@@ -54,7 +54,7 @@ struct BodyTemplate
 	/// \param inSize Body size; must be > 0 in both dimensions
 	/// \param inMass Body mass; if 0, the body is static; must be >= 0
 	/// \param inFriction Friction coefficient; must be in range [0, 1]
-	BodyTemplate(
+	Body(
 		const Vec2& inSize,
 		float inMass,
 		float inFriction) :
@@ -84,10 +84,11 @@ struct BodyTemplate
 };
 
 /// 2D body alias
-using Body = BodyTemplate<2>;
+using Body2 = Body<2>;
 
 /// 2D body array type
-using BodyArray = std::vector<Body>;
+template <uint16_t D>
+using BodyArray = std::vector<Body<D>>;
 
 // namespace nph
 }

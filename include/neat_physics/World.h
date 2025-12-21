@@ -30,7 +30,7 @@ public:
 	void reserveBodies(uint32_t maxBodies);
 
 	/// Returns the bodies in the world
-	[[nodiscard]] const BodyArray& getBodies() const noexcept
+	[[nodiscard]] const BodyArray<2>& getBodies() const noexcept
 	{
 		return mBodies;
 	}
@@ -50,7 +50,7 @@ public:
 	/// Adds a body to the world
 	/// \return the added body or nullptr if the body could not be added
 	/// (e.g., when the number of bodies == uint32_t max value)
-	Body* addBody(
+	Body<2>* addBody(
 		const Vec2& size,
 		float mass,
 		float friction,
@@ -106,7 +106,7 @@ private:
 	uint32_t mPositionIterations;
 
 	/// Bodies in the world
-	BodyArray mBodies;
+	BodyArray<2> mBodies;
 
 	/// Collision system
 	CollisionSystem mCollision;

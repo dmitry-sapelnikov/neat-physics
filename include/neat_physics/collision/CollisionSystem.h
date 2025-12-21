@@ -17,7 +17,7 @@ class CollisionSystem : private BroadPhaseCallback
 {
 public:
 	/// Constructor
-	CollisionSystem(const BodyArray& bodies) noexcept :
+	CollisionSystem(const BodyArray<2>& bodies) noexcept :
 		mBodies(bodies),
 		mBroadPhase(bodies)
 	{
@@ -36,7 +36,7 @@ private:
 	void onCollision(uint32_t bodyIndA, uint32_t bodyIndB) override;
 
 	/// Reference to the bodies
-	const BodyArray& mBodies;
+	const BodyArray<2>& mBodies;
 
 	/// Broad-phase collision detector
 	BroadPhase mBroadPhase;

@@ -39,35 +39,35 @@ public:
 
 	/// Prepares the contact point for velocity solving;
 	void prepareToSolve(
-		Body& bodyA,
-		Body& bodyB) noexcept;
+		Body<2>& bodyA,
+		Body<2>& bodyB) noexcept;
 	
 	/// Solves the contact velocities
 	/// asserts that friction is in [0, 1]
 	void solveVelocities(
-		Body& bodyA,
-		Body& bodyB,
+		Body<2>& bodyA,
+		Body<2>& bodyB,
 		float friction) noexcept;
 
 	/// Solves the contact position (penetration)
-	void solvePositions(Body& bodyA, Body& bodyB) noexcept;
+	void solvePositions(Body<2>& bodyA, Body<2>& bodyB) noexcept;
 	
 private:
 	/// Returns the relative velocity at the contact point
 	[[nodiscard]] Vec2 getVelocityAtContact(
-		const Body& bodyA,
-		const Body& bodyB) const noexcept;
+		const Body<2>& bodyA,
+		const Body<2>& bodyB) const noexcept;
 
 	/// Applies an impulse at the contact point
 	void applyImpulse(
-		Body& bodyA,
-		Body& bodyB,
+		Body<2>& bodyA,
+		Body<2>& bodyB,
 		const Vec2& impulse) const noexcept;
 
 	/// Gets the transformed contact data
 	void getTransformedContact(
-		const Body& bodyA,
-		const Body& bodyB,
+		const Body<2>& bodyA,
+		const Body<2>& bodyB,
 		Vec2& normal,
 		Vec2& clippedPoint,
 		float& penetration) const;

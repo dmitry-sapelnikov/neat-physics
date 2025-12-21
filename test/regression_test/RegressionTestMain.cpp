@@ -148,7 +148,7 @@ int wmain(int argc, wchar_t** argv)
 				resultFile << "Step " << step << ":\n";
 				for (size_t i = 0; i < world.getBodies().size(); ++i)
 				{
-					const Body& body = world.getBodies()[i];
+					const Body<2>& body = world.getBodies()[i];
 					resultFile << "Body " << i << ": ";
 					resultFile << "Pos(" << body.position.x << ", " << body.position.y << ") ";
 					resultFile << "Rot(" << body.rotation.getAngle() << ")\n";

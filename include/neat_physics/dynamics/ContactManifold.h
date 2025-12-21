@@ -18,18 +18,18 @@ class ContactManifold
 public:
 	/// Constructor
 	ContactManifold(
-		Body& bodyA,
-		Body& bodyB,
+		Body<2>& bodyA,
+		Body<2>& bodyB,
 		const CollisionManifold& manifold) noexcept;
 
 	/// Returns the first body
-	const Body& getBodyA() const noexcept
+	const Body<2>& getBodyA() const noexcept
 	{
 		return *mBodyA;
 	}
 
 	/// Returns the second body
-	const Body& getBodyB() const noexcept
+	const Body<2>& getBodyB() const noexcept
 	{
 		return *mBodyB;
 	}
@@ -80,10 +80,10 @@ public:
 
 private:
 	/// First body
-	Body* mBodyA;
+	Body<2>* mBodyA;
 
 	/// Second body
-	Body* mBodyB;
+	Body<2>* mBodyB;
 
 	/// Contact array
 	std::array<ContactPoint, MAX_COLLISION_POINTS> mContacts;

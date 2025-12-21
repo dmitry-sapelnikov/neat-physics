@@ -27,7 +27,7 @@ public:
 	using AabbArray = std::vector<Aabb2>;
 
 	/// Constructor
-	BroadPhase(const BodyArray& bodies) noexcept :
+	BroadPhase(const BodyArray<2>& bodies) noexcept :
 		mBodies(bodies)
 	{
 	}
@@ -67,7 +67,7 @@ private:
 	void sweepAxis(BroadPhaseCallback& callback);
 
 	/// Reference to the bodies
-	const BodyArray& mBodies;
+	const BodyArray<2>& mBodies;
 
 	/// AABBs of the bodies
 	AabbArray mAabbs;

@@ -11,8 +11,8 @@ namespace nph
 
 // Global classes
 ContactManifold::ContactManifold(
-	Body& bodyA,
-	Body& bodyB,
+	Body<2>& bodyA,
+	Body<2>& bodyB,
 	const CollisionManifold& manifold) noexcept :
 
 	mBodyA(&bodyA),
@@ -90,10 +90,10 @@ void ContactManifold::solvePositions() noexcept
 void ContactManifold::onBodiesReallocation(
 	std::ptrdiff_t memoryOffsetInBytes) noexcept
 {
-	mBodyA = reinterpret_cast<Body*>(
+	mBodyA = reinterpret_cast<Body<2>*>(
 		reinterpret_cast<std::byte*>(mBodyA) + memoryOffsetInBytes);
 
-	mBodyB = reinterpret_cast<Body*>(
+	mBodyB = reinterpret_cast<Body<2>*>(
 		reinterpret_cast<std::byte*>(mBodyB) + memoryOffsetInBytes);
 }
 

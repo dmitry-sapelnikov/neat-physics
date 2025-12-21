@@ -22,7 +22,7 @@ World::World(
 
 void World::reserveBodies(uint32_t maxBodies)
 {
-	const Body* const oldData = mBodies.data();
+	const Body<2>* const oldData = mBodies.data();
 	mBodies.reserve(maxBodies);
 	if (std::ptrdiff_t memoryOffsetInBytes =
 		reinterpret_cast<std::byte*>(mBodies.data()) -
@@ -33,7 +33,7 @@ void World::reserveBodies(uint32_t maxBodies)
 	}
 }
 
-Body* World::addBody(
+Body<2>* World::addBody(
 	const Vec2& size,
 	float mass,
 	float friction,
@@ -46,8 +46,8 @@ Body* World::addBody(
 		return nullptr;
 	}
 
-	const Body* const oldData = mBodies.data();
-	Body* result = &mBodies.emplace_back(size, mass, friction);
+	const Body<2>* const oldData = mBodies.data();
+	Body<2>* result = &mBodies.emplace_back(size, mass, friction);
 	result->position = position;
 	result->rotation.setAngle(rotationRad);
 

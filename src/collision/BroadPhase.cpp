@@ -61,7 +61,7 @@ void BroadPhase::sweepAxis(BroadPhaseCallback& callback)
 		if (endpoint.isStart)
 		{
 			const uint32_t i1 = endpoint.index;
-			const Body& bodyA = mBodies[i1];
+			const Body<2>& bodyA = mBodies[i1];
 			const Aabb2& aabbA = mAabbs[i1];
 
 			for (uint32_t i2 : mActivePoints)

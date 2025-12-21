@@ -337,7 +337,7 @@ void drawArrow(
 }
 
 /// Draws a body
-void drawBody(const Body& body)
+void drawBody(const Body<2>& body)
 {
 	const Mat22& rot = body.rotation.getMat();
 	const Vec2& pos = body.position;
@@ -405,8 +405,8 @@ void drawContacts(const World& world, float pointSize)
 	for (const auto& pair : world.getContactSolver().getManifolds())
 	{
 		const ContactManifold& manifold = pair.second;
-		const Body& bodyA = manifold.getBodyA();
-		const Body& bodyB = manifold.getBodyB();
+		const Body<2>& bodyA = manifold.getBodyA();
+		const Body<2>& bodyB = manifold.getBodyB();
 
 		for (uint32_t i = 0; i < manifold.getContactCount(); ++i)
 		{
@@ -559,7 +559,7 @@ void Visualization::drawWorld(
 		}
 	}
 
-	for (const Body& body : world.getBodies())
+	for (const Body<2>& body : world.getBodies())
 	{
 		drawBody(body);
 		if (settings.bodyVelocities)

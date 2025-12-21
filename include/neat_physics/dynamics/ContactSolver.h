@@ -30,7 +30,7 @@ public:
 	using ManifoldsArray = std::vector<ManifoldsArrayEntry>;
 
 	/// Constructor
-	ContactSolver(BodyArray& bodies) noexcept;
+	ContactSolver(BodyArray<2>& bodies) noexcept;
 
 	/// Clears all contact manifolds
 	void clear() noexcept;
@@ -66,7 +66,7 @@ public:
 
 private:
 	/// Reference to the body array
-	BodyArray& mBodies;
+	BodyArray<2>& mBodies;
 
 	/// Persistent contact manifolds
 	ContactPairsMap mContactPairs;

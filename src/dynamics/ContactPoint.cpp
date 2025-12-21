@@ -14,7 +14,7 @@ namespace
 
 /// Applies impulse at a point relative to the center of mass
 void applyImpulse(
-	Body& body,
+	Body<2>& body,
 	const Vec2& localPoint,
 	const Vec2& impulse) noexcept
 {
@@ -24,8 +24,8 @@ void applyImpulse(
 
 /// Computes the effective mass for a given contact and direction
 [[nodiscard]] float getEffectiveMass(
-	const Body& bodyA,
-	const Body& bodyB,
+	const Body<2>& bodyA,
+	const Body<2>& bodyB,
 	const Vec2& armA,
 	const Vec2& armB,
 	const Vec2& direction) noexcept
@@ -48,8 +48,8 @@ void ContactPoint::updateFrom(const ContactPoint& other) noexcept
 }
 
 void ContactPoint::prepareToSolve(
-	Body& bodyA,
-	Body& bodyB) noexcept
+	Body<2>& bodyA,
+	Body<2>& bodyB) noexcept
 {
 	mOffsetA = mPoint.position - bodyA.position;
 	mOffsetB = mPoint.position - bodyB.position;
@@ -68,8 +68,8 @@ void ContactPoint::prepareToSolve(
 }
 
 void ContactPoint::solveVelocities(
-	Body& bodyA,
-	Body& bodyB,
+	Body<2>& bodyA,
+	Body<2>& bodyB,
 	float friction) noexcept
 {
 	assert(0.0f <= friction && friction <= 1.0f);
@@ -108,8 +108,8 @@ void ContactPoint::solveVelocities(
 }
 
 void ContactPoint::solvePositions(
-	Body& bodyA,
-	Body& bodyB) noexcept
+	Body<2>& bodyA,
+	Body<2>& bodyB) noexcept
 {
 	// This method is similar to the position based dynamics (PBD) approach :
 	// we directly modify the positions and rotations of the bodies
@@ -149,8 +149,8 @@ void ContactPoint::solvePositions(
 
 /// Returns the relative velocity at the contact point
 [[nodiscard]] Vec2 ContactPoint::getVelocityAtContact(
-	const Body& bodyA,
-	const Body& bodyB) const noexcept
+	const Body<2>& bodyA,
+	const Body<2>& bodyB) const noexcept
 {
 	return
 		bodyB.linearVelocity + cross(bodyB.angularVelocity, mOffsetB) -
@@ -159,8 +159,8 @@ void ContactPoint::solvePositions(
 
 /// Applies an impulse at the contact point
 void ContactPoint::applyImpulse(
-	Body& bodyA,
-	Body& bodyB,
+	Body<2>& bodyA,
+	Body<2>& bodyB,
 	const Vec2& impulse) const noexcept
 {
 	nph::applyImpulse(bodyA, mOffsetA, -impulse);
@@ -168,8 +168,8 @@ void ContactPoint::applyImpulse(
 }
 
 void ContactPoint::getTransformedContact(
-	const Body& bodyA,
-	const Body& bodyB,
+	const Body<2>& bodyA,
+	const Body<2>& bodyB,
 	Vec2& normal,
 	Vec2& clippedPoint,
 	float& penetration) const
