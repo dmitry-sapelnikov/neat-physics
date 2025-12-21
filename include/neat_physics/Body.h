@@ -39,7 +39,7 @@ struct Body
 	Vec2 position{ 0.0f, 0.0f };
 
 	/// Rotation
-	Rotation rotation{ 0.0f };
+	Rotation2 rotation{ 0.0f };
 
 	/// Linear velocity
 	Vec2 linearVelocity{ 0.0f, 0.0f };

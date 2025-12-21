@@ -10,8 +10,13 @@
 namespace nph
 {
 
+/// Generic rotation template
+template <uint16_t D>
+class Rotation;
+
 /// 2D rotation (angle + rotation matrix)
-class Rotation
+template <>
+class Rotation<2>
 {
 public:
 	/// Default constructor (no initialization)
@@ -57,5 +62,8 @@ private:
 	/// Rotation matrix
 	Mat22 mMat;
 };
+
+/// 2D rotation alias
+using Rotation2 = Rotation<2>;
 
 } // namespace nph
