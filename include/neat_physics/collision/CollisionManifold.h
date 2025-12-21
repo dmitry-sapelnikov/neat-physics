@@ -21,7 +21,7 @@ struct CollisionManifold
 	const uint32_t bodyIndB;
 
 	/// Collision points
-	CollisionPointArray points;
+	CollisionPointArray<2> points;
 
 	/// The actual number of collision points
 	uint32_t pointsCount;

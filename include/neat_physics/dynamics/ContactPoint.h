@@ -20,7 +20,7 @@ public:
 	ContactPoint() noexcept = default;
 
 	/// Constructor
-	ContactPoint(const CollisionPoint& inPoint) noexcept :
+	ContactPoint(const CollisionPoint<2>& inPoint) noexcept :
 		mPoint(inPoint),
 		mNormalImpulse(0.0f),
 		mTangentImpulse(0.0f)
@@ -29,7 +29,7 @@ public:
 	}
 
 	/// Returns the collision point
-	[[nodiscard]] const CollisionPoint& getPoint() const noexcept
+	[[nodiscard]] const CollisionPoint<2>& getPoint() const noexcept
 	{
 		return mPoint;
 	}
@@ -73,7 +73,7 @@ private:
 		float& penetration) const;
 
 	/// Collision point
-	CollisionPoint mPoint;
+	CollisionPoint<2> mPoint;
 
 	/// Tangent vector
 	Vec2 mTangent;

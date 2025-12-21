@@ -182,7 +182,7 @@ void ContactPoint::getTransformedContact(
 		bodyA.rotation.getMat(),
 		bodyB.rotation.getMat() };
 
-	const CollisionPoint& contact = mPoint;
+	const CollisionPoint<2>& contact = mPoint;
 	const uint32_t ind1 = contact.clipBoxIndex;
 	const uint32_t ind2 = 1 - ind1;
 

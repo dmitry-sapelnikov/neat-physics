@@ -410,7 +410,7 @@ void drawContacts(const World& world, float pointSize)
 
 		for (uint32_t i = 0; i < manifold.getContactCount(); ++i)
 		{
-			const CollisionPoint& point = manifold.getContact(i).getPoint();
+			const CollisionPoint<2>& point = manifold.getContact(i).getPoint();
 			const Vec2 point1 =
 				bodyA.position + bodyA.rotation.getMat() * point.localPoints[0];
 

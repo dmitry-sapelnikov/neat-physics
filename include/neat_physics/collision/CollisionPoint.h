@@ -11,16 +11,18 @@
 namespace nph
 {
 
-/// Maximum number of collision points between 2 geometries
-static constexpr uint32_t MAX_COLLISION_POINTS = 2;
-
-/// Collision point between 2 geometries
+/// A collision point between 2 geometries
 /// \note Unfortunately it is not possible to apply const-members trick
 /// to ensure fulfillment of the member constraints, so we rely only on
 /// assertions in the constructor
+template <uint16_t D>
 struct CollisionPoint
 {
+	/// Maximum number of collision points between 2 geometries
+	static constexpr uint32_t MAX_POINTS = (D == 2) ? 2 : 8;
+
 	/// Pair of geometry features yielding a contact point
+	/// \todo: it is not actual for 3D, needs to be redesigned
 	struct GeometryFeature
 	{
 		/// Geometry index (0 - 1)
@@ -48,10 +50,10 @@ struct CollisionPoint
 	using GeometryFeaturePair = std::array<GeometryFeature, 2>;
 
 	/// Position of the contact point in world space
-	Vec2 position;
+	Vec<D> position;
 
 	/// Contact normal, pointing from body A to body B
-	Vec2 normal;
+	Vec<D> normal;
 
 	/// Penetration depth
 	float penetration;
@@ -60,10 +62,10 @@ struct CollisionPoint
 	uint32_t clipBoxIndex;
 
 	/// The collision point in the box local frames 
-	std::array<Vec2, 2> localPoints;
+	std::array<Vec<D>, 2> localPoints;
 
 	/// Contact normal in the clipping box frame
-	Vec2 localContactNormal;
+	Vec<D> localContactNormal;
 
 	/// A pair of features yielding this contact point
 	GeometryFeaturePair featurePair;
@@ -101,6 +103,8 @@ struct CollisionPoint
 };
 
 // Array of the max number of collison points
-using CollisionPointArray = std::array<CollisionPoint, MAX_COLLISION_POINTS>;
+template <uint16_t D>
+using CollisionPointArray =
+	std::array<CollisionPoint<D>, CollisionPoint<D>::MAX_POINTS>;
 
 } // namespace nph

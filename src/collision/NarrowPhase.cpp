@@ -21,7 +21,7 @@ struct ClippedPoint
 	Vec2 position;
 
 	/// Feature pair yielding this point
-	CollisionPoint::GeometryFeaturePair featurePair{};
+	CollisionPoint<2>::GeometryFeaturePair featurePair{};
 };
 
 /// Clipped edge
@@ -74,7 +74,7 @@ uint32_t getBoxBoxCollision(
 	const Vec2Array2& positions,
 	const Rotation2Array2 rotations,
 	const Vec2Array2& halfSizes,
-	CollisionPointArray& result)
+	CollisionPointArray<2>& result)
 {
 	assert(halfSizes[0].x > 0.0f && halfSizes[0].y > 0.0f);
 	assert(halfSizes[1].x > 0.0f && halfSizes[1].y > 0.0f);
@@ -260,7 +260,7 @@ uint32_t getBoxBoxCollision(
 				std::swap(point.featurePair[0], point.featurePair[1]);
 			}
 
-			result[resultPointCount++] = CollisionPoint(
+			result[resultPointCount++] = CollisionPoint<2>(
 				clippedPoint,
 				minPenetrationDir,
 				penetration,

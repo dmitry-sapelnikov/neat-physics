@@ -26,7 +26,7 @@ uint32_t getBoxBoxCollision(
 	const Vec2Array2& positions,
 	const Rotation2Array2 rotations,
 	const Vec2Array2& halfSizes,
-	CollisionPointArray& result);
+	CollisionPointArray<2>& result);
 
 // End of namespace nph
 }

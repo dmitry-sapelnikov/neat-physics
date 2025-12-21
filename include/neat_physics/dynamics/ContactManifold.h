@@ -86,7 +86,7 @@ private:
 	Body<2>* mBodyB;
 
 	/// Contact array
-	std::array<ContactPoint, MAX_COLLISION_POINTS> mContacts;
+	std::array<ContactPoint, CollisionPoint<2>::MAX_POINTS> mContacts;
 
 	/// Actual contact count
 	uint32_t mContactCount;
