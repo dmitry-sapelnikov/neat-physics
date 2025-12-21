@@ -16,7 +16,7 @@ namespace
 {
 
 /// Creates the test scene
-void createTestScene(World& world)
+void createTestScene(World<2>& world)
 {
 	constexpr float BOTTOM_SIZE = 25.0f;
 	constexpr float BOTTOM_THICKNESS = 5.0f;

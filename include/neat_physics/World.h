@@ -13,21 +13,16 @@ namespace nph
 {
 
 /// Physics world
+template <uint16_t D>
 class World
 {
 public:
-	/// Body array alias
-	using BodyArrayType = BodyArray<2>;
-
-	/// Collision system alias
-	using CollisionSystemType = CollisionSystem<2>;
-
 	/// Constructor
 	/// \param maxBodies Maximum number of bodies in the world; asserted to be > 0
 	/// \param gravity Gravity vector applied to all bodies
 	/// \param velocityIterations Velocity iterations for constraint solvers; asserted to be > 0
 	World(
-		const Vec2& gravity,
+		const Vec<D>& gravity,
 		uint32_t velocityIterations,
 		uint32_t positionIterations);
 
@@ -36,19 +31,19 @@ public:
 	void reserveBodies(uint32_t maxBodies);
 
 	/// Returns the bodies in the world
-	[[nodiscard]] const BodyArrayType& getBodies() const noexcept
+	[[nodiscard]] const BodyArray<D>& getBodies() const noexcept
 	{
 		return mBodies;
 	}
 
 	/// Returns the collision system
-	[[nodiscard]] const CollisionSystemType& getCollision() const noexcept
+	[[nodiscard]] const CollisionSystem<D>& getCollision() const noexcept
 	{
 		return mCollision;
 	}
 
 	/// Returns the contact solver
-	[[nodiscard]] const ContactSolver<2>& getContactSolver() const noexcept
+	[[nodiscard]] const ContactSolver<D>& getContactSolver() const noexcept
 	{
 		return mContactSolver;
 	}
@@ -56,12 +51,12 @@ public:
 	/// Adds a body to the world
 	/// \return the added body or nullptr if the body could not be added
 	/// (e.g., when the number of bodies == uint32_t max value)
-	Body<2>* addBody(
-		const Vec2& size,
+	Body<D>* addBody(
+		const Vec<D>& size,
 		float mass,
 		float friction,
-		const Vec2& position = {0.0f, 0.0f},
-		float rotationRad = 0.0f);
+		const Vec<D>& position = {},
+		const AxisAngle<D>& rotationRad = {});
 
 	/// Clear the world: remove all bodies
 	void clear() noexcept;
@@ -103,7 +98,7 @@ private:
 	void integratePositions(float timeStep);
 
 	/// Gravity vector
-	Vec2 mGravity;
+	Vec<D> mGravity;
 
 	/// Number of velocity iterations for constraint solvers
 	uint32_t mVelocityIterations;
@@ -112,13 +107,115 @@ private:
 	uint32_t mPositionIterations;
 
 	/// Bodies in the world
-	BodyArrayType mBodies;
+	BodyArray<D> mBodies;
 
 	/// Collision system
-	CollisionSystemType mCollision;
+	CollisionSystem<D> mCollision;
 
 	/// Contact solver
-	ContactSolver<2> mContactSolver;
+	ContactSolver<D> mContactSolver;
 };
+
+template <uint16_t D>
+World<D>::World(
+	const Vec<D>& gravity,
+	uint32_t velocityIterations,
+	uint32_t positionIterations) :
+
+	mGravity(gravity),
+	mCollision(mBodies),
+	mContactSolver(mBodies)
+{
+	setVelocityIterations(velocityIterations);
+	setPositionIterations(positionIterations);
+}
+
+template <uint16_t D>
+void World<D>::reserveBodies(uint32_t maxBodies)
+{
+	const Body<D>* const oldData = mBodies.data();
+	mBodies.reserve(maxBodies);
+	if (std::ptrdiff_t memoryOffsetInBytes =
+		reinterpret_cast<std::byte*>(mBodies.data()) -
+		reinterpret_cast<const std::byte*>(oldData);
+		memoryOffsetInBytes != 0)
+	{
+		mContactSolver.onBodiesReallocation(memoryOffsetInBytes);
+	}
+}
+
+template <uint16_t D>
+Body<D>* World<D>::addBody(
+	const Vec<D>& size,
+	float mass,
+	float friction,
+	const Vec<D>& position,
+	const AxisAngle<D>& rotationRad)
+{
+	// We limit the number of bodies to uint32_t max value
+	if (mBodies.size() == std::numeric_limits<uint32_t>::max())
+	{
+		return nullptr;
+	}
+
+	const Body<D>* const oldData = mBodies.data();
+	Body<D>* result = &mBodies.emplace_back(size, mass, friction);
+	result->position = position;
+	result->rotation.setAngle(rotationRad);
+
+	if (const std::ptrdiff_t memoryOffsetInBytes =
+		reinterpret_cast<std::byte*>(mBodies.data()) -
+		reinterpret_cast<const std::byte*>(oldData);
+		memoryOffsetInBytes != 0)
+	{
+		mContactSolver.onBodiesReallocation(memoryOffsetInBytes);
+	}
+	return result;
+}
+
+template <uint16_t D>
+void World<D>::clear() noexcept
+{
+	mBodies.clear();
+	mContactSolver.clear();
+}
+
+template <uint16_t D>
+void World<D>::doStep(float timeStep)
+{
+	assert(timeStep > 0.0f);
+	applyForces(timeStep);
+
+	mContactSolver.prepareManifoldsUpdate();
+	mCollision.update(mContactSolver);
+	mContactSolver.finishManifoldsUpdate();
+
+	mContactSolver.prepareToSolve();
+	mContactSolver.solveVelocities(mVelocityIterations);
+	integratePositions(timeStep);
+	// Solving of positions is intetionally done after the integration step
+	mContactSolver.solvePositions(mPositionIterations);
+}
+
+template <uint16_t D>
+void World<D>::applyForces(float timeStep)
+{
+	for (auto& body : mBodies)
+	{
+		body.linearVelocity += (!body.isStatic()) * timeStep * mGravity;
+	}
+}
+
+template <uint16_t D>
+void World<D>::integratePositions(float timeStep)
+{
+	for (auto& body : mBodies)
+	{
+		body.position += timeStep * body.linearVelocity;
+		/// \todo generalize for 3D
+		body.rotation.setAngle(
+			body.rotation.getAngle() + timeStep * body.angularVelocity);
+	}
+}
 
 } // namespace nph

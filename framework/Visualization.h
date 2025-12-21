@@ -15,6 +15,7 @@ namespace nph
 {
 
 // Forward declarations
+template <uint16_t D>
 class World;
 
 /// Settings for world visualization
@@ -104,7 +105,7 @@ public:
 
 	/// Draws a physics world
 	void drawWorld(
-		const World& world,
+		const World<2>& world,
 		const WorldDrawSettings& settings);
 
 private:

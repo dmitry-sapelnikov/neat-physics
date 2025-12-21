@@ -21,9 +21,6 @@
     <Filter Include="include\dynamics">
       <UniqueIdentifier>{fa99d590-193a-4684-81e2-ce16568ca8f3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\dynamics">
-      <UniqueIdentifier>{75747606-27d1-4943-9174-e38726e5db5a}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\neat_physics\math\Mat22.h">
@@ -85,9 +82,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\World.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\collision\NarrowPhase.cpp">
       <Filter>src\collision</Filter>
     </ClCompile>

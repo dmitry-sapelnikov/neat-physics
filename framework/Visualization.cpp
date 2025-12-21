@@ -396,7 +396,7 @@ void drawFrame(const Vec2& position, const Mat22& rotation, float size)
 }
 
 /// Draw contact points
-void drawContacts(const World& world, float pointSize)
+void drawContacts(const World<2>& world, float pointSize)
 {
 	assert(pointSize > 0.0f);
 	glPointSize(pointSize);
@@ -544,7 +544,7 @@ void Visualization::setVSyncEnabled(bool enabled)
 }
 
 void Visualization::drawWorld(
-	const World& world,
+	const World<2>& world,
 	const WorldDrawSettings& settings)
 {
 	/// \note AABBs are drawn as they were at

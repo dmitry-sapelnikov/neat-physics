@@ -54,7 +54,7 @@ struct SimulationControl
 
 /// Creates a 'glass-shaped' container
 void createGlass(
-	nph::World& world,
+	nph::World<2>& world,
 	const nph::Vec2& glassSize,
 	float glassThickness,
 	float friction)
@@ -82,7 +82,7 @@ void createGlass(
 }
 
 void addBoxOnMouseClick(
-	nph::World& world,
+	nph::World<2>& world,
 	float glassSize,
 	const nph::SimulationControl& simulationControl)
 {
@@ -113,7 +113,7 @@ void addBoxOnMouseClick(
 
 /// Draws ImGui controls
 void drawGui(
-	const nph::World& world,
+	const nph::World<2>& world,
 	float lastPhysicsStepTime,
 	nph::WorldDrawSettings& drawSettings,
 	float bottomSize,
@@ -323,7 +323,7 @@ int main()
 	try
 	{
 		const nph::Vec2 glassSize{ nph::GRAVITY * 0.5f, nph::GRAVITY };
-		nph::World world({ 0.0f, -nph::GRAVITY }, 1, 1);
+		nph::World<2> world({ 0.0f, -nph::GRAVITY }, 1, 1);
 		world.reserveBodies(nph::BODIES_TO_RESERVE);
 
 		nph::Visualization* visualization = nph::Visualization::getInstance();
