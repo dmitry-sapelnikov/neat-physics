@@ -24,7 +24,7 @@ public:
 	using BodyIndexPairArray = std::vector<BodyIndexPair>;
 
 	/// Array of Aabbs
-	using AabbArray = std::vector<Aabb>;
+	using AabbArray = std::vector<Aabb2>;
 
 	/// Constructor
 	BroadPhase(const BodyArray& bodies) noexcept :

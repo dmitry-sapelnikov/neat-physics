@@ -366,7 +366,7 @@ void drawBody(const Body& body)
 }
 
 /// Draws an Aabb
-void drawAabb(const Aabb& aabb)
+void drawAabb(const Aabb2& aabb)
 {
 	glColor3f(0.0f, 0.5f, 0.0f);
 	glBegin(GL_LINE_LOOP);
@@ -552,7 +552,7 @@ void Visualization::drawWorld(
 	/// so they may not match the bodies' current positions
 	if (settings.aabbs)
 	{
-		for (const Aabb& aabb :
+		for (const Aabb2& aabb :
 			world.getCollision().getBroadPhase().getAabbs())
 		{
 			drawAabb(aabb);

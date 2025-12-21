@@ -10,25 +10,6 @@
 namespace nph
 {
 
-namespace
-{
-
-/// Computes the AABB for a box-shaped body
-Aabb getAabb(const Body& body) noexcept
-{
-	const Mat22 absRotation = abs(body.rotation.getMat());
-	const Vec2 halfExtents =
-		body.halfSize.x * absRotation.col1 +
-		body.halfSize.y * absRotation.col2;
-
-	return {
-		body.position - halfExtents,
-		body.position + halfExtents
-	};
-}
-
-} // anonymous namespace
-
 void BroadPhase::update(BroadPhaseCallback& callback)
 {
 	// Reserve-emplace because Aabb is immutable
@@ -36,7 +17,10 @@ void BroadPhase::update(BroadPhaseCallback& callback)
 	mAabbs.reserve(mBodies.size());
 	for (size_t i = 0; i < mBodies.size(); ++i)
 	{
-		mAabbs.emplace_back(getAabb(mBodies[i]));
+		mAabbs.emplace_back(getAabb(
+			mBodies[i].position,
+			mBodies[i].rotation.getMat(),
+			mBodies[i].halfSize));
 	}
 
 	mActiveMapping.resize(mBodies.size());
@@ -78,7 +62,7 @@ void BroadPhase::sweepAxis(BroadPhaseCallback& callback)
 		{
 			const uint32_t i1 = endpoint.index;
 			const Body& bodyA = mBodies[i1];
-			const Aabb& aabbA = mAabbs[i1];
+			const Aabb2& aabbA = mAabbs[i1];
 
 			for (uint32_t i2 : mActivePoints)
 			{
@@ -88,7 +72,7 @@ void BroadPhase::sweepAxis(BroadPhaseCallback& callback)
 				}
 
 				// If y-axes don't intersect
-				const Aabb& aabbB = mAabbs[i2];
+				const Aabb2& aabbB = mAabbs[i2];
 				if (aabbA.max.y < aabbB.min.y ||
 					aabbB.max.y < aabbA.min.y)
 				{

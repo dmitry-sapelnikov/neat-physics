@@ -11,13 +11,14 @@ namespace nph
 {
 
 /// 2D axis-aligned bounding box, immutable for simplicity
+template <uint16_t D>
 struct Aabb
 {
 	/// Minimum corner
-	const Vec2 min;
+	const Vec<D> min;
 
 	/// Maximum corner
-	const Vec2 max;
+	const Vec<D> max;
 
 	/// Default constructor (no initialization)
 	Aabb() noexcept = default;
@@ -29,10 +30,34 @@ struct Aabb
 		min(inMin),
 		max(inMax)
 	{
-		assert(min.x <= max.x);
-		assert(min.y <= max.y);
+		for (uint16_t i = 0; i < D; ++i)
+		{
+			assert(min[i] <= max[i]);
+		}
 	}
 };
+
+/// 2D AABB alias
+using Aabb2 = Aabb<2>;
+
+
+/// Computes the AABB for a box-shaped geometry
+template <uint16_t D>
+Aabb<D> getAabb(
+	const Vec<D>& position,
+	const Mat<D, D>& rotation,
+	const Vec<D>& halfSize)
+{
+	const Mat<D, D> absRotation = abs(rotation);
+	const Vec<D> halfExtents =
+		halfSize.x * absRotation.col1 +
+		halfSize.y * absRotation.col2;
+
+	return {
+		position - halfExtents,
+		position + halfExtents
+	};
+}	
 
 // namespace nph
 }
