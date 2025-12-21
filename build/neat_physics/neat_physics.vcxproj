@@ -29,6 +29,7 @@
     <ClInclude Include="..\..\include\neat_physics\math\Rotation.h" />
     <ClInclude Include="..\..\include\neat_physics\math\Vec.h" />
     <ClInclude Include="..\..\include\neat_physics\math\Vec2.h" />
+    <ClInclude Include="..\..\include\neat_physics\math\Vec3.h" />
     <ClInclude Include="..\..\include\neat_physics\World.h" />
     <ClInclude Include="..\..\include\neat_physics\collision\Aabb.h" />
     <ClInclude Include="..\..\src\collision\Plane.h" />
