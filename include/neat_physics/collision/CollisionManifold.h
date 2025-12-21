@@ -10,8 +10,9 @@
 namespace nph
 {
 
-/// Contact manifold between 2 bodies
+/// Collision manifold between 2 bodies
 /// \todo Should be turned into a class for encapsulation
+template <uint16_t D>
 struct CollisionManifold
 {
 	/// Index of body A
@@ -21,7 +22,7 @@ struct CollisionManifold
 	const uint32_t bodyIndB;
 
 	/// Collision points
-	CollisionPointArray<2> points;
+	CollisionPointArray<D> points;
 
 	/// The actual number of collision points
 	uint32_t pointsCount;

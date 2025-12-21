@@ -18,7 +18,7 @@ public:
 	virtual ~CollisionCallback() = default;
 
 	/// Called when a collision manifold is created
-	virtual void onCollision(const CollisionManifold& manifold) = 0;
+	virtual void onCollision(const CollisionManifold<2>& manifold) = 0;
 };
 
 } // namespace nph

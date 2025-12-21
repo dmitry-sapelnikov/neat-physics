@@ -21,7 +21,7 @@ void CollisionSystem::onCollision(uint32_t bodyIndA, uint32_t bodyIndB)
 	const Body<2>& bodyA = mBodies[bodyIndA];
 	const Body<2>& bodyB = mBodies[bodyIndB];
 
-	CollisionManifold manifold(bodyIndA, bodyIndB);
+	CollisionManifold<2> manifold(bodyIndA, bodyIndB);
 	manifold.pointsCount = getBoxBoxCollision(
 		{ bodyA.position, bodyB.position },
 		{ bodyA.rotation, bodyB.rotation },

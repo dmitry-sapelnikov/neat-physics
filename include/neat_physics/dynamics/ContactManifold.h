@@ -20,7 +20,7 @@ public:
 	ContactManifold(
 		Body<2>& bodyA,
 		Body<2>& bodyB,
-		const CollisionManifold& manifold) noexcept;
+		const CollisionManifold<2>& manifold) noexcept;
 
 	/// Returns the first body
 	const Body<2>& getBodyA() const noexcept
@@ -61,7 +61,7 @@ public:
 
 	/// Updates the contact manifold with new contacts
 	/// preserving impulses for matching contact points
-	void update(const CollisionManifold& newManifold) noexcept;
+	void update(const CollisionManifold<2>& newManifold) noexcept;
 
 	/// Prepares the contact manifold for velocity solving
 	void prepareToSolve() noexcept;

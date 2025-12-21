@@ -45,7 +45,7 @@ public:
 	void prepareManifoldsUpdate() noexcept;
 
 	/// Collision callback
-	void onCollision(const CollisionManifold& collisionManifold);
+	void onCollision(const CollisionManifold<2>& collisionManifold);
 
 	/// Finishes the contact manifolds update
 	void finishManifoldsUpdate();

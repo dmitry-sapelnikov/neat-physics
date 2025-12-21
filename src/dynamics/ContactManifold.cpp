@@ -13,7 +13,7 @@ namespace nph
 ContactManifold::ContactManifold(
 	Body<2>& bodyA,
 	Body<2>& bodyB,
-	const CollisionManifold& manifold) noexcept :
+	const CollisionManifold<2>& manifold) noexcept :
 
 	mBodyA(&bodyA),
 	mBodyB(&bodyB),
@@ -28,7 +28,7 @@ ContactManifold::ContactManifold(
 	assert(0 < mContactCount && mContactCount <= MAX_COLLISION_POINTS);
 }
 
-void ContactManifold::update(const CollisionManifold& newManifold) noexcept
+void ContactManifold::update(const CollisionManifold<2>& newManifold) noexcept
 {
 	// Make a backup of old contacts
 	std::array<ContactPoint, CollisionPoint<2>::MAX_POINTS> oldContacts;
