@@ -1,0 +1,161 @@
+// OpenGL tutorials and engine (https://github.com/dmitry-sapelnikov/opengl-tutorials)
+// SPDX-FileCopyrightText: 2024-2025 Dmitry Sapelnikov
+// SPDX-License-Identifier: MIT
+
+// Includes
+#include "MouseCameraController.h"
+
+#include <algorithm>
+#include "neat_physics/math/MathFunctions.h"
+#include "Camera.h"
+
+namespace nph
+{
+
+MouseCameraController::MouseCameraController(
+	Camera& camera,
+	float mouseSpeed,
+	float zoomSpeed,
+	float targetMinDistance,
+	float targetMaxDistance) :
+
+	mCamera(camera),
+	mMouseSpeed(mouseSpeed),
+	mZoomSpeed(zoomSpeed),
+	mTargetMinDistance(targetMinDistance),
+	mTargetMaxDistance(targetMaxDistance)
+{
+	assert(mMouseSpeed > 0.0F);
+	assert(mZoomSpeed > 0.0F);
+	assert(mTargetMinDistance > 0.0F);
+	assert(mTargetMaxDistance > mTargetMinDistance);
+
+	const auto& view = camera.getView();
+	mPrevZoom = std::clamp(
+		(view.getPosition() - view.getTarget()).length(),
+		mTargetMinDistance,
+		mTargetMaxDistance);
+
+	mCurrentZoom = mPrevZoom;
+
+	const Vec3 up = view.getUp();
+	const Vec3 right = view.getRight();
+	const Vec3 front = cross(up, right).getNormalized();
+
+	mPitchYawBasis.setAxis(0, front);
+	mPitchYawBasis.setAxis(1, right);
+	mPitchYawBasis.setAxis(2, up);
+
+	Mat44 pitchYawBasisInv = mPitchYawBasis.getInverse();
+	const Vec3 directionLocal = pitchYawBasisInv * view.getDirection();
+	const Vec3 distanceAzimuthInclination =
+		getDistanceAzimuthInclination(directionLocal);
+
+	mYaw = toDegrees(distanceAzimuthInclination.y);
+	mPitch = toDegrees(distanceAzimuthInclination.z);
+}
+
+void MouseCameraController::updateCamera(
+	bool leftMouse,
+	bool midMouse,
+	int mouseWheel) noexcept
+{
+	auto& camera = getCamera();
+	auto& view = camera.getView();
+
+	mCurrentZoom *= std::pow(
+		2.0f,
+		-mouseWheel * 0.25f * (mZoomSpeed / 100.0f));
+
+	mCurrentZoom = std::clamp(
+		mCurrentZoom,
+		mTargetMinDistance,
+		mTargetMaxDistance);
+
+	// Zoom
+	if (mPrevZoom != mCurrentZoom)
+	{
+		view.setPosition(view.getTarget() - mCurrentZoom * view.getDirection());
+		mPrevZoom = mCurrentZoom;
+	}
+
+	// Rotation
+	if (leftMouse)
+	{
+		if (!mRotating)
+		{
+			mMouseStart = mMousePosition;
+			mRotating = true;
+		}
+		else
+		{
+			const Point2i mouseDelta = mMousePosition - mMouseStart;
+
+			mYaw += mouseDelta.x * mMouseSpeed;
+
+			// The pitch is inverted because the mouse Y-axis is inverted
+			mPitch -= mouseDelta.y * mMouseSpeed;
+
+			// Clamp the pitch to prevent the camera from flipping
+			mPitch = std::clamp(mPitch, -89.0f, 89.0f);
+
+			const Vec3 localDir = setDistanceAzimuthInclination(
+				{1.0f, toRadians(mYaw), toRadians(mPitch)});
+
+			const Vec3 direction = mPitchYawBasis * localDir;
+			view.setPosition(view.getTarget() - mCurrentZoom * direction);
+
+			mMouseStart = mMousePosition;
+			return;
+		}
+	}
+	else
+	{
+		mRotating = false;
+	}
+
+	// Translation
+	if (midMouse)
+	{
+		if (!mTranslating)
+		{
+			mMouseStart = mMousePosition;
+			mTranslating = true;
+			mInitialTarget = view.getTarget();
+			mInitialPosition = view.getPosition();
+			mProjectionViewInv = (camera.getProjection().getMatrix() *
+								  camera.getView().getMatrix())
+									 .getInverse();
+
+			mWindowSize = camera.getProjection().getWindowSize();
+			mDragStart = screenToCameraRay(
+				mMouseStart,
+				mWindowSize,
+				mInitialPosition,
+				mProjectionViewInv);
+		}
+		else
+		{
+			const Vec3 currentDrag = screenToCameraRay(
+				mMousePosition,
+				mWindowSize,
+				mInitialPosition,
+				mProjectionViewInv);
+
+			const Vec3 distance = mInitialTarget - mInitialPosition;
+			const float proj = dot(distance, currentDrag);
+			assert(proj > 0.0F);
+			const Vec3 deltaWorld = (distance.lengthSquared() / proj) * (mDragStart - currentDrag);
+			view.setTarget(mInitialTarget + deltaWorld);
+			view.setPosition(mInitialPosition + deltaWorld);
+		}
+		return;
+	}
+	else
+	{
+		mTranslating = false;
+	}
+}
+
+// End of the namespace nph
+}
