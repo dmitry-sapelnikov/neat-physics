@@ -32,7 +32,6 @@
     <ClInclude Include="..\..\src\collision\Plane.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\collision\BroadPhase.cpp" />
     <ClCompile Include="..\..\src\collision\CollisionSystem.cpp" />
     <ClCompile Include="..\..\src\collision\NarrowPhase.cpp" />
     <ClCompile Include="..\..\src\dynamics\ContactManifold.cpp" />

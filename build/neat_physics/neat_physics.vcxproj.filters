@@ -88,9 +88,6 @@
     <ClCompile Include="..\..\src\World.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\collision\BroadPhase.cpp">
-      <Filter>src\collision</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\collision\NarrowPhase.cpp">
       <Filter>src\collision</Filter>
     </ClCompile>

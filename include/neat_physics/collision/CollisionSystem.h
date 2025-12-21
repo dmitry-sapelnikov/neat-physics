@@ -24,7 +24,7 @@ public:
 	}
 
 	/// Returns the broad-phase collision detector
-	[[nodiscard]] const BroadPhase& getBroadPhase() const noexcept
+	[[nodiscard]] const BroadPhase<2>& getBroadPhase() const noexcept
 	{
 		return mBroadPhase;
 	}
@@ -39,7 +39,7 @@ private:
 	const BodyArray<2>& mBodies;
 
 	/// Broad-phase collision detector
-	BroadPhase mBroadPhase;
+	BroadPhase<2> mBroadPhase;
 
 	/// A temporary pointer to the collision callback
 	CollisionCallback* mCallback{ nullptr };
