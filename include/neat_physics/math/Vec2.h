@@ -34,13 +34,6 @@ struct Vec<2>
 	{
 	}
 
-	/// Sets the vector components
-	void set(float inX, float inY) noexcept
-	{
-		x = inX;
-		y = inY;
-	}
-
 	/// Returns the squared length of the vector
 	[[nodiscard]] float lengthSquared() const noexcept
 	{
