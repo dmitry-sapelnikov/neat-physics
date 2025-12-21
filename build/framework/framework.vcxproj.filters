@@ -17,9 +17,15 @@
     <ClInclude Include="..\..\framework\Visualization.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\Camera.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\Visualization.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\Camera.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
