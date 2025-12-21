@@ -316,7 +316,7 @@ void drawArrow(
 
 	const Vec2 dir = end - start;
 	const Vec2 dirNorm = dir.getNormalized();
-	const Vec2 orthoLeft = getLeftOrthoVec(dirNorm);
+	const Vec2 orthoLeft = cross(dirNorm, 1.0f);
 	const Vec2 tipEnd = end + tipSize * dirNorm;
 	const Vec2 leftArrowHead = end + TIP_SIDE_FACTOR * tipSize * orthoLeft;
 	const Vec2 rightArrowHead = end - TIP_SIDE_FACTOR * tipSize * orthoLeft;

@@ -8,7 +8,6 @@ namespace nph
 {
 
 World::World(
-	uint32_t maxBodies,
 	const Vec2& gravity,
 	uint32_t velocityIterations,
 	uint32_t positionIterations) :
@@ -17,10 +16,21 @@ World::World(
 	mCollision(mBodies),
 	mContactSolver(mBodies)
 {
-	assert(maxBodies > 0);
-	mBodies.reserve(maxBodies);
 	setVelocityIterations(velocityIterations);
 	setPositionIterations(positionIterations);
+}
+
+void World::reserveBodies(uint32_t maxBodies)
+{
+	const Body* const oldData = mBodies.data();
+	mBodies.reserve(maxBodies);
+	if (std::ptrdiff_t memoryOffsetInBytes =
+		reinterpret_cast<std::byte*>(mBodies.data()) -
+		reinterpret_cast<const std::byte*>(oldData);
+		memoryOffsetInBytes != 0)
+	{
+		mContactSolver.onBodiesReallocation(memoryOffsetInBytes);
+	}
 }
 
 Body* World::addBody(
@@ -30,14 +40,24 @@ Body* World::addBody(
 	const Vec2& position,
 	float rotationRad)
 {
-	if (mBodies.size() == mBodies.capacity())
+	// We limit the number of bodies to uint32_t max value
+	if (mBodies.size() == std::numeric_limits<uint32_t>::max())
 	{
 		return nullptr;
 	}
 
+	const Body* const oldData = mBodies.data();
 	Body* result = &mBodies.emplace_back(size, mass, friction);
 	result->position = position;
 	result->rotation.setAngle(rotationRad);
+
+	if (const std::ptrdiff_t memoryOffsetInBytes =
+		reinterpret_cast<std::byte*>(mBodies.data()) -
+		reinterpret_cast<const std::byte*>(oldData);
+		memoryOffsetInBytes != 0)
+	{
+		mContactSolver.onBodiesReallocation(memoryOffsetInBytes);
+	}
 	return result;
 }
 

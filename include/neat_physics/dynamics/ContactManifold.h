@@ -18,8 +18,8 @@ class ContactManifold
 public:
 	/// Constructor
 	ContactManifold(
-		Body* bodyA,
-		Body* bodyB,
+		Body& bodyA,
+		Body& bodyB,
 		const CollisionManifold& manifold) noexcept;
 
 	/// Returns the first body
@@ -71,6 +71,12 @@ public:
 
 	/// Solves the contact positions (penetration)
 	void solvePositions() noexcept;
+
+	/// Called when bodies are reallocated
+	/// \param memoryOffset the offset in BYTES between the previously allocated
+	/// and newly allocated body arrays
+	void onBodiesReallocation(
+		std::ptrdiff_t memoryOffset) noexcept;
 
 private:
 	/// First body

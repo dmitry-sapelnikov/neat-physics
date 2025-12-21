@@ -12,8 +12,8 @@ namespace nph
 namespace
 {
 
-/// Maximum number of bodies in the physics world
-static constexpr uint32_t MAX_BODIES = 5000;
+/// Number of bodies to reserve space for in the physics world
+static constexpr uint32_t BODIES_TO_RESERVE = 16;
 
 /// Gravity
 static constexpr float GRAVITY = 10.0f;
@@ -323,7 +323,8 @@ int main()
 	try
 	{
 		const nph::Vec2 glassSize{ nph::GRAVITY * 0.5f, nph::GRAVITY };
-		nph::World world(nph::MAX_BODIES, { 0.0f, -nph::GRAVITY }, 1, 1);
+		nph::World world({ 0.0f, -nph::GRAVITY }, 1, 1);
+		world.reserveBodies(nph::BODIES_TO_RESERVE);
 
 		nph::Visualization* visualization = nph::Visualization::getInstance();
 		if (visualization == nullptr)

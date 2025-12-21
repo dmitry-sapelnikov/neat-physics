@@ -90,8 +90,14 @@ void createTestScene(World& world)
 int wmain(int argc, wchar_t** argv)
 {
 	constexpr float TIME_STEP = 1.0f / 60.0f;
-	constexpr uint32_t MAX_BODIES = 2048;
+	constexpr uint32_t SOLVER_VELOCITY_ITERATIONS = 15;
+	constexpr uint32_t SOLVER_POSITION_ITERATIONS = 5;
+	constexpr uint32_t BODIES_TO_RESERVE = 2048;
+	constexpr Vec2 GRAVITY = Vec2(0.0f, -10.0f);
 	constexpr bool USE_VISUALIZATION = false;
+
+	constexpr uint32_t MAX_STEPS = 400;
+	constexpr uint32_t DUMP_INTERVAL = 10;
 
 	try
 	{
@@ -102,7 +108,12 @@ int wmain(int argc, wchar_t** argv)
 			return -1;
 		}
 
-		World world(MAX_BODIES, Vec2(0.0f, -10.0f), 15, 5);
+		World world(
+			GRAVITY,
+			SOLVER_VELOCITY_ITERATIONS,
+			SOLVER_POSITION_ITERATIONS);
+
+		world.reserveBodies(BODIES_TO_RESERVE);
 		createTestScene(world);
 
 		Visualization* visualization{ nullptr };
@@ -129,11 +140,10 @@ int wmain(int argc, wchar_t** argv)
 			return -1;
 		}
 
-		int maxSteps = 400;
-		int dumpInterval = 10;
-		for (int step = 0; step < maxSteps; ++step)
+		
+		for (int step = 0; step < MAX_STEPS; ++step)
 		{
-			if (step % dumpInterval == 0)
+			if (step % DUMP_INTERVAL == 0)
 			{
 				resultFile << "Step " << step << ":\n";
 				for (size_t i = 0; i < world.getBodies().size(); ++i)
@@ -147,7 +157,7 @@ int wmain(int argc, wchar_t** argv)
 			}
 
 			world.doStep(TIME_STEP);
-			std::cout << "\rProgress: " << (100 * (step + 1) / maxSteps) << "%";
+			std::cout << "\rProgress: " << (100 * (step + 1) / MAX_STEPS) << "%";
 
 			if (visualization != nullptr)
 			{

@@ -16,8 +16,18 @@ namespace nph
 class ContactSolver : public CollisionCallback
 {
 public:
-	/// Contact manifold container type
-	using ContactManifoldsMap = std::unordered_map<uint64_t, ContactManifold>;
+	/// Map of contact pairs.
+	/// The key is combination of two body IDs,
+	/// the value is the index in the manifold array.
+	using ContactPairsMap = std::unordered_map<uint64_t, uint32_t>;
+
+	/// Entry in the manifolds array
+	/// The first element is a pointer to the contact pair map entry
+	using ManifoldsArrayEntry =
+		std::pair<ContactPairsMap::iterator, ContactManifold>;
+
+	/// Array of contact manifolds
+	using ManifoldsArray = std::vector<ManifoldsArrayEntry>;
 
 	/// Constructor
 	ContactSolver(BodyArray& bodies) noexcept;
@@ -26,7 +36,7 @@ public:
 	void clear() noexcept;
 
 	/// Returns the contact manifolds
-	[[nodiscard]] const ContactManifoldsMap& getManifolds() const noexcept
+	[[nodiscard]] const ManifoldsArray& getManifolds() const noexcept
 	{
 		return mManifolds;
 	}
@@ -49,12 +59,20 @@ public:
 	/// Solves the contact positions (penetration)
 	void solvePositions(uint32_t positionIterations) noexcept;
 
+	/// Called when bodies are reallocated
+	/// \param memoryOffset the offset in BYTES between the previously allocated
+	/// and newly allocated body arrays
+	void onBodiesReallocation(std::ptrdiff_t memoryOffsetInBytes) noexcept;
+
 private:
 	/// Reference to the body array
 	BodyArray& mBodies;
 
 	/// Persistent contact manifolds
-	ContactManifoldsMap mManifolds;
+	ContactPairsMap mContactPairs;
+
+	/// Contact manifolds
+	ManifoldsArray mManifolds;
 };
 
 }
