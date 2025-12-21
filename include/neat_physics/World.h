@@ -48,7 +48,7 @@ public:
 	}
 
 	/// Returns the contact solver
-	[[nodiscard]] const ContactSolver& getContactSolver() const noexcept
+	[[nodiscard]] const ContactSolver<2>& getContactSolver() const noexcept
 	{
 		return mContactSolver;
 	}
@@ -118,7 +118,7 @@ private:
 	CollisionSystemType mCollision;
 
 	/// Contact solver
-	ContactSolver mContactSolver;
+	ContactSolver<2> mContactSolver;
 };
 
 } // namespace nph

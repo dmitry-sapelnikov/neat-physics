@@ -13,7 +13,8 @@ namespace nph
 {
 
 /// Solver for contact constraints between bodies
-class ContactSolver : public CollisionCallback<2>
+template <uint16_t D>
+class ContactSolver : public CollisionCallback<D>
 {
 public:
 	/// Map of contact pairs.
@@ -24,13 +25,16 @@ public:
 	/// Entry in the manifolds array
 	/// The first element is a pointer to the contact pair map entry
 	using ManifoldsArrayEntry =
-		std::pair<ContactPairsMap::iterator, ContactManifold<2>>;
+		std::pair<ContactPairsMap::iterator, ContactManifold<D>>;
 
 	/// Array of contact manifolds
 	using ManifoldsArray = std::vector<ManifoldsArrayEntry>;
 
 	/// Constructor
-	ContactSolver(BodyArray<2>& bodies) noexcept;
+	ContactSolver(BodyArray<D>& bodies) noexcept :
+		mBodies(bodies)
+	{
+	}
 
 	/// Clears all contact manifolds
 	void clear() noexcept;
@@ -45,7 +49,7 @@ public:
 	void prepareManifoldsUpdate() noexcept;
 
 	/// Collision callback
-	void onCollision(const CollisionManifold<2>& collisionManifold);
+	void onCollision(const CollisionManifold<D>& collisionManifold);
 
 	/// Finishes the contact manifolds update
 	void finishManifoldsUpdate();
@@ -60,13 +64,14 @@ public:
 	void solvePositions(uint32_t positionIterations) noexcept;
 
 	/// Called when bodies are reallocated
-	/// \param memoryOffset the offset in BYTES between the previously allocated
+	/// \param memoryOffsetInBytes the offset in bytes
+	/// between the previously allocated
 	/// and newly allocated body arrays
 	void onBodiesReallocation(std::ptrdiff_t memoryOffsetInBytes) noexcept;
 
 private:
 	/// Reference to the body array
-	BodyArray<2>& mBodies;
+	BodyArray<D>& mBodies;
 
 	/// Persistent contact manifolds
 	ContactPairsMap mContactPairs;
@@ -75,4 +80,116 @@ private:
 	ManifoldsArray mManifolds;
 };
 
+template <uint16_t D>
+void ContactSolver<D>::clear() noexcept
+{
+	mContactPairs.clear();
+	mManifolds.clear();
 }
+
+template <uint16_t D>
+void ContactSolver<D>::onBodiesReallocation(
+	std::ptrdiff_t memoryOffsetInBytes) noexcept
+{
+	for (auto& pair : mManifolds)
+	{
+		pair.second.onBodiesReallocation(memoryOffsetInBytes);
+	}
+}
+
+template <uint16_t D>
+void ContactSolver<D>::prepareToSolve() noexcept
+{
+	for (auto& pair : mManifolds)
+	{
+		pair.second.prepareToSolve();
+	}
+}
+
+template <uint16_t D>
+void ContactSolver<D>::solveVelocities(uint32_t velocityIterations) noexcept
+{
+	for (uint32_t i = 0; i < velocityIterations; ++i)
+	{
+		for (auto& pair : mManifolds)
+		{
+			pair.second.solveVelocities();
+		}
+	}
+}
+
+template <uint16_t D>
+void ContactSolver<D>::solvePositions(uint32_t positionIterations) noexcept
+{
+	for (uint32_t i = 0; i < positionIterations; ++i)
+	{
+		for (auto& pair : mManifolds)
+		{
+			pair.second.solvePositions();
+		}
+	}
+}
+
+template <uint16_t D>
+void ContactSolver<D>::prepareManifoldsUpdate() noexcept
+{
+	for (auto& pair : mManifolds)
+	{
+		pair.second.markObsolete();
+	}
+}
+
+template <uint16_t D>
+void ContactSolver<D>::onCollision(const CollisionManifold<D>& manifold)
+{
+	const uint64_t key =
+		(static_cast<uint64_t>(manifold.bodyIndA) << 32) |
+		manifold.bodyIndB;
+
+	if (auto iter = mContactPairs.find(key);
+		iter != mContactPairs.end())
+	{
+		mManifolds[iter->second].second.update(manifold);
+	}
+	else
+	{
+		size_t manifoldCount = mManifolds.size();
+		assert(manifoldCount <= std::numeric_limits<uint32_t>::max());
+		const uint32_t index = static_cast<uint32_t>(manifoldCount);
+		mManifolds.emplace_back(
+			std::piecewise_construct,
+			std::forward_as_tuple(mContactPairs.try_emplace(key, index).first),
+			std::forward_as_tuple(
+				mBodies[manifold.bodyIndA],
+				mBodies[manifold.bodyIndB],
+				manifold)
+		);
+	}
+}
+
+template <uint16_t D>
+void ContactSolver<D>::finishManifoldsUpdate()
+{
+	// Remove obsolete manifolds, rewire the contact pairs map
+	size_t mi = 0;
+	while (mi != mManifolds.size())
+	{
+		if (mManifolds[mi].second.isObsolete())
+		{
+			mContactPairs.erase(mManifolds[mi].first);
+			// Swap and pop
+			if (mi != mManifolds.size() - 1)
+			{
+				mManifolds[mi] = std::move(mManifolds.back());
+				mManifolds[mi].first->second = static_cast<uint32_t>(mi);
+			}
+			mManifolds.pop_back();
+		}
+		else
+		{
+			++mi;
+		}
+	}
+}
+
+} // nph namespace
