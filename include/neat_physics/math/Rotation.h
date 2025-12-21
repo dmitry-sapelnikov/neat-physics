@@ -6,7 +6,7 @@
 #pragma once
 
 // Includes
-#include "neat_physics/math/Mat.h"
+#include "neat_physics/math/Mat22.h"
 
 namespace nph
 {

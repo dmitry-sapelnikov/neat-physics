@@ -86,6 +86,9 @@
     <ClInclude Include="..\..\include\neat_physics\math\Vec2.h">
       <Filter>include\math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\Mat22.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\collision\NarrowPhase.cpp">
