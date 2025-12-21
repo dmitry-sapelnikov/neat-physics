@@ -30,7 +30,7 @@ using ClippedEdge = std::array<ClippedPoint, 2>;
 /// Clips an edge by a plane
 bool clipEdgeByPlane(
 	const ClippedEdge& source,
-	const Plane& clipPlane,
+	const Plane2& clipPlane,
 	uint32_t clipBody,
 	uint32_t clipAxisInd,
 	ClippedEdge& target)

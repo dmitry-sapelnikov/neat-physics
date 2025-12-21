@@ -11,10 +11,11 @@ namespace nph
 {
 
 /// Represents a 2D plane defined by a normal and an offset
+template <uint64_t D>
 struct Plane
 {
 	/// Normal (asserted to be normalized)
-	const Vec2 normal;
+	const Vec<D> normal;
 
 	/// Offset from the origin
 	float offset;
@@ -24,7 +25,7 @@ struct Plane
 
 	/// Constructs plane from normal and offset
 	Plane(
-		const Vec2& inNormal,
+		const Vec<D>& inNormal,
 		float inOffset) noexcept :
 
 		normal(inNormal),
@@ -35,8 +36,8 @@ struct Plane
 
 	/// Constructs plane from normal and a point on the plane
 	Plane(
-		const Vec2& inNormal,
-		const Vec2& inOrigin) noexcept :
+		const Vec<D>& inNormal,
+		const Vec<D>& inOrigin) noexcept :
 
 		Plane(inNormal, dot(inNormal, inOrigin))
 	{
@@ -44,8 +45,8 @@ struct Plane
 
 	/// Constructs plane from normal, a point on the plane + extra offset
 	Plane(
-		const Vec2& inNormal,
-		const Vec2& inOrigin,
+		const Vec<D>& inNormal,
+		const Vec<D>& inOrigin,
 		float inOffset) noexcept :
 
 		Plane(inNormal, dot(inNormal, inOrigin) + inOffset)
@@ -53,10 +54,13 @@ struct Plane
 	}
 
 	/// Returns the signed distance from the plane to the point
-	[[nodiscard]] float getDistance(const Vec2& point) const noexcept
+	[[nodiscard]] float getDistance(const Vec<D>& point) const noexcept
 	{
 		return dot(normal, point) - offset;
 	}
 };
+
+/// 2D plane alias
+using Plane2 = Plane<2>;
 
 } // namespace nph
