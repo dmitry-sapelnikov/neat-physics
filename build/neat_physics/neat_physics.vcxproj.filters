@@ -77,6 +77,9 @@
     <ClInclude Include="..\..\include\neat_physics\collision\BroadPhaseCallback.h">
       <Filter>include\collision</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\AxisAngle.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Body.cpp">
