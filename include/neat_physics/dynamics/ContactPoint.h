@@ -72,13 +72,13 @@ private:
 		const Body<D>& bodyB,
 		Vec<D>& normal,
 		Vec<D>& clippedPoint,
-		float& penetration) const;
+		float& penetration) const noexcept;
 
 	/// Collision point
 	CollisionPoint<D> mPoint;
 
-	/// Tangent vector
-	Vec<D> mTangent;
+	/// Tangent vector(s)
+	std::array<Vec<D>, D - 1> mTangents;
 
 	/// Vector from the body A center of mass to the contact point
 	Vec<D> mOffsetA;
@@ -91,14 +91,14 @@ private:
 
 	/// Effective mass in the tangent direction
 	/// \todo: generalize for 3D
-	float mTangentMass;
+	std::array<float, D - 1> mTangentMasses;
 
 	/// Accumulated normal impulse
 	float mNormalImpulse;
 
 	/// Accumulated tangent (friction) impulse
 	/// \todo: generalize for 3D
-	float mTangentImpulse;
+	std::array<float, D - 1> mTangentImpulse;
 };
 
 /// Applies impulse at a point relative to the center of mass
@@ -121,16 +121,29 @@ void ContactPoint<D>::prepareToSolve(
 	mOffsetB = mPoint.position - bodyB.position;
 
 	// Precompute normal mass, tangent mass, and bias.
-	mNormalMass = getEffectiveMass(bodyA, bodyB, mOffsetA, mOffsetB, mPoint.normal);
-
-	mTangent = cross(mPoint.normal, 1.0f);
-	mTangentMass = getEffectiveMass(bodyA, bodyB, mOffsetA, mOffsetB, mTangent);
-
-	// Apply the warm starting impulse
-	applyImpulse(
+	mNormalMass = getEffectiveMass(
 		bodyA,
 		bodyB,
-		mNormalImpulse * mPoint.normal + mTangentImpulse * mTangent);
+		mOffsetA,
+		mOffsetB,
+		mPoint.normal);
+
+	/// \todo generalize for 3D
+	mTangents[0] = cross(mPoint.normal, 1.0f);
+
+	Vec<D> warmStartingImpulse = mNormalImpulse * mPoint.normal;
+	for (uint16_t i = 0; i < D - 1; ++i)
+	{
+		mTangentMasses[i] = getEffectiveMass(
+			bodyA,
+			bodyB,
+			mOffsetA,
+			mOffsetB,
+			mTangents[i]);
+		warmStartingImpulse += mTangentImpulse[i] * mTangents[i];
+	}
+	// Apply the warm starting impulse
+	applyImpulse(bodyA, bodyB, warmStartingImpulse);
 }
 
 template <uint16_t D>
@@ -155,14 +168,14 @@ void ContactPoint<D>::solveVelocities(
 	}
 
 	// Dry friction impulse
+	const float maxFriction = friction * mNormalImpulse;
+	for (uint16_t i = 0; i < D - 1; ++i)
 	{
-		const float maxFriction = friction * mNormalImpulse;
+		const float impulse = -mTangentMasses[i] *
+			dot(getVelocityAtContact(bodyA, bodyB), mTangents[i]);
 
-		const float impulse = -mTangentMass *
-			dot(getVelocityAtContact(bodyA, bodyB), mTangent);
-
-		const float oldImpulse = mTangentImpulse;
-		mTangentImpulse = std::clamp(
+		const float oldImpulse = mTangentImpulse[i];
+		mTangentImpulse[i] = std::clamp(
 			oldImpulse + impulse,
 			-maxFriction,
 			maxFriction);
@@ -170,7 +183,7 @@ void ContactPoint<D>::solveVelocities(
 		applyImpulse(
 			bodyA,
 			bodyB,
-			(mTangentImpulse - oldImpulse) * mTangent);
+			(mTangentImpulse[i] - oldImpulse) * mTangents[i]);
 	}
 }
 
@@ -206,6 +219,7 @@ void ContactPoint<D>::solvePositions(
 	const Vec<D> penetrationImpulse = std::max(0.0f, effectiveMass * biasFactor) * normal;
 
 	// Directly integrate positions and rotations of the bodies in contact
+	/// \todo generalize for 3D
 	bodyA.position -= bodyA.invMass * penetrationImpulse;
 	bodyA.rotation.setAngle(bodyA.rotation.getAngle() -
 		bodyA.invInertia * cross(offsetA, penetrationImpulse));
@@ -243,7 +257,7 @@ void ContactPoint<D>::getTransformedContact(
 	const Body<D>& bodyB,
 	Vec<D>& normal,
 	Vec<D>& clippedPoint,
-	float& penetration) const
+	float& penetration) const noexcept
 {
 	const std::array<Vec<D>, 2> positions{
 		bodyA.position,
