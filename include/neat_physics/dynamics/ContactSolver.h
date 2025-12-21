@@ -13,7 +13,7 @@ namespace nph
 {
 
 /// Solver for contact constraints between bodies
-class ContactSolver : public CollisionCallback
+class ContactSolver : public CollisionCallback<2>
 {
 public:
 	/// Map of contact pairs.

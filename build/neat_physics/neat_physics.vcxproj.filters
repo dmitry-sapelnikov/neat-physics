@@ -56,9 +56,6 @@
     <ClInclude Include="..\..\include\neat_physics\collision\CollisionManifold.h">
       <Filter>include\collision</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\collision\NarrowPhase.h">
-      <Filter>src\collision</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\neat_physics\collision\CollisionSystem.h">
       <Filter>include\collision</Filter>
     </ClInclude>
@@ -83,15 +80,15 @@
     <ClInclude Include="..\..\include\neat_physics\math\Inertia.h">
       <Filter>include\math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\collision\NarrowPhase.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\World.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\collision\NarrowPhase.cpp">
-      <Filter>src\collision</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\collision\CollisionSystem.cpp">
       <Filter>src\collision</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\dynamics\ContactPoint.cpp">

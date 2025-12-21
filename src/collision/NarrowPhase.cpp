@@ -4,15 +4,23 @@
 
 // Includes
 #include <algorithm>
-#include "neat_physics/Body.h"
+#include "neat_physics/collision/NarrowPhase.h"
 #include "Plane.h"
-#include "NarrowPhase.h"
 
 namespace nph
 {
 
 namespace
 {
+
+// 2-element array of Vec2
+using Vec2Array2 = std::array<Vec2, 2>;
+
+// 2-element array of Rotation
+using Rotation2Array2 = std::array<Rotation2, 2>;
+
+// 2-element array of Mat22
+using Mat22Array2 = std::array<Mat22, 2>;
 
 /// Clipped point
 struct ClippedPoint
@@ -69,11 +77,11 @@ bool clipEdgeByPlane(
 
 } // anonymous namespace
 
-
-uint32_t getBoxBoxCollision(
-	const Vec2Array2& positions,
-	const Rotation2Array2 rotations,
-	const Vec2Array2& halfSizes,
+template <>
+uint32_t getBoxBoxCollision<2>(
+	const std::array<Vec2, 2>& positions,
+	const std::array<Rotation2, 2>& rotations,
+	const std::array<Vec2, 2>& halfSizes,
 	CollisionPointArray<2>& result)
 {
 	assert(halfSizes[0].x > 0.0f && halfSizes[0].y > 0.0f);

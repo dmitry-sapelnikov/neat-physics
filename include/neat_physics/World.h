@@ -16,6 +16,12 @@ namespace nph
 class World
 {
 public:
+	/// Body array alias
+	using BodyArrayType = BodyArray<2>;
+
+	/// Collision system alias
+	using CollisionSystemType = CollisionSystem<2>;
+
 	/// Constructor
 	/// \param maxBodies Maximum number of bodies in the world; asserted to be > 0
 	/// \param gravity Gravity vector applied to all bodies
@@ -30,13 +36,13 @@ public:
 	void reserveBodies(uint32_t maxBodies);
 
 	/// Returns the bodies in the world
-	[[nodiscard]] const BodyArray<2>& getBodies() const noexcept
+	[[nodiscard]] const BodyArrayType& getBodies() const noexcept
 	{
 		return mBodies;
 	}
 
 	/// Returns the collision system
-	[[nodiscard]] const CollisionSystem& getCollision() const noexcept
+	[[nodiscard]] const CollisionSystemType& getCollision() const noexcept
 	{
 		return mCollision;
 	}
@@ -106,10 +112,10 @@ private:
 	uint32_t mPositionIterations;
 
 	/// Bodies in the world
-	BodyArray<2> mBodies;
+	BodyArrayType mBodies;
 
 	/// Collision system
-	CollisionSystem mCollision;
+	CollisionSystemType mCollision;
 
 	/// Contact solver
 	ContactSolver mContactSolver;

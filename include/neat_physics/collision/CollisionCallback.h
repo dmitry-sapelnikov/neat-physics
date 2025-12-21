@@ -11,6 +11,7 @@ namespace nph
 {
 
 /// Callback interface for the collision system update
+template <uint16_t D>
 class CollisionCallback
 {
 public:
@@ -18,7 +19,7 @@ public:
 	virtual ~CollisionCallback() = default;
 
 	/// Called when a collision manifold is created
-	virtual void onCollision(const CollisionManifold<2>& manifold) = 0;
+	virtual void onCollision(const CollisionManifold<D>& manifold) = 0;
 };
 
 } // namespace nph
