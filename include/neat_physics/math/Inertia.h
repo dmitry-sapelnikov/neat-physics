@@ -6,6 +6,7 @@
 
 // Includes
 #include <cstdint>
+#include "neat_physics/math/Vec2.h"
 
 namespace nph
 {
@@ -24,5 +25,17 @@ struct InertiaTrait<2>
 /// Inertia definition via trait
 template <uint16_t D>
 using Inertia = typename InertiaTrait<D>::Type;
+
+/// Returns the inverse 2D inertia given the inertia value
+inline float getInvInertia(float inertia) noexcept
+{
+	return (inertia == 0.0f) ? 0.0f : 1.0f / inertia;
+}
+
+/// Returns the moment of inertia for a 2D box shape
+inline float getBoxInertia(const Vec2& size, float mass)
+{
+	return mass * size.lengthSquared() / 12.0f;
+}
 
 } // namespace nph

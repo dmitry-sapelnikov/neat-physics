@@ -6,7 +6,9 @@
 
 // Includes
 #include <vector>
+#include "neat_physics/math/AxisAngle.h"
 #include "neat_physics/math/Rotation.h"
+#include "neat_physics/math/Inertia.h"
 
 namespace nph
 {
@@ -15,10 +17,11 @@ namespace nph
 /// The class design is intentionaly minimalistic
 /// To achieve this, we use struct with public members
 /// while keeping all members with value constraints constant
-struct Body
+template <uint16_t D>
+struct BodyTemplate
 {
 	/// Half size (width / 2, height / 2)
-	const Vec2 halfSize;
+	const Vec<D> halfSize;
 
 	/// Mass (0 if static)
 	const float mass;
@@ -27,34 +30,51 @@ struct Body
 	const float invMass;
 
 	/// Moment of inertia (0 if static)
-	const float inertia;
+	const Inertia<D> inertia;
 
 	/// Inverse moment of inertia (0 if static)
-	const float invInertia;
+	const Inertia<D> invInertia;
 
 	/// Friction coefficient [0, 1]
 	const float friction;
 
 	/// Position
-	Vec2 position{ 0.0f, 0.0f };
+	Vec<D> position{};
 
 	/// Rotation
-	Rotation2 rotation{ 0.0f };
+	Rotation<D> rotation{};
 
 	/// Linear velocity
-	Vec2 linearVelocity{ 0.0f, 0.0f };
+	Vec<D> linearVelocity{};
 
 	/// Angular velocity
-	float angularVelocity{ 0.0f };
+	AxisAngle<D> angularVelocity{};
 
 	/// Constructor
 	/// \param inSize Body size; must be > 0 in both dimensions
 	/// \param inMass Body mass; if 0, the body is static; must be >= 0
 	/// \param inFriction Friction coefficient; must be in range [0, 1]
-	Body(
+	BodyTemplate(
 		const Vec2& inSize,
 		float inMass,
-		float inFriction);
+		float inFriction) :
+
+		halfSize(0.5f * inSize),
+		mass(inMass),
+		invMass((mass == 0.0f) ? 0.0f : 1.0f / mass),
+
+		inertia(getBoxInertia(inSize, mass)),
+		invInertia(getInvInertia(inertia)),
+
+		friction(inFriction)
+	{
+		for (uint16_t i = 0; i < D; ++i)
+		{
+			assert(halfSize[i] > 0.0f);
+		}
+		assert(mass >= 0.0f);
+		assert(0.0f <= friction && friction <= 1.0f);
+	}
 
 	/// Checks if the body is static
 	[[nodiscard]] bool isStatic() const noexcept
@@ -63,7 +83,10 @@ struct Body
 	}
 };
 
-/// Body array type
+/// 2D body alias
+using Body = BodyTemplate<2>;
+
+/// 2D body array type
 using BodyArray = std::vector<Body>;
 
 // namespace nph
