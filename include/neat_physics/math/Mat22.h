@@ -10,8 +10,13 @@
 namespace nph
 {
 
+/// Generic matrix template
+template <uint16_t R, uint16_t C>
+struct Mat;
+
 /// 2x2 matrix, column major
-struct Mat22
+template <>
+struct Mat<2, 2>
 {
 	/// Column #1, intentionally uninitialized
 	Vec2 col1;
@@ -20,16 +25,16 @@ struct Mat22
 	Vec2 col2;
 
 	/// Default constructor (no initialization)
-	Mat22() noexcept = default;
+	Mat() noexcept = default;
 
 	/// Constructor with columns
-	constexpr Mat22(const Vec2& inCol1, const Vec2& inCol2) noexcept :
+	constexpr Mat(const Vec2& inCol1, const Vec2& inCol2) noexcept :
 		col1(inCol1), col2(inCol2)
 	{
 	}
 
 	/// Returns the transposed matrix
-	[[nodiscard]] Mat22 getTransposed() const noexcept
+	[[nodiscard]] Mat getTransposed() const noexcept
 	{
 		return { { col1.x, col2.x }, { col1.y, col2.y } };
 	}
@@ -49,7 +54,7 @@ struct Mat22
 	}
 
 	/// Addition assignment operator
-	Mat22& operator+=(const Mat22& other) noexcept
+	Mat& operator+=(const Mat& other) noexcept
 	{
 		col1 += other.col1;
 		col2 += other.col2;
@@ -57,7 +62,7 @@ struct Mat22
 	}
 
 	/// Subtraction assignment operator
-	Mat22& operator-=(const Mat22& other) noexcept
+	Mat& operator-=(const Mat& other) noexcept
 	{
 		col1 -= other.col1;
 		col2 -= other.col2;
@@ -65,20 +70,24 @@ struct Mat22
 	}
 };
 
+using Mat22 = Mat<2, 2>;
+
 /// Matrix addition operator
-inline [[nodiscard]] Mat22 operator+(
-	const Mat22& matA,
-	const Mat22& matB) noexcept
+template <uint16_t R, uint16_t C>
+inline [[nodiscard]] Mat<R, C> operator+(
+	const Mat<R, C>& matA,
+	const Mat<R, C>& matB) noexcept
 {
-	return Mat22(matA) += matB;
+	return Mat<R, C>(matA) += matB;
 }
 
 /// Matrix subtraction operator
-inline [[nodiscard]] Mat22 operator-(
-	const Mat22& matA,
-	const Mat22& matB) noexcept
+template <uint16_t R, uint16_t C>
+inline [[nodiscard]] Mat<R, C> operator-(
+	const Mat<R, C>& matA,
+	const Mat<R, C>& matB) noexcept
 {
-	return Mat22(matA) -= matB;
+	return Mat<R, C>(matA) -= matB;
 }
 
 /// Matrix-vector multiplication operator
