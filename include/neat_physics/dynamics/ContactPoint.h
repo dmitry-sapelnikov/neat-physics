@@ -283,12 +283,13 @@ template <uint16_t D>
 	const Vec<D>& armB,
 	const Vec<D>& direction) noexcept
 {
-	const float crossA = cross(armA, direction);
-	const float crossB = cross(armB, direction);
+	const auto crossA = cross(armA, direction);
+	const auto crossB = cross(armB, direction);
 	const float invResult =
-		bodyA.invMass + bodyB.invMass +
-		bodyA.invInertia * crossA * crossA +
-		bodyB.invInertia * crossB * crossB;
+		bodyA.invMass +
+		bodyB.invMass +
+		dot(cross((bodyA.invInertia * crossA), armA) +
+			cross((bodyB.invInertia * crossB), armB), direction);
 	return 1.0f / invResult;
 }
 
