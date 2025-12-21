@@ -80,6 +80,7 @@ inline [[nodiscard]] Vec2 operator*(
 	const Mat22& mat,
 	const Vec2& vec) noexcept
 {
+	// This works faster than 2 dot() calls
 	return {
 		mat.col1.x * vec.x + mat.col2.x * vec.y,
 		mat.col1.y * vec.x + mat.col2.y * vec.y
