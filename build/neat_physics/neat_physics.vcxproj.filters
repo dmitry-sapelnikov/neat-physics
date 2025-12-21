@@ -29,6 +29,9 @@
     <ClInclude Include="..\..\include\neat_physics\math\Rotation.h">
       <Filter>include\math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\Vec.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\include\neat_physics\math\Vec2.h">
       <Filter>include\math</Filter>
     </ClInclude>
@@ -79,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\neat_physics\collision\NarrowPhase.h">
       <Filter>include\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\Vec2.h">
+      <Filter>include\math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

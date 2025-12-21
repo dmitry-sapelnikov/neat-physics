@@ -6,9 +6,7 @@
 #pragma once
 
 // Includes
-#include <cassert>
-#include <cmath>
-#include <cfloat>
+#include "neat_physics/math/Vec.h"
 
 namespace nph
 {
@@ -153,33 +151,6 @@ inline [[nodiscard]] Vec2 cross(
 	const Vec2& xy) noexcept
 {
 	return { -xy.y * z, xy.x * z };
-}
-
-/// Vector addition operator
-inline [[nodiscard]] Vec2 operator+(
-	const Vec2& vecA,
-	const Vec2& vecB) noexcept
-{
-	return Vec2(vecA) += vecB;
-}
-
-/// Vector subtraction operator
-inline [[nodiscard]] Vec2 operator-(
-	const Vec2& vecA,
-	const Vec2& vecB) noexcept
-{
-	return Vec2(vecA) -= vecB;
-}
-
-/// Scalar multiplication operator
-///	\note the vector-scalar operator is
-/// intentionally not defined to avoid
-/// optimization flaws like 2.0f * vec * 3.0f
-inline [[nodiscard]] Vec2 operator*(
-	float scalar,
-	const Vec2& vec) noexcept
-{
-	return Vec2(vec) *= scalar;
 }
 
 /// Component-wise absolute value of a vector
