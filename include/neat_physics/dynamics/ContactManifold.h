@@ -13,23 +13,24 @@ namespace nph
 
 /// Persistent contact manifold between two bodies
 /// Exploits temporal coherence to improve precision
+template <uint16_t D>
 class ContactManifold
 {
 public:
 	/// Constructor
 	ContactManifold(
-		Body<2>& bodyA,
-		Body<2>& bodyB,
-		const CollisionManifold<2>& manifold) noexcept;
+		Body<D>& bodyA,
+		Body<D>& bodyB,
+		const CollisionManifold<D>& manifold) noexcept;
 
 	/// Returns the first body
-	const Body<2>& getBodyA() const noexcept
+	const Body<D>& getBodyA() const noexcept
 	{
 		return *mBodyA;
 	}
 
 	/// Returns the second body
-	const Body<2>& getBodyB() const noexcept
+	const Body<D>& getBodyB() const noexcept
 	{
 		return *mBodyB;
 	}
@@ -41,7 +42,7 @@ public:
 	}
 
 	/// Returns the contact at given index
-	inline const ContactPoint<2>& getContact(uint32_t index) const noexcept
+	inline const ContactPoint<D>& getContact(uint32_t index) const noexcept
 	{
 		assert(index < mContactCount);
 		return mContacts[index];
@@ -61,7 +62,7 @@ public:
 
 	/// Updates the contact manifold with new contacts
 	/// preserving impulses for matching contact points
-	void update(const CollisionManifold<2>& newManifold) noexcept;
+	void update(const CollisionManifold<D>& newManifold) noexcept;
 
 	/// Prepares the contact manifold for velocity solving
 	void prepareToSolve() noexcept;
@@ -80,13 +81,13 @@ public:
 
 private:
 	/// First body
-	Body<2>* mBodyA;
+	Body<D>* mBodyA;
 
 	/// Second body
-	Body<2>* mBodyB;
+	Body<D>* mBodyB;
 
 	/// Contact array
-	std::array<ContactPoint<2>, CollisionPoint<2>::MAX_POINTS> mContacts;
+	std::array<ContactPoint<D>, CollisionPoint<D>::MAX_POINTS> mContacts;
 
 	/// Actual contact count
 	uint32_t mContactCount;
@@ -97,5 +98,99 @@ private:
 	/// Contact pair friction coefficient
 	float mFriction;
 };
+
+template <uint16_t D>
+ContactManifold<D>::ContactManifold(
+	Body<D>& bodyA,
+	Body<D>& bodyB,
+	const CollisionManifold<D>& manifold) noexcept :
+
+	mBodyA(&bodyA),
+	mBodyB(&bodyB),
+	mContacts{ manifold.points[0], manifold.points[1] },
+	mContactCount(manifold.pointsCount),
+	mObsolete(false),
+
+	// A well-known approximation for friction between two materials
+	// \todo: introduce material pairs
+	mFriction(std::sqrt(mBodyA->friction* mBodyB->friction))
+{
+	assert(0 < mContactCount && mContactCount <= MAX_COLLISION_POINTS);
+}
+
+template <uint16_t D>
+void ContactManifold<D>::update(
+	const CollisionManifold<D>& newManifold) noexcept
+{
+	// Make a backup of old contacts
+	std::array<ContactPoint<D>, CollisionPoint<D>::MAX_POINTS> oldContacts;
+	const uint32_t oldCount = mContactCount;
+	for (uint32_t i = 0; i < mContactCount; ++i)
+	{
+		oldContacts[i] = mContacts[i];
+	}
+
+	for (uint32_t i = 0; i < newManifold.pointsCount; ++i)
+	{
+		mContacts[i] = ContactPoint<D>(newManifold.points[i]);
+		for (ContactPoint<D>*oldContact = oldContacts.data();
+			oldContact < oldContacts.data() + oldCount;
+			++oldContact)
+		{
+			if (newManifold.points[i].featurePair ==
+				oldContact->getPoint().featurePair)
+			{
+				mContacts[i].updateFrom(*oldContact);
+				break;
+			}
+		}
+	}
+	mContactCount = newManifold.pointsCount;
+	mObsolete = false;
+}
+
+template <uint16_t D>
+void ContactManifold<D>::prepareToSolve() noexcept
+{
+	for (ContactPoint<D>*contact = mContacts.data();
+		contact < mContacts.data() + mContactCount;
+		++contact)
+	{
+		contact->prepareToSolve(*mBodyA, *mBodyB);
+	}
+}
+
+template <uint16_t D>
+void ContactManifold<D>::solveVelocities() noexcept
+{
+	for (ContactPoint<D>*contact = mContacts.data();
+		contact < mContacts.data() + mContactCount;
+		++contact)
+	{
+		contact->solveVelocities(*mBodyA, *mBodyB, mFriction);
+	}
+}
+
+template <uint16_t D>
+void ContactManifold<D>::solvePositions() noexcept
+{
+	for (ContactPoint<D>*contact = mContacts.data();
+		contact < mContacts.data() + mContactCount;
+		++contact)
+	{
+		contact->solvePositions(*mBodyA, *mBodyB);
+	}
+}
+
+template <uint16_t D>
+void ContactManifold<D>::onBodiesReallocation(
+	std::ptrdiff_t memoryOffsetInBytes) noexcept
+{
+	mBodyA = reinterpret_cast<Body<D>*>(
+		reinterpret_cast<std::byte*>(mBodyA) + memoryOffsetInBytes);
+
+	mBodyB = reinterpret_cast<Body<D>*>(
+		reinterpret_cast<std::byte*>(mBodyB) + memoryOffsetInBytes);
+}
 
 }

@@ -24,7 +24,7 @@ public:
 	/// Entry in the manifolds array
 	/// The first element is a pointer to the contact pair map entry
 	using ManifoldsArrayEntry =
-		std::pair<ContactPairsMap::iterator, ContactManifold>;
+		std::pair<ContactPairsMap::iterator, ContactManifold<2>>;
 
 	/// Array of contact manifolds
 	using ManifoldsArray = std::vector<ManifoldsArrayEntry>;

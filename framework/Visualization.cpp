@@ -404,7 +404,7 @@ void drawContacts(const World& world, float pointSize)
 	glBegin(GL_POINTS);
 	for (const auto& pair : world.getContactSolver().getManifolds())
 	{
-		const ContactManifold& manifold = pair.second;
+		const ContactManifold<2>& manifold = pair.second;
 		const Body<2>& bodyA = manifold.getBodyA();
 		const Body<2>& bodyB = manifold.getBodyB();
 

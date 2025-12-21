@@ -33,7 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\collision\NarrowPhase.cpp" />
-    <ClCompile Include="..\..\src\dynamics\ContactManifold.cpp" />
     <ClCompile Include="..\..\src\dynamics\ContactSolver.cpp" />
     <ClCompile Include="..\..\src\World.cpp" />
   </ItemGroup>
