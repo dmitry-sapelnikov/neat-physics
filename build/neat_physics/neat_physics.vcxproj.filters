@@ -23,7 +23,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\neat_physics\math\Mat22.h">
+    <ClInclude Include="..\..\include\neat_physics\math\Mat.h">
       <Filter>include\math</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\neat_physics\math\Rotation.h">
