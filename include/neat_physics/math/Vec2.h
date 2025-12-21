@@ -12,8 +12,13 @@
 namespace nph
 {
 
+/// Generic vector template
+template <uint16_t D>
+struct Vec;
+
 /// 2-dimensional vector
-struct Vec2
+template <>
+struct Vec<2>
 {
 	/// X component, intentionally uninitialized
 	float x;
@@ -22,10 +27,10 @@ struct Vec2
 	float y;
 
 	/// Default constructor (no initialization)
-	Vec2() noexcept = default;
+	Vec() noexcept = default;
 
 	/// Constructor with components
-	constexpr Vec2(float inX, float inY) noexcept :
+	constexpr Vec(float inX, float inY) noexcept :
 		x(inX), y(inY)
 	{
 	}
@@ -51,7 +56,7 @@ struct Vec2
 
 	/// Returns a normalized version of the vector, or a zero vector
 	/// if the vector length < FLT_EPSILON
-	[[nodiscard]] Vec2 getNormalized() const noexcept
+	[[nodiscard]] Vec getNormalized() const noexcept
 	{
 		const float len = length();
 		if (len < FLT_EPSILON)
@@ -83,13 +88,13 @@ struct Vec2
 	}
 
 	/// Negation operator
-	[[nodiscard]] Vec2 operator-() const noexcept
+	[[nodiscard]] Vec operator-() const noexcept
 	{
 		return { -x, -y };
 	}
 
 	/// Addition assignment operator
-	Vec2& operator+=(const Vec2& vec) noexcept
+	Vec& operator+=(const Vec& vec) noexcept
 	{
 		x += vec.x;
 		y += vec.y;
@@ -97,7 +102,7 @@ struct Vec2
 	}
 
 	/// Subtraction assignment operator
-	Vec2& operator-=(const Vec2& vec) noexcept
+	Vec& operator-=(const Vec& vec) noexcept
 	{
 		x -= vec.x;
 		y -= vec.y;
@@ -105,13 +110,16 @@ struct Vec2
 	}
 
 	/// Scalar multiplication assignment operator
-	Vec2& operator*=(float scalar) noexcept
+	Vec& operator*=(float scalar) noexcept
 	{
 		x *= scalar;
 		y *= scalar;
 		return *this;
 	}
 };
+
+/// 2D vector alias
+using Vec2 = Vec<2>;
 
 /// Dot product of two vectors
 inline [[nodiscard]] float dot(
