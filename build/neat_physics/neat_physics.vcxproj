@@ -26,6 +26,7 @@
     <ClInclude Include="..\..\include\neat_physics\math\Inertia.h" />
     <ClInclude Include="..\..\include\neat_physics\math\Mat.h" />
     <ClInclude Include="..\..\include\neat_physics\math\Mat22.h" />
+    <ClInclude Include="..\..\include\neat_physics\math\Mat33.h" />
     <ClInclude Include="..\..\include\neat_physics\math\Rotation.h" />
     <ClInclude Include="..\..\include\neat_physics\math\Vec.h" />
     <ClInclude Include="..\..\include\neat_physics\math\Vec2.h" />
