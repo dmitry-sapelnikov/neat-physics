@@ -29,11 +29,9 @@ void ContactSolver::onBodiesReallocation(std::ptrdiff_t memoryOffsetInBytes) noe
 
 void ContactSolver::prepareToSolve(float timeStep) noexcept
 {
-	for (auto& [key, manifold] : mManifolds)
 	const float invTimeStep = 1.0f / timeStep;
 	for (auto& [key, manifold] : mManifolds)
 	{
-		manifold.prepareToSolve();
 		manifold.prepareToSolve(invTimeStep);
 	}
 }
