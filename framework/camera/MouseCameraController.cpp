@@ -14,30 +14,25 @@ namespace nph
 
 MouseCameraController::MouseCameraController(
 	Camera& camera,
-	float mouseSpeed,
+	float rotationSpeed,
 	float zoomSpeed,
 	float targetMinDistance,
 	float targetMaxDistance) :
 
 	mCamera(camera),
-	mMouseSpeed(mouseSpeed),
+	mRotationSpeed(rotationSpeed),
 	mZoomSpeed(zoomSpeed),
 	mTargetMinDistance(targetMinDistance),
 	mTargetMaxDistance(targetMaxDistance)
 {
-	assert(mMouseSpeed > 0.0f);
+	assert(mRotationSpeed >= 0.0f);
 	assert(mZoomSpeed > 0.0f);
 	assert(mTargetMinDistance > 0.0f);
 	assert(mTargetMaxDistance > mTargetMinDistance);
 
-	const auto& view = camera.getView();
-	mPrevZoom = std::clamp(
-		(view.getPosition() - view.getTarget()).length(),
-		mTargetMinDistance,
-		mTargetMaxDistance);
+	updateZoom();
 
-	mCurrentZoom = mPrevZoom;
-
+	const CameraView& view = mCamera.getView();
 	const Vec3 up = view.getUp();
 	const Vec3 right = view.getRight();
 	const Vec3 front = cross(up, right).getNormalized();
@@ -55,10 +50,21 @@ MouseCameraController::MouseCameraController(
 	mPitch = toDegrees(distanceAzimuthInclination.z);
 }
 
+void MouseCameraController::setCameraPosition(const Vec3& position)
+{
+	mCamera.getView().setPosition(position);
+	updateZoom();
+}
+
+void MouseCameraController::setCameraTarget(const Vec3& target)
+{
+	mCamera.getView().setTarget(target);
+	updateZoom();
+}
+
 bool MouseCameraController::update(const MouseInput& mouseInput) noexcept
 {
-	auto& camera = getCamera();
-	auto& view = camera.getView();
+	auto& view = mCamera.getView();
 
 	mCurrentZoom *= std::pow(
 		2.0f,
@@ -78,7 +84,7 @@ bool MouseCameraController::update(const MouseInput& mouseInput) noexcept
 	}
 
 	// Rotation
-	if (mouseInput.leftMouseDown)
+	if (mouseInput.leftMouseDown && mRotationSpeed > 0.0f)
 	{
 		if (!mRotating)
 		{
@@ -89,10 +95,10 @@ bool MouseCameraController::update(const MouseInput& mouseInput) noexcept
 		{
 			const Vec2 mouseDelta = mouseInput.position - mMouseStart;
 
-			mYaw += mouseDelta.x * mMouseSpeed;
+			mYaw += mouseDelta.x * mRotationSpeed;
 
 			// The pitch is inverted because the mouse Y-axis is inverted
-			mPitch -= mouseDelta.y * mMouseSpeed;
+			mPitch -= mouseDelta.y * mRotationSpeed;
 
 			// Clamp the pitch to prevent the camera from flipping
 			mPitch = std::clamp(mPitch, -89.0f, 89.0f);
@@ -142,6 +148,17 @@ bool MouseCameraController::update(const MouseInput& mouseInput) noexcept
 	}
 
 	return false;
+}
+
+void MouseCameraController::updateZoom()
+{
+	const auto& view = mCamera.getView();
+	mPrevZoom = std::clamp(
+		(view.getPosition() - view.getTarget()).length(),
+		mTargetMinDistance,
+		mTargetMaxDistance);
+
+	mCurrentZoom = mPrevZoom;
 }
 
 // End of the namespace nph

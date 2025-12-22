@@ -21,13 +21,13 @@ public:
 	/// Constructor
 	MouseCameraController(
 		Camera& camera,
-		float mouseSpeed,
+		float rotationSpeed,
 		float zoomSpeed,
 		float targetMinDistance,
 		float targetMaxDistance);
 
 	/// Returns the camera
-	Camera& getCamera() noexcept
+	const Camera& getCamera() noexcept
 	{
 		return mCamera;
 	}
@@ -35,12 +35,24 @@ public:
 	/// Updates the camera
 	bool update(const MouseInput& mouseInput) noexcept;
 
+	/// Sets the camera position
+	void setCameraPosition(const Vec3& position);
+
+	/// Sets the camera target
+	void setCameraTarget(const Vec3& target);
+
+	/// Sets the window size
+	void setWindowSize(const Vec2& size);
+
 private:
+	/// Updates the zoom level
+	void updateZoom();
+
 	/// The camera
 	Camera& mCamera;
 
 	/// Rotation speed
-	float mMouseSpeed;
+	float mRotationSpeed;
 
 	/// Zoom speed
 	float mZoomSpeed;

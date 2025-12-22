@@ -228,7 +228,7 @@ public:
 	}
 
 	/// Converts a screen point to a camera ray in world space
-	[[nodiscard]] Vec3 screenToCameraRay(const Vec2& screenPoint) noexcept;
+	[[nodiscard]] Vec3 screenToCameraRay(const Vec2& screenPoint) const noexcept;
 
 private:
 	/// The view

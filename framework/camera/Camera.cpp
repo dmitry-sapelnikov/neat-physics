@@ -65,7 +65,7 @@ Mat44 CameraProjection::getMatrix(float aspectRatio) const noexcept
 		mFarPlane);
 }
 
-Vec3 Camera::screenToCameraRay(const Vec2& screenPoint) noexcept
+Vec3 Camera::screenToCameraRay(const Vec2& screenPoint) const noexcept
 {
 	const Vec2& windowSize = mProjection.getWindowSize();
 
