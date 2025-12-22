@@ -19,6 +19,7 @@
     <ClInclude Include="..\..\framework\camera\Camera.h" />
     <ClInclude Include="..\..\framework\camera\MouseCameraController.h" />
     <ClInclude Include="..\..\framework\Core.h" />
+    <ClInclude Include="..\..\framework\MouseInput.h" />
     <ClInclude Include="..\..\framework\Visualization.h" />
   </ItemGroup>
   <ItemGroup>

@@ -29,6 +29,9 @@
     <ClInclude Include="..\..\framework\camera\Camera.h">
       <Filter>include\camera</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\MouseInput.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\Visualization.cpp">
