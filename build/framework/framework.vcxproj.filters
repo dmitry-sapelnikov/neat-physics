@@ -32,6 +32,12 @@
     <ClInclude Include="..\..\framework\MouseInput.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\DrawFunctions.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\Color.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\Visualization.cpp">
@@ -42,6 +48,9 @@
     </ClCompile>
     <ClCompile Include="..\..\framework\camera\Camera.cpp">
       <Filter>src\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\DrawFunctions.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

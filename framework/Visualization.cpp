@@ -479,49 +479,6 @@ void Visualization::setVSyncEnabled(bool enabled)
 	}
 }
 
-void Visualization::drawWorld(
-	const World<2>& world,
-	const WorldDrawSettings& settings)
-{
-	/// \note AABBs are drawn as they were at
-	/// the beginning of the last simulation step,
-	/// so they may not match the bodies' current positions
-	if (settings.aabbs)
-	{
-		for (const Aabb2& aabb :
-			world.getCollision().getBroadPhase().getAabbs())
-		{
-			drawAabb(aabb);
-		}
-	}
-
-	for (const Body<2>&body : world.getBodies())
-	{
-		drawBody(body);
-		if (settings.bodyVelocities)
-		{
-			drawArrow(
-				body.position,
-				body.position + body.linearVelocity,
-				settings.bodyVelocityArrowSize,
-				{ 1.0f, 0.0f, 1.0f });
-		}
-
-		if (settings.bodyFrames)
-		{
-			drawFrame(
-				body.position,
-				body.rotation.getMat(),
-				settings.bodyFrameSize);
-		}
-	}
-
-	if (settings.contacts)
-	{
-		drawContacts(world, settings.contactSize);
-	}
-}
-
 void Visualization::setWindowSize(const Vec2& size)
 {
 	assert(size.x > 0.0f);

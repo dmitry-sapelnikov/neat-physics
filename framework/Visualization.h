@@ -13,6 +13,7 @@
 #include "camera/Camera.h"
 #include "camera/MouseCameraController.h"
 #include "MouseInput.h"
+#include "DrawFunctions.h"
 
 namespace nph
 {
@@ -100,8 +101,9 @@ public:
 	void setVSyncEnabled(bool enabled);
 
 	/// Draws a physics world
+	template <uint16_t D>
 	void drawWorld(
-		const World<2>& world,
+		const World<D>& world,
 		const WorldDrawSettings& settings);
 
 private:
@@ -127,6 +129,50 @@ private:
 	/// Camera controller
 	MouseCameraController mCameraController;
 };
+
+template <uint16_t D>
+void Visualization::drawWorld(
+	const World<D>& world,
+	const WorldDrawSettings& settings)
+{
+	/// \note AABBs are drawn as they were at
+	/// the beginning of the last simulation step,
+	/// so they may not match the bodies' current positions
+	if (settings.aabbs)
+	{
+		for (const Aabb<D>& aabb :
+			world.getCollision().getBroadPhase().getAabbs())
+		{
+			drawAabb(aabb);
+		}
+	}
+
+	for (const Body<2>&body : world.getBodies())
+	{
+		drawBody(body);
+		if (settings.bodyVelocities)
+		{
+			drawArrow(
+				body.position,
+				body.position + body.linearVelocity,
+				settings.bodyVelocityArrowSize,
+				{ 1.0f, 0.0f, 1.0f });
+		}
+
+		if (settings.bodyFrames)
+		{
+			drawFrame(
+				body.position,
+				body.rotation.getMat(),
+				settings.bodyFrameSize);
+		}
+	}
+
+	if (settings.contacts)
+	{
+		drawContacts(world, settings.contactSize);
+	}
+}
 
 // End of nph namespace
 }
