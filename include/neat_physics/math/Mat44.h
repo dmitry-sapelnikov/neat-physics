@@ -1,3 +1,8 @@
+// A minimalistic 2D and 3D physics engine
+// https://github.com/dmitry-sapelnikov/neat-physics
+// SPDX-FileCopyrightText: 2025 Dmitry Sapelnikov
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 // Includes
@@ -7,7 +12,7 @@
 namespace nph
 {
 
-/// Represents a 4x4 matrix in column-major order
+/// Represents a column-major 4x4 matrix
 template <>
 struct Mat<4, 4>
 {
@@ -42,12 +47,6 @@ public:
 		m[1][3] = m31;
 		m[2][3] = m32;
 		m[3][3] = m33;
-	}
-
-	/// Data constructor
-	Mat(const float* data) noexcept
-	{
-		std::memcpy(m, data, 16 * sizeof(float));
 	}
 
 	// += operator
@@ -116,26 +115,17 @@ public:
 			m[0][2] * v.x + m[1][2] * v.y + m[2][2] * v.z + m[3][2]);
 
 		float w = m[0][3] * v.x + m[1][3] * v.y + m[2][3] * v.z + m[3][3];
-		return (1.0f / w) * u;
+		return (1.f / w) * u;
 	}
 
 	/// *= operator
 	Mat& operator*=(float f) noexcept
 	{
-		for (int i = 0; i < 4; i++)
+		for (float* value = data(); value < data() + 16; value++)
 		{
-			for (int j = 0; j < 4; j++)
-			{
-				m[i][j] *= f;
-			}
+			*value *= f;
 		}
 		return *this;
-	}
-
-	/// * operator
-	Mat operator*(float f) const noexcept
-	{
-		return Mat(*this) *= f;
 	}
 
 	// - operator
@@ -176,12 +166,6 @@ public:
 		col[2] = v.z;
 	}
 
-	/// Sets the matrix to the identity matrix
-	Mat& setToIdentity() noexcept
-	{
-		return *this = identity();
-	}
-
 	/// Returns a pointer to the matrix data (non-const version)
 	float* data() noexcept
 	{
@@ -208,6 +192,7 @@ public:
 		return m[col][row];
 	}
 
+	/// Returns the inverse of the matrix
 	Mat getInverse() const;
 
 	/// Extracts the translation component from the matrix
@@ -217,7 +202,7 @@ public:
 	}
 
 	/// Returns the identity matrix
-	static Mat identity() noexcept;
+	static constexpr Mat identity() noexcept;
 
 	/// Returns a 4x4 translation matrix
 	static Mat translationMatrix(const Vec3& v) noexcept;
@@ -230,7 +215,7 @@ public:
 
 	static Mat transformMatrix(
 		const Vec3& position,
-		const Vec3& axisAngle = { 0.0f, 0.0f, 0.0f },
+		const Vec3& axisAngle = { 0.f, 0.f, 0.f },
 		const Vec3& scale = { 1.f, 1.f, 1.f }) noexcept;
 
 	/// Returns a 4x4 look-at matrix
@@ -348,7 +333,7 @@ inline Mat<4, 4> Mat<4, 4>::getInverse() const
 // * operator
 inline Mat44 operator*(float f, const Mat44& m) noexcept
 {
-	return m * f;
+	return Mat44(m) *= f;
 }
 
 inline Mat<4, 4> Mat<4, 4>::identity() noexcept
@@ -448,7 +433,7 @@ inline Mat<4, 4> Mat<4, 4>::perspectiveProjectionMatrix(
 	assert(nearDistance > FLT_EPSILON);
 	assert(farDistance > nearDistance);
 
-	const float top = nearDistance * std::tan(fieldOfViewRadians / 2.0f);
+	const float top = nearDistance * std::tan(fieldOfViewRadians / 2.f);
 	const float bottom = -top;
 	const float left = bottom * aspectRatio;
 	const float right = top * aspectRatio;
