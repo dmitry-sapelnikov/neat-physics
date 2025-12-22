@@ -273,7 +273,7 @@ inline Mat<4, 4> Mat<4, 4>::getInverse() const
 		(M(0, 1) * M(1, 3) - M(0, 3) * M(1, 1)) * (M(2, 0) * M(3, 2) - M(2, 2) * M(3, 0)) +
 		(M(0, 2) * M(1, 3) - M(0, 3) * M(1, 2)) * (M(2, 0) * M(3, 1) - M(2, 1) * M(3, 0));
 
-	assert(std::abs(d) >= FLOAT_EPSILON);
+	assert(std::abs(d) >= FLT_EPSILON);
 
 	d = 1.f / d;
 
@@ -443,9 +443,9 @@ inline Mat<4, 4> Mat<4, 4>::perspectiveProjectionMatrix(
 	float nearDistance,
 	float farDistance) noexcept
 {
-	assert(fieldOfViewRadians > FLOAT_EPSILON);
-	assert(aspectRatio > FLOAT_EPSILON);
-	assert(nearDistance > FLOAT_EPSILON);
+	assert(fieldOfViewRadians > FLT_EPSILON);
+	assert(aspectRatio > FLT_EPSILON);
+	assert(nearDistance > FLT_EPSILON);
 	assert(farDistance > nearDistance);
 
 	const float top = nearDistance * std::tan(fieldOfViewRadians / 2.0f);
@@ -472,9 +472,9 @@ inline Mat44 Mat<4, 4>::orthographicProjectionMatrix(
 	float nearDistance,
 	float farDistance) noexcept
 {
-	assert(width > FLOAT_EPSILON);
-	assert(height > FLOAT_EPSILON);
-	assert(nearDistance > FLOAT_EPSILON);
+	assert(width > FLT_EPSILON);
+	assert(height > FLT_EPSILON);
+	assert(nearDistance > FLT_EPSILON);
 	assert(farDistance > nearDistance);
 
 	const float fx = 2.f / width;
