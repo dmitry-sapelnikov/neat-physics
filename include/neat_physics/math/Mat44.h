@@ -202,7 +202,7 @@ public:
 	}
 
 	/// Returns the identity matrix
-	static constexpr Mat identity() noexcept;
+	static Mat identity() noexcept;
 
 	/// Returns a 4x4 translation matrix
 	static Mat translationMatrix(const Vec3& v) noexcept;
