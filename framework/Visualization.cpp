@@ -28,42 +28,8 @@ struct Color
 int gWindowWidth = (1920 * 3) / 4;
 int gWindowHeight = (1080 * 3) / 4;
 
-/// Camera state
-struct Camera
-{
-	int zoom = 1;
-	Vec2 pan{ 0.0f, 0.0f };
-	Vec2 startPan{ 0.0f, 0.0f };
-	Vec2 startPos{ 0.0f, 0.0f };
-	bool panning = false;
-} gCamera;
-
 /// Input state
-Visualization::Input gInput;
-
-/// Computes the half-size of the view matrix based
-/// on the current camera state
-Vec2 getViewHalfSize()
-{
-	const float aspect = float(gWindowWidth) / float(gWindowHeight);
-	return Vec2(
-		gCamera.zoom * std::min(1.0f, aspect),
-		gCamera.zoom / std::max(1.0f, aspect)
-	);
-}
-
-/// Converts cursor position to the world coordinates
-Vec2 cursorToWorld(const Vec2& pos)
-{
-	const Vec2 viewHalfSize = getViewHalfSize();
-	const float worldX = gCamera.pan.x +
-		viewHalfSize.x * (2.0f * pos.x / gWindowWidth - 1.0f);
-
-	const float worldY = gCamera.pan.y +
-		viewHalfSize.y * (1.0f - 2.0f * pos.y / gWindowHeight);
-
-	return { worldX, worldY };
-}
+MouseInput gMouseInput;
 
 /// Callback for GLFW errors
 void glfwErrorCallback(
@@ -73,22 +39,6 @@ void glfwErrorCallback(
 	logError("GLFW error ", error, ": ", description);
 }
 
-/// Updates the OpenGL projection matrix based on the camera state
-void updateProjectionMatrix()
-{
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	const Vec2 viewHalfSize = getViewHalfSize();
-	glOrtho(
-		-viewHalfSize.x + gCamera.pan.x, // left
-		 viewHalfSize.x + gCamera.pan.x, // right
-		-viewHalfSize.y + gCamera.pan.y, // bottom
-		 viewHalfSize.y + gCamera.pan.y, // top
-		-1.0f, // near plane
-		1.0f // far plane
-	);
-}
 
 /// Callback for GLFW window resize events
 void windowResizeCallback(
@@ -96,11 +46,14 @@ void windowResizeCallback(
 	int width,
 	int height)
 {
+	assert(width > 0);
+	assert(height > 0);
+
 	NPH_UNUSED(window);
-	gWindowWidth = width;
-	gWindowHeight = height;
 	glViewport(0, 0, width, height);
-	updateProjectionMatrix();
+	Visualization::getInstanceRef().setWindowSize({
+		static_cast<float>(width),
+		static_cast<float>(height) });
 }
 
 /// Callback for GLFW cursor position events
@@ -110,16 +63,11 @@ void cursorPosCallback(
 	double ypos)
 {
 	NPH_UNUSED(window);
-	if (gCamera.panning)
-	{
-		const Vec2 currentPos(
-			static_cast<float>(xpos),
-			static_cast<float>(ypos));
-		gCamera.pan =
-			gCamera.startPan +
-			cursorToWorld(gCamera.startPos) - cursorToWorld(currentPos);
-		updateProjectionMatrix();
-	}
+	gMouseInput.position = {
+		static_cast<float>(xpos),
+		static_cast<float>(ypos)
+	};
+	Visualization::getInstanceRef().updateCamera();
 }
 
 /// Callback for GLFW mouse button events
@@ -136,35 +84,29 @@ void mouseButtonCallback(
 	{
 	case GLFW_MOUSE_BUTTON_LEFT:
 	{
-		gInput.leftMouseDown = (action == GLFW_PRESS);
+		gMouseInput.leftMouseDown = (action == GLFW_PRESS);
 		if (action == GLFW_PRESS)
 		{
-			gInput.leftMouseClicked = true;
+			gMouseInput.leftMouseClicked = true;
 		}
+		Visualization::getInstanceRef().updateCamera();
 	}
 	break;
 
 	case GLFW_MOUSE_BUTTON_RIGHT:
-		gInput.rightMouseDown = (action == GLFW_PRESS);
-		break;
+	{
+		gMouseInput.rightMouseDown = (action == GLFW_PRESS);
+		Visualization::getInstanceRef().updateCamera();
+	}
+	break;
 
 	case GLFW_MOUSE_BUTTON_MIDDLE:
-		if (action == GLFW_PRESS)
-		{
-			gCamera.panning = true;
-			gCamera.startPan = gCamera.pan;
-			double x;
-			double y;
-			glfwGetCursorPos(window, &x, &y);
-			gCamera.startPos = {
-				static_cast<float>(x),
-				static_cast<float>(y) };
-		}
-		else
-		{
-			gCamera.panning = false;
-		}
-		break;
+	{
+		gMouseInput.middleMouseDown = (action == GLFW_PRESS);
+		Visualization::getInstanceRef().updateCamera();
+	}
+	break;
+
 	}
 }
 
@@ -174,19 +116,9 @@ void scrollCallback(
 	double xoffset,
 	double yoffset)
 {
-	/// Min zoom value
-	constexpr int MIN_ZOOM = 1;
-
-	/// Zoom speed factor
-	constexpr int ZOOM_SPEED = 2;
-
-	NPH_UNUSED(window);
-	NPH_UNUSED(xoffset);
-	gCamera.zoom = std::max(
-		MIN_ZOOM,
-		gCamera.zoom - static_cast<int>(yoffset * ZOOM_SPEED));
-
-	updateProjectionMatrix();
+	gMouseInput.mouseWheel = yoffset;
+	Visualization::getInstanceRef().updateCamera();
+	gMouseInput.mouseWheel = 0.0;
 }
 
 /// Callback for GLFW keyboard events
@@ -351,18 +283,18 @@ void drawBody(const Body<2>& body)
 
 	glColor4f(1.0f, 1.0f, 0.9f, body.isStatic() ? 0.3f : 0.15f);
 	glBegin(GL_TRIANGLE_FAN);
-	glVertex2f(v1.x, v1.y);
-	glVertex2f(v2.x, v2.y);
-	glVertex2f(v3.x, v3.y);
-	glVertex2f(v4.x, v4.y);
+	glVertex3f(v1.x, v1.y, 0.0f);
+	glVertex3f(v2.x, v2.y, 0.0f);
+	glVertex3f(v3.x, v3.y, 0.0f);
+	glVertex3f(v4.x, v4.y, 0.0f);
 	glEnd();
 
 	glColor3f(0.8f, 0.8f, 0.75f);
 	glBegin(GL_LINE_LOOP);
-	glVertex2f(v1.x, v1.y);
-	glVertex2f(v2.x, v2.y);
-	glVertex2f(v3.x, v3.y);
-	glVertex2f(v4.x, v4.y);
+	glVertex3f(v1.x, v1.y, 0.0f);
+	glVertex3f(v2.x, v2.y, 0.0f);
+	glVertex3f(v3.x, v3.y, 0.0f);
+	glVertex3f(v4.x, v4.y, 0.0f);
 	glEnd();
 }
 
@@ -371,10 +303,10 @@ void drawAabb(const Aabb2& aabb)
 {
 	glColor3f(0.0f, 0.5f, 0.0f);
 	glBegin(GL_LINE_LOOP);
-	glVertex2f(aabb.min.x, aabb.min.y);
-	glVertex2f(aabb.max.x, aabb.min.y);
-	glVertex2f(aabb.max.x, aabb.max.y);
-	glVertex2f(aabb.min.x, aabb.max.y);
+	glVertex3f(aabb.min.x, aabb.min.y, 0.0f);
+	glVertex3f(aabb.max.x, aabb.min.y, 0.0f);
+	glVertex3f(aabb.max.x, aabb.max.y, 0.0f);
+	glVertex3f(aabb.min.x, aabb.max.y, 0.0f);
 	glEnd();
 }
 
@@ -430,7 +362,23 @@ void drawContacts(const World<2>& world, float pointSize)
 
 } // anonymous namespace
 
-Visualization::Visualization()
+Visualization::Visualization() :
+	mCamera(
+		{ 0.0f, 0.0f, -10.0f },
+		{ 0.0f, 0.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
+		45.0f,
+		0.1f,
+		1000.0f,
+		{ static_cast<float>(gWindowWidth),
+		  static_cast<float>(gWindowHeight) }),
+
+	mCameraController(
+		mCamera,
+		0.0f,
+		75.0f,
+		1.0f,
+		1000.0f)
 {
 	if (!initGlfw())
 		return;
@@ -447,7 +395,7 @@ Visualization::Visualization()
 
 	setVSyncEnabled(true);
 	setClearColor(0.0f, 0.0f, 20.0f / 255.0f);
-	updateProjectionMatrix();
+	updateViewProjectionMatrix();
 	mWindow = result;
 }
 
@@ -455,6 +403,13 @@ Visualization* Visualization::getInstance()
 {
 	static Visualization instance;
 	return instance.mWindow != nullptr ? &instance : nullptr;
+}
+
+Visualization& Visualization::getInstanceRef()
+{
+	Visualization* result = getInstance();
+	assert(result != nullptr);
+	return *result;
 }
 
 Visualization::~Visualization()
@@ -487,47 +442,27 @@ void Visualization::endFrame()
 	ImGui::Render();
 	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 
-	gInput.leftMouseClicked = false;
+	gMouseInput.leftMouseClicked = false;
 	glfwPollEvents();
 	glfwSwapBuffers(mWindow);
 }
 
-const Visualization::Input& Visualization::getInput() const
+const MouseInput& Visualization::getMouseInput() const
 {
-	return gInput;
+	return gMouseInput;
 }
 
-const Vec2& Visualization::getCameraPan() const
+void Visualization::setCameraPosition(const Vec3& position)
 {
-	return gCamera.pan;
+	mCameraController.setCameraPosition(position);
+	updateViewProjectionMatrix();
 }
 
-void Visualization::setCameraPan(const Vec2& pan)
+/// Sets the camera target
+void Visualization::setCameraTarget(const Vec3& target)
 {
-	gCamera.pan = pan;
-	updateProjectionMatrix();
-}
-
-int Visualization::getCameraZoom() const
-{
-	return gCamera.zoom;
-}
-
-void Visualization::setCameraZoom(int zoom)
-{
-	gCamera.zoom = zoom;
-	updateProjectionMatrix();
-}
-
-Vec2 Visualization::getCursorPositionWorld() const
-{
-	double x;
-	double y;
-	glfwGetCursorPos(mWindow, &x, &y);
-	return cursorToWorld({
-		static_cast<float>(x),
-		static_cast<float>(y)
-		});
+	mCameraController.setCameraTarget(target);
+	updateViewProjectionMatrix();
 }
 
 void Visualization::setClearColor(float r, float g, float b) const
@@ -560,7 +495,7 @@ void Visualization::drawWorld(
 		}
 	}
 
-	for (const Body<2>& body : world.getBodies())
+	for (const Body<2>&body : world.getBodies())
 	{
 		drawBody(body);
 		if (settings.bodyVelocities)
@@ -585,6 +520,31 @@ void Visualization::drawWorld(
 	{
 		drawContacts(world, settings.contactSize);
 	}
+}
+
+void Visualization::setWindowSize(const Vec2& size)
+{
+	assert(size.x > 0.0f);
+	assert(size.y > 0.0f);
+	mCamera.getProjection().setWindowSize(size);
+	updateViewProjectionMatrix();
+}
+
+void Visualization::updateCamera()
+{
+	if (mCameraController.update(getMouseInput()))
+	{
+		updateViewProjectionMatrix();
+	}
+}
+
+void Visualization::updateViewProjectionMatrix()
+{
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixf(mCamera.getView().getMatrix().data());
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(mCamera.getProjection().getMatrix().data());
 }
 
 } // namespace nph

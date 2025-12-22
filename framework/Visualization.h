@@ -10,7 +10,9 @@
 #include "GLFW/glfw3.h"
 #include "imgui/imgui.h"
 
-#include "neat_physics/math/Vec2.h"
+#include "camera/Camera.h"
+#include "camera/MouseCameraController.h"
+#include "MouseInput.h"
 
 namespace nph
 {
@@ -48,22 +50,12 @@ struct WorldDrawSettings
 class Visualization
 {
 public:
-	/// Input state
-	struct Input
-	{
-		/// Left mouse down flag
-		bool leftMouseDown = false;
-
-		/// Left mouse clicked flag
-		bool leftMouseClicked = false;
-
-		/// Right mouse down flag
-		bool rightMouseDown = false;
-	};
-
 	/// Visualization instance getter
 	/// \return nullptr if initialization failed
 	static Visualization* getInstance();
+
+	/// Visualization instance getter; asserts if the instance != nullptr
+	static Visualization& getInstanceRef();
 
 	/// Checks if the visualization is running
 	bool isRunning() const;
@@ -75,22 +67,25 @@ public:
 	void endFrame();
 
 	/// Returns the input state
-	const Input& getInput() const;
+	const MouseInput& getMouseInput() const;
 
-	/// Gets the camera pan
-	const Vec2& getCameraPan() const;
+	/// Returns the camera (const version)
+	const Camera& getCamera() const
+	{
+		return mCamera;
+	}
 
-	/// Sets the camera pan
-	void setCameraPan(const Vec2& pan);
+	/// Sets the camera position
+	void setCameraPosition(const Vec3& position);
 
-	/// Gets the camera zoom
-	int getCameraZoom() const;
+	/// Sets the camera target
+	void setCameraTarget(const Vec3& target);
 
-	/// Sets the camera zoom
-	void setCameraZoom(int zoom);
+	/// Sets the window size
+	void setWindowSize(const Vec2& size);
 
-	/// Returns the cursor position in world coordinates
-	[[nodiscard]] Vec2 getCursorPositionWorld() const;
+	/// Updates the camera based on the input state
+	void updateCamera();
 
 	/// Sets the clear color
 	void setClearColor(float r, float g, float b) const;
@@ -117,11 +112,20 @@ private:
 	Visualization& operator=(const Visualization&) = delete;
 	Visualization(Visualization&&) = delete;
 
+	/// Updates the view-projection matrix
+	void updateViewProjectionMatrix();
+
 	/// GLFW window pointer
 	GLFWwindow* mWindow{ nullptr };
 
 	/// VSync enabled flag
 	bool mVSyncEnabled{ false };
+
+	/// Camera
+	Camera mCamera;
+
+	/// Camera controller
+	MouseCameraController mCameraController;
 };
 
 // End of nph namespace

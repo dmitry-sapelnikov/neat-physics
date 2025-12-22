@@ -95,8 +95,8 @@ void addBoxOnMouseClick(
 		ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
 
 	if (overImgui ||
-		!visualization->getInput().leftMouseClicked &&
-		!visualization->getInput().rightMouseDown)
+		!visualization->getMouseInput().leftMouseClicked &&
+		!visualization->getMouseInput().rightMouseDown)
 	{
 		return;
 	}
@@ -105,11 +105,23 @@ void addBoxOnMouseClick(
 	const float boxSizeY = boxSizeX * simulationControl.boxSideRatio;
 	const float boxMass = boxSizeX * boxSizeY * simulationControl.boxDensity;
 
+	Vec3 ray = visualization->getCamera().screenToCameraRay(
+		visualization->getMouseInput().position).getNormalized();
+
+	if (std::abs(ray.z) < FLT_EPSILON)
+	{
+		return;
+	}
+	const CameraView& cameraView = visualization->getCamera().getView();
+	// Ray parameter corresponding to z = 0 plane
+	const float t = -cameraView.getPosition().z / ray.z;
+	const Vec3 boxLocation = cameraView.getPosition() + t * ray;
+
 	world.addBody(
 		{ boxSizeX, boxSizeY },
 		boxMass,
 		simulationControl.friction,
-		visualization->getCursorPositionWorld());
+		{ boxLocation.x, boxLocation.y });
 }
 
 /// Draws ImGui controls
@@ -332,8 +344,10 @@ int main()
 		{
 			return -1;
 		}
-		visualization->setCameraZoom(int(glassSize.x * 2.0f));
-		visualization->setCameraPan(nph::Vec2(0.0f, glassSize.y * 0.5f));
+
+		visualization->setCameraPosition({ 0.0f, glassSize.y * 0.5f, glassSize.y * 1.5f });
+		visualization->setCameraTarget({ 0.0f, glassSize.y * 0.5f, 0.0f });
+
 		ImGuiStyle& style = ImGui::GetStyle();
 		style.ItemSpacing.y = 6.0f;
 

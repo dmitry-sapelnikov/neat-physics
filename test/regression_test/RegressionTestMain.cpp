@@ -16,16 +16,16 @@ using namespace nph;
 namespace
 {
 
+constexpr float BOTTOM_SIZE = 25.0f;
+constexpr float BOTTOM_THICKNESS = 5.0f;
+constexpr float BOX_BOTTOM_RATIO = 1.0f / 15.0f;
+constexpr int COLUMN_COUNT = 20;
+constexpr int ROW_COUNT = COLUMN_COUNT * 5;
+constexpr float FRICTION = 0.5f;
+
 /// Creates the test scene
 void createTestScene(World<2>& world)
 {
-	constexpr float BOTTOM_SIZE = 25.0f;
-	constexpr float BOTTOM_THICKNESS = 5.0f;
-	constexpr float BOX_BOTTOM_RATIO = 1.0f / 15.0f;
-	constexpr int COLUMN_COUNT = 20;
-	constexpr int ROW_COUNT = COLUMN_COUNT * 5;
-	constexpr float FRICTION = 0.5f;
-
 	// Create a 'glass' with bottom size = BOTTOM_SIZE and 2 sides with
 	// height = BOTTOM_SIZE * 2
 	
@@ -95,7 +95,7 @@ int wmain(int argc, wchar_t** argv)
 	constexpr uint32_t SOLVER_POSITION_ITERATIONS = 5;
 	constexpr uint32_t BODIES_TO_RESERVE = 2048;
 	constexpr Vec2 GRAVITY = Vec2(0.0f, -10.0f);
-	constexpr bool USE_VISUALIZATION = false;
+	constexpr bool USE_VISUALIZATION = true;
 
 	constexpr uint32_t MAX_STEPS = 400;
 	constexpr uint32_t DUMP_INTERVAL = 10;
@@ -126,8 +126,8 @@ int wmain(int argc, wchar_t** argv)
 				logError("Failed to initialize visualization.");
 				return -1;
 			}
-			visualization->setCameraZoom(80);
-			visualization->setCameraPan({ 0.0f, 20.0f });
+			visualization->setCameraPosition({ 0.0f, BOTTOM_SIZE, -BOTTOM_SIZE * 3.0f });
+			visualization->setCameraTarget({ 0.0f, BOTTOM_SIZE, 0.0f });
 		}
 
 		std::filesystem::path outputDirectory =
