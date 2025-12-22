@@ -116,7 +116,7 @@ ContactManifold<D>::ContactManifold(
 	// \todo: introduce material pairs
 	mFriction(std::sqrt(mBodyA->friction* mBodyB->friction))
 {
-	assert(0 < mContactCount && mContactCount <= MAX_COLLISION_POINTS);
+	assert(0 < mContactCount && mContactCount <= CollisionPoint<D>::MAX_POINTS);
 }
 
 template <uint16_t D>
