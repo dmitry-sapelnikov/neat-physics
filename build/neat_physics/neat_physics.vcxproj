@@ -29,6 +29,7 @@
     <ClInclude Include="..\..\include\neat_physics\math\Mat33.h" />
     <ClInclude Include="..\..\include\neat_physics\math\Mat44.h" />
     <ClInclude Include="..\..\include\neat_physics\math\MathFunctions.h" />
+    <ClInclude Include="..\..\include\neat_physics\math\Quat.h" />
     <ClInclude Include="..\..\include\neat_physics\math\Rotation.h" />
     <ClInclude Include="..\..\include\neat_physics\math\Vec.h" />
     <ClInclude Include="..\..\include\neat_physics\math\Vec2.h" />

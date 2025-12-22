@@ -101,6 +101,9 @@
     <ClInclude Include="..\..\include\neat_physics\math\MathFunctions.h">
       <Filter>include\math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\Quat.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\collision\NarrowPhase.cpp">
