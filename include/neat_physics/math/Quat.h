@@ -96,32 +96,6 @@ struct Quat
 		return std::abs(lengthSquared() - 1.0f) < 100.0f * FLT_EPSILON;
 	}
 
-	/// Returns the rotation matrix corresponding to this quaternion
-	/// Assert that the quaternion is normalized
-	[[nodiscard]] Mat33 getMat() const noexcept
-	{
-		assert(isNormalized());
-
-		// Computations used for optimization (less multiplications)
-		const float xs = x * 2.f;
-		const float ys = y * 2.f;
-		const float zs = z * 2.f;
-		const float wxs = w * xs;
-		const float wys = w * ys;
-		const float wzs = w * zs;
-		const float xxs = x * xs;
-		const float xys = x * ys;
-		const float xzs = x * zs;
-		const float yys = y * ys;
-		const float yzs = y * zs;
-		const float zzs = z * zs;
-
-		return {
-			{ 1.f - yys - zzs, xys + wzs, xzs - wys },
-			{ xys - wzs, 1.f - xxs - zzs, yzs + wxs },
-			{ xzs + wys, yzs - wxs, 1.f - xxs - yys } };
-	}
-
 	/// Scalar multiplication assignment operator
 	Quat& operator*=(float scalar) noexcept
 	{
@@ -167,6 +141,32 @@ inline [[nodiscard]] Vec3 operator*(
 	const Quat vectorQuat(vec.x, vec.y, vec.z, 0.f);
 	const Quat result = (quat * vectorQuat) * quat.getConjugate();
 	return result.getVec();
+}
+
+/// Returns the rotation matrix corresponding to this quaternion
+/// Assert that the quaternion is normalized
+inline [[nodiscard]] Mat33 rotationMat(const Quat& q) noexcept
+{
+	assert(q.isNormalized());
+
+	// Computations used for optimization (less multiplications)
+	const float xs = q.x * 2.f;
+	const float ys = q.y * 2.f;
+	const float zs = q.z * 2.f;
+	const float wxs = q.w * xs;
+	const float wys = q.w * ys;
+	const float wzs = q.w * zs;
+	const float xxs = q.x * xs;
+	const float xys = q.x * ys;
+	const float xzs = q.x * zs;
+	const float yys = q.y * ys;
+	const float yzs = q.y * zs;
+	const float zzs = q.z * zs;
+
+	return {
+		{ 1.f - yys - zzs, xys + wzs, xzs - wys },
+		{ xys - wzs, 1.f - xxs - zzs, yzs + wxs },
+		{ xzs + wys, yzs - wxs, 1.f - xxs - yys } };
 }
 
 } // namespace nph

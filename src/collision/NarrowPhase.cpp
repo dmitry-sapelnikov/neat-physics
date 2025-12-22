@@ -5,8 +5,10 @@
 
 // Includes
 #include <algorithm>
+#include "neat_physics/math/Mat22.h"
 #include "neat_physics/collision/NarrowPhase.h"
 #include "Plane.h"
+
 
 namespace nph
 {
@@ -18,7 +20,7 @@ namespace
 using Vec2Array2 = std::array<Vec2, 2>;
 
 // 2-element array of Rotation
-using Rotation2Array2 = std::array<Rotation2, 2>;
+using Rotation2Array2 = std::array<Rotation<2>, 2>;
 
 // 2-element array of Mat22
 using Mat22Array2 = std::array<Mat22, 2>;
@@ -81,7 +83,7 @@ bool clipEdgeByPlane(
 template <>
 uint32_t getBoxBoxCollision<2>(
 	const std::array<Vec2, 2>& positions,
-	const std::array<Rotation2, 2>& rotations,
+	const std::array<Rotation<2>, 2>& rotations,
 	const std::array<Vec2, 2>& halfSizes,
 	CollisionPointArray<2>& result)
 {
@@ -101,11 +103,11 @@ uint32_t getBoxBoxCollision<2>(
 	{
 		const Vec2 centersVec = positions[1] - positions[0];
 		// A -> B relative rotation
-		const Mat22 abRelRotation = invRotations[0] * rotations[1].getMat();
+		const Mat22 relRotation = invRotations[0] * rotations[1].getMat();
 
 		const Mat22Array2 absRelRotations{
-			abs(abRelRotation),
-			abs(abRelRotation.getTransposed())
+			abs(relRotation),
+			abs(relRotation.getTransposed())
 		};
 
 		float minPenetration = std::numeric_limits<float>::max();

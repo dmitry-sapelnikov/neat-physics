@@ -7,64 +7,77 @@
 
 // Includes
 #include "neat_physics/math/Mat22.h"
+#include "neat_physics/math/Mat33.h"
+#include "neat_physics/math/Quat.h"
 
 namespace nph
 {
 
-/// Generic rotation template
 template <uint16_t D>
-class Rotation;
+struct RotationTraits;
 
 /// 2D rotation (angle + rotation matrix)
-template <>
-class Rotation<2>
+template <uint16_t D>
+class Rotation
 {
 public:
+	using RotationType = typename RotationTraits<D>::Type;
+	using RotationMat = Mat<D, D>;
+
 	/// Default constructor (no initialization)
 	Rotation() noexcept = default;
 
 	/// Constructor from angle in radians
-	explicit Rotation(float angleRad) noexcept :
-		mAngleRad(angleRad),
-		mMat(rotationMat(mAngleRad))
+	explicit Rotation(const RotationType& rotation) noexcept :
+		mRotation(rotation),
+		mMat(rotationMat(mRotation))
 	{
 	}
 
 	/// Returns the rotation angle in radians
-	[[nodiscard]] float getAngle() const noexcept
+	[[nodiscard]] float get() const noexcept
 	{
-		return mAngleRad;
+		return mRotation;
 	}
 
-	/// Sets the rotation angle in radians
-	void setAngle(float angleRad) noexcept
+	/// Sets the rotation
+	void set(const RotationType& rotation) noexcept
 	{
-		mAngleRad = angleRad;
-		mMat = rotationMat(mAngleRad);
+		mRotation = rotation;
+		mMat = rotationMat(mRotation);
 	}
 
 	/// Returns the rotation matrix
-	[[nodiscard]] const Mat22& getMat() const noexcept
+	[[nodiscard]] const RotationMat& getMat() const noexcept
 	{
 		return mMat;
 	}
 
 	/// Returns the inverse rotation matrix
 	/// (equal to the transposed matrix)
-	[[nodiscard]] Mat22 getInverseMat() const noexcept
+	[[nodiscard]] RotationMat getInverseMat() const noexcept
 	{
 		return mMat.getTransposed();
 	}
 
 private:
 	/// Angle in radians
-	float mAngleRad;
+	RotationType mRotation;
 
 	/// Rotation matrix
-	Mat22 mMat;
+	RotationMat mMat;
 };
 
-/// 2D rotation alias
-using Rotation2 = Rotation<2>;
+template <>
+struct RotationTraits<2>
+{
+	using Type = float;
+};
+
+template <>
+struct RotationTraits<3>
+{
+	using Type = Quat;
+};
 
 } // namespace nph

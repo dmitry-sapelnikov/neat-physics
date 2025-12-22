@@ -162,7 +162,7 @@ Body<D>* World<D>::addBody(
 	const Body<D>* const oldData = mBodies.data();
 	Body<D>* result = &mBodies.emplace_back(size, mass, friction);
 	result->position = position;
-	result->rotation.setAngle(rotationRad);
+	result->rotation.set(rotationRad);
 
 	if (const std::ptrdiff_t memoryOffsetInBytes =
 		reinterpret_cast<std::byte*>(mBodies.data()) -
@@ -214,8 +214,8 @@ void World<D>::integratePositions(float timeStep)
 	{
 		body.position += timeStep * body.linearVelocity;
 		/// \todo generalize for 3D
-		body.rotation.setAngle(
-			body.rotation.getAngle() + timeStep * body.angularVelocity);
+		body.rotation.set(
+			body.rotation.get() + timeStep * body.angularVelocity);
 	}
 }
 

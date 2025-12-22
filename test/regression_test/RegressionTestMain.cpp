@@ -152,7 +152,7 @@ int wmain(int argc, wchar_t** argv)
 					const Body<2>& body = world.getBodies()[i];
 					resultFile << "Body " << i << ": ";
 					resultFile << "Pos(" << body.position.x << ", " << body.position.y << ") ";
-					resultFile << "Rot(" << body.rotation.getAngle() << ")\n";
+					resultFile << "Rot(" << body.rotation.get() << ")\n";
 				}
 				resultFile << "\n";
 			}

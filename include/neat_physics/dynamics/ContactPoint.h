@@ -222,11 +222,11 @@ void ContactPoint<D>::solvePositions(
 	// Directly integrate positions and rotations of the bodies in contact
 	/// \todo generalize for 3D
 	bodyA.position -= bodyA.invMass * penetrationImpulse;
-	bodyA.rotation.setAngle(bodyA.rotation.getAngle() -
+	bodyA.rotation.set(bodyA.rotation.get() -
 		bodyA.invInertia * cross(offsetA, penetrationImpulse));
 
 	bodyB.position += bodyB.invMass * penetrationImpulse;
-	bodyB.rotation.setAngle(bodyB.rotation.getAngle() +
+	bodyB.rotation.set(bodyB.rotation.get() +
 		bodyB.invInertia * cross(offsetB, penetrationImpulse));
 }
 
