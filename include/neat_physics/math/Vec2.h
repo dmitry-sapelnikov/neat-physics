@@ -6,6 +6,7 @@
 #pragma once
 
 // Includes
+#include <cfloat>
 #include "neat_physics/math/Vec.h"
 
 namespace nph
@@ -40,6 +41,12 @@ struct Vec<2>
 	[[nodiscard]] float length() const noexcept
 	{
 		return std::sqrt(lengthSquared());
+	}
+
+	/// Checks if the vector is near zero
+	[[nodiscard]] bool isNearZero() const noexcept
+	{
+		return lengthSquared() < 100.0f * FLT_EPSILON;
 	}
 
 	/// Returns a normalized version of the vector, or a zero vector

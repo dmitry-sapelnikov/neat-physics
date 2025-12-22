@@ -6,6 +6,7 @@
 #pragma once
 
 // Includes
+#include <cfloat>
 #include "neat_physics/math/Vec.h"
 
 namespace nph
@@ -56,6 +57,12 @@ struct Vec<3>
 		}
 		const float invLen = 1.0f / len;
 		return { x * invLen, y * invLen, z * invLen };
+	}
+
+	/// Checks if the vector is near zero
+	[[nodiscard]] bool isNearZero() const noexcept
+	{
+		return lengthSquared() < 100.0f * FLT_EPSILON;
 	}
 
 	/// Checks if the vector is normalized
