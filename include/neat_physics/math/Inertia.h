@@ -8,6 +8,7 @@
 // Includes
 #include <cstdint>
 #include "neat_physics/math/Vec2.h"
+#include "neat_physics/math/Mat33.h"
 
 namespace nph
 {
@@ -21,6 +22,13 @@ template <>
 struct InertiaTrait<2>
 {
 	using Type = float;
+};
+
+/// 3D inertia trait specialization
+template <>
+struct InertiaTrait<3>
+{
+	using Type = Mat33;
 };
 
 /// Inertia definition via trait
