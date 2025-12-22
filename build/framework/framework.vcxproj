@@ -21,6 +21,7 @@
     <ClInclude Include="..\..\framework\Color.h" />
     <ClInclude Include="..\..\framework\Core.h" />
     <ClInclude Include="..\..\framework\DrawFunctions.h" />
+    <ClInclude Include="..\..\framework\Gui.h" />
     <ClInclude Include="..\..\framework\MouseInput.h" />
     <ClInclude Include="..\..\framework\Visualization.h" />
   </ItemGroup>
@@ -28,6 +29,7 @@
     <ClCompile Include="..\..\framework\camera\Camera.cpp" />
     <ClCompile Include="..\..\framework\camera\MouseCameraController.cpp" />
     <ClCompile Include="..\..\framework\DrawFunctions.cpp" />
+    <ClCompile Include="..\..\framework\Gui.cpp" />
     <ClCompile Include="..\..\framework\Visualization.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

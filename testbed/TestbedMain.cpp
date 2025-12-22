@@ -5,8 +5,8 @@
 
 #include <chrono>
 #include "Core.h"
+#include "Gui.h"
 #include "Visualization.h"
-#include "neat_physics/World.h"
 
 namespace nph
 {
@@ -19,18 +19,9 @@ static constexpr uint32_t BODIES_TO_RESERVE = 16;
 /// Gravity
 static constexpr float GRAVITY = 10.0f;
 
-/// Simulation control parameters
-struct SimulationControl
+/// Scene control parameters
+struct SceneControl
 {
-	/// V-Sync flag
-	bool vSync{ true };
-
-	/// Reset world flag
-	bool resetWorld{ true };
-
-	/// Simulation running flag
-	bool simulationRunning{ true };
-
 	/// Friction for newly created bodies
 	float friction{ 0.0f };
 
@@ -42,15 +33,6 @@ struct SimulationControl
 
 	/// Box side ratio (height / width)
 	float boxSideRatio{ 0.5f };
-
-	/// Time step frequency
-	float timeStepFrequency{ 50.0f };
-
-	/// Velocity solver iterations
-	int velocityIterations{ 30 };
-
-	/// Position solver iterations
-	int positionIterations{ 10 };
 };
 
 /// Creates a 'glass-shaped' container
@@ -85,7 +67,7 @@ void createGlass(
 void addBoxOnMouseClick(
 	nph::World<2>& world,
 	float glassSize,
-	const nph::SimulationControl& simulationControl)
+	const nph::SceneControl& sceneControl)
 {
 	nph::Visualization* visualization = nph::Visualization::getInstance();
 	assert(visualization != nullptr);
@@ -101,9 +83,9 @@ void addBoxOnMouseClick(
 		return;
 	}
 
-	const float boxSizeX = glassSize / simulationControl.boxSize;
-	const float boxSizeY = boxSizeX * simulationControl.boxSideRatio;
-	const float boxMass = boxSizeX * boxSizeY * simulationControl.boxDensity;
+	const float boxSizeX = glassSize / sceneControl.boxSize;
+	const float boxSizeY = boxSizeX * sceneControl.boxSideRatio;
+	const float boxMass = boxSizeX * boxSizeY * sceneControl.boxDensity;
 
 	Vec3 ray = visualization->getCamera().screenToCameraRay(
 		visualization->getMouseInput().position).getNormalized();
@@ -120,25 +102,13 @@ void addBoxOnMouseClick(
 	world.addBody(
 		{ boxSizeX, boxSizeY },
 		boxMass,
-		simulationControl.friction,
+		sceneControl.friction,
 		{ boxLocation.x, boxLocation.y });
 }
 
-/// Draws ImGui controls
-void drawGui(
-	const nph::World<2>& world,
-	float lastPhysicsStepTime,
-	nph::WorldDrawSettings& drawSettings,
-	float bottomSize,
-	SimulationControl& simulationControl)
+/// Draws the help tab in ImGui
+void drawHelpTab()
 {
-	ImGui::SetNextWindowPos(ImVec2(10.0f, 10.0f), ImGuiCond_Once);
-	ImGui::SetNextWindowSize(ImVec2(400.0f, 700.0f), ImGuiCond_Once);
-
-	ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_NoCollapse);
-
-	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.4f);
-
 	if (ImGui::CollapsingHeader("Help"))
 	{
 		ImGui::Text("Controls:");
@@ -156,146 +126,21 @@ void drawGui(
 			"set friction first, then press Reset.");
 		ImGui::BulletText("Disable VSync to speed up the simulation.");
 	}
+}
 
-	if (ImGui::CollapsingHeader("Visualization"))
-	{
-		ImGui::Checkbox(
-			"AABBs",
-			&drawSettings.aabbs);
-
-		ImGui::Checkbox(
-			"Body Frames",
-			&drawSettings.bodyFrames);
-
-		ImGui::SliderFloat(
-			"Body Frame Size",
-			&drawSettings.bodyFrameSize,
-			0.1f,
-			1.0f);
-
-		ImGui::Checkbox(
-			"Contacts",
-			&drawSettings.contacts);
-
-		ImGui::SliderFloat(
-			"Contact Size",
-			&drawSettings.contactSize,
-			2.0f,
-			10.0f);
-
-		ImGui::Checkbox(
-			"Body Velocities",
-			&drawSettings.bodyVelocities);
-
-		ImGui::SliderFloat(
-			"Velocity Arrow Size",
-			&drawSettings.bodyVelocityArrowSize,
-			0.1f,
-			0.5f);
-	}
-
-	if (ImGui::CollapsingHeader("Stats"))
-	{
-		ImGui::Text(
-			"Bodies: %zu",
-			world.getBodies().size());
-
-		ImGui::Text(
-			"Contacts: %zu",
-			world.getContactSolver().getManifolds().size());
-
-		ImGui::Text(
-			"Physics Time: %.3f ms",
-			lastPhysicsStepTime * 1000.0f);
-
-		ImGui::Text(
-			"Physics FPS: %.1f",
-			1.0f / lastPhysicsStepTime);
-
-		float maxPenetration = 0.0f;
-		for (const auto& manifold : world.getContactSolver().getManifolds())
-		{
-			for (uint32_t i = 0; i < manifold.second.getContactCount(); ++i)
-			{
-				const auto& contact = manifold.second.getContact(i);
-				if (contact.getPoint().penetration > maxPenetration)
-				{
-					maxPenetration = contact.getPoint().penetration;
-				}
-			}
-		}
-
-		float maxAllowedPenetration = 0.1f * (bottomSize / 8.0f);
-
-		// Set text color based on penetration
-		ImGui::PushStyleColor(
-			ImGuiCol_Text,
-			maxPenetration > maxAllowedPenetration ?
-				ImVec4(1.0f, 0.0f, 0.0f, 1.0f) :
-				ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
-
-		ImGui::Text(
-			"Max Penetration: %.4f / %.4f",
-			maxPenetration,
-			maxAllowedPenetration);
-
-		ImGui::PopStyleColor();
-	}
-
+/// Draws the ImGui scene control tab
+void drawSceneControlTab(SceneControl& sceneControl)
+{
 	if (ImGui::CollapsingHeader(
-		"Simulation Control",
+		"Scene",
 		ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::Indent(20.0f);
-
-		ImGui::Checkbox(
-			"VSync",
-			&simulationControl.vSync);
-
-		// Add 'World' splitter
-		if (ImGui::CollapsingHeader(
-			"World",
-			ImGuiTreeNodeFlags_DefaultOpen))
-		{
-			const ImVec2 buttonsSize{
-				ImGui::GetWindowWidth() * 0.4f,
-				0.0f };
-			simulationControl.resetWorld = ImGui::Button("Reset", buttonsSize);
-
-			if (ImGui::Button(
-				simulationControl.simulationRunning ? "Pause" : "Resume",
-				buttonsSize))
-			{
-				simulationControl.simulationRunning = 
-					!simulationControl.simulationRunning;
-			}
-
-			ImGui::SliderFloat(
-				"New Bodies Friction",
-				&simulationControl.friction,
-				0.0f,
-				1.0f,
-				"%.1f");
-
-			ImGui::SliderFloat(
-				"Time Step Frequency",
-				&simulationControl.timeStepFrequency,
-				30.0f,
-				100.0f,
-				"%.0f Hz");
-
-			ImGui::SliderInt(
-				"Velocity Iterations",
-				&simulationControl.velocityIterations,
-				1,
-				50);
-
-			ImGui::SliderInt(
-				"Position Iterations",
-				&simulationControl.positionIterations,
-				0,
-				50);
-		}
+		ImGui::SliderFloat(
+			"New Bodies Friction",
+			&sceneControl.friction,
+			0.0f,
+			1.0f,
+			"%.1f");
 
 		if (ImGui::CollapsingHeader(
 			"New Boxes",
@@ -303,27 +148,49 @@ void drawGui(
 		{
 			ImGui::SliderFloat(
 				"Size",
-				&simulationControl.boxSize,
+				&sceneControl.boxSize,
 				1.0f,
 				20.0f,
 				"1 / %.0f of glass");
 
 			ImGui::SliderFloat(
 				"Side Ratio",
-				&simulationControl.boxSideRatio,
+				&sceneControl.boxSideRatio,
 				0.1f,
 				1.0f,
 				"%.2f");
 
 			ImGui::SliderFloat(
 				"Density",
-				&simulationControl.boxDensity,
+				&sceneControl.boxDensity,
 				100.0f,
 				500.0f,
 				"%.0f");
 		}
-		ImGui::Unindent(20.0f);
 	}
+}
+
+/// Draws ImGui controls
+void drawGui(
+	const nph::World<2>& world,
+	float lastPhysicsStepTime,
+	nph::WorldDrawSettings& drawSettings,
+	SimulationControl& simulationControl,
+	SceneControl& sceneControl)
+{
+	ImGui::SetNextWindowPos(ImVec2(10.0f, 10.0f), ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(400.0f, 700.0f), ImGuiCond_Once);
+
+	ImGui::Begin("Settings", nullptr, ImGuiWindowFlags_NoCollapse);
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.4f);
+
+	drawHelpTab();
+	drawVisualizationTab(drawSettings);
+	drawStatsTab(world, lastPhysicsStepTime);
+	drawSimulationControlTab(simulationControl);
+	drawSceneControlTab(sceneControl);
+
+	ImGui::PopItemWidth();
 	ImGui::End();
 }
 
@@ -353,6 +220,7 @@ int main()
 
 		nph::WorldDrawSettings drawSettings;
 		nph::SimulationControl simulationControl;
+		nph::SceneControl sceneControl;
 		std::chrono::duration<float> lastPhyicsStepTime{ 0.0 };
 		while (visualization->isRunning())
 		{
@@ -363,14 +231,14 @@ int main()
 					world,
 					glassSize,
 					nph::GRAVITY * 0.05f,
-					simulationControl.friction);
+					sceneControl.friction);
 				simulationControl.resetWorld = false;
 			}
 
 			nph::addBoxOnMouseClick(
 				world,
 				glassSize.x,
-				simulationControl);
+				sceneControl);
 
 			visualization->startFrame();
 			visualization->drawWorld(world, drawSettings);
@@ -378,8 +246,8 @@ int main()
 				world,
 				lastPhyicsStepTime.count(),
 				drawSettings,
-				glassSize.x,
-				simulationControl);
+				simulationControl,
+				sceneControl);
 			visualization->endFrame();
 
 			visualization->setVSyncEnabled(simulationControl.vSync);

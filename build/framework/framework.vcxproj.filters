@@ -38,6 +38,9 @@
     <ClInclude Include="..\..\framework\Color.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\Gui.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\Visualization.cpp">
@@ -50,6 +53,9 @@
       <Filter>src\camera</Filter>
     </ClCompile>
     <ClCompile Include="..\..\framework\DrawFunctions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\Gui.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
