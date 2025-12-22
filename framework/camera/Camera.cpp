@@ -28,40 +28,31 @@ CameraProjection::CameraProjection(
 	float fov,
 	float nearPlane,
 	float farPlane,
-	const Point2u& windowSize) :
+	const Vec2& windowSize) :
 
 	mFov(fov),
 	mNearPlane(nearPlane),
 	mFarPlane(farPlane)
 {
-	assert(fov > FLOAT_EPSILON);
-	assert(nearPlane > FLOAT_EPSILON);
+	assert(fov > FLT_EPSILON);
+	assert(nearPlane > FLT_EPSILON);
 	assert(farPlane > nearPlane);
 	setWindowSize(windowSize);
 }
 
-void CameraProjection::setWindowSize(const Point2u& size) noexcept
+void CameraProjection::setWindowSize(const Vec2& size) noexcept
 {
-	assert(size.x > 0);
-	assert(size.y > 0);
+	assert(size.x > 0.0f);
+	assert(size.y > 0.0f);
 	mWindowSize = size;
 	update();
 }
 
 void CameraProjection::update() noexcept
 {
-	float aspectRatio = 0.0f;
-	if (!mAspectRatio.has_value())
-	{
-		aspectRatio =
-			static_cast<float>(mWindowSize.x) /
-			static_cast<float>(mWindowSize.y);
-	}
-	else
-	{
-		aspectRatio = *mAspectRatio;
-	}
-
+	const float aspectRatio =
+		static_cast<float>(mWindowSize.x) /
+		static_cast<float>(mWindowSize.y);
 	mMatrix = getMatrix(aspectRatio);
 }
 
@@ -74,22 +65,19 @@ Mat44 CameraProjection::getMatrix(float aspectRatio) const noexcept
 		mFarPlane);
 }
 
-// Global functions
-Vec3 screenToCameraRay(
-	const Point2i& screenPoint,
-	const Point2u& windowSize,
-	const Vec3& cameraPosition,
-	const Mat44& cameraProjectionViewInverse)
+Vec3 Camera::screenToCameraRay(const Vec2& screenPoint) noexcept
 {
-	assert(windowSize.x != 0);
-	assert(windowSize.y != 0);
+	const Vec2& windowSize = mProjection.getWindowSize();
 
 	// Convert the screen point to the normalized device coordinates (NDC)
 	const Vec3 ndc(
 		(2.0f * screenPoint.x) / windowSize.x - 1.0f,
 		1.0f - (2.0f * screenPoint.y) / windowSize.y,
 		1.0f);
-	return cameraProjectionViewInverse * ndc - cameraPosition;
+	const Mat44 cameraProjectionViewInverse =
+		(mProjection.getMatrix() * mView.getMatrix()).getInverse();
+
+	return cameraProjectionViewInverse * ndc - mView.getPosition();
 }
 
 } // namespace nph

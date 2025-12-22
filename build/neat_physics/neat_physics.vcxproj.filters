@@ -98,9 +98,6 @@
     <ClInclude Include="..\..\include\neat_physics\math\Mat44.h">
       <Filter>include\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\neat_physics\math\Point2.h">
-      <Filter>include\math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\neat_physics\math\MathFunctions.h">
       <Filter>include\math</Filter>
     </ClInclude>

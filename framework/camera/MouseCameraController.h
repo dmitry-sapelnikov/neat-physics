@@ -5,8 +5,9 @@
 #pragma once
 
 // Includes
-#include "neat_physics/math/Point2.h"
+#include "neat_physics/math/Vec2.h"
 #include "neat_physics/math/Mat44.h"
+#include "../MouseInput.h"
 
 namespace nph
 {
@@ -32,10 +33,7 @@ public:
 	}
 
 	/// Updates the camera
-	void updateCamera(
-		bool leftMouse,
-		bool midMouse,
-		int mouseWheel) noexcept;
+	bool update(const MouseInput& mouseInput) noexcept;
 
 private:
 	/// The camera
@@ -56,10 +54,6 @@ private:
 	/// Camera position
 	Vec3 mInitialPosition;
 
-	Point2u mWindowSize;
-
-	Mat44 mProjectionViewInv;
-
 	Vec3 mDragStart;
 
 	/// The camera's yaw, in degrees
@@ -72,10 +66,10 @@ private:
 	Mat44 mPitchYawBasis = Mat44::identity();
 
 	/// Min allowed distance to the camera target
-	float mTargetMinDistance = 0.1f;
+	float mTargetMinDistance;
 
 	/// Max allowed distance from the camera target
-	float mTargetMaxDistance = 10000.0f;
+	float mTargetMaxDistance;
 
 	/// Rotation process flag
 	bool mRotating = false;
@@ -84,18 +78,12 @@ private:
 	bool mTranslating = false;
 
 	/// Translation start point in the screen coordinates
-	Point2i mMouseStart;
+	Vec2 mMouseStart;
 
 	float mPrevZoom = 0.0f;
 
 	/// Current zoom value
 	float mCurrentZoom = 0.0f;
-
-	/// Mouse position in the screen coordinates
-	Point2i mMousePosition;
-
-	bool mLeftMouseButton{ false };
-	bool mMiddleMouseButton{ false };
 };
 
 // End of the namespace nph

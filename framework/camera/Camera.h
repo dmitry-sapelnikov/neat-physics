@@ -1,9 +1,9 @@
 #pragma once
 
 // Includes
-#include <optional>
 #include "neat_physics/math/Mat44.h"
-#include "neat_physics/math/Point2.h"
+#include "neat_physics/math/Vec2.h"
+#include "neat_physics/math/Vec3.h"
 
 namespace nph
 {
@@ -101,7 +101,7 @@ public:
 		float fov,
 		float nearPlane,
 		float farPlane,
-		const Point2u& windowSize);
+		const Vec2& windowSize);
 
 	/// Returns the projection matrix
 	const Mat44& getMatrix() const noexcept
@@ -152,13 +152,13 @@ public:
 	}
 
 	/// Returns the window size
-	[[nodiscard]] const Point2u& getWindowSize() const noexcept
+	[[nodiscard]] const Vec2& getWindowSize() const noexcept
 	{
 		return mWindowSize;
 	}
 
 	/// Sets the window size
-	void setWindowSize(const Point2u& size) noexcept;
+	void setWindowSize(const Vec2& size) noexcept;
 
 private:
 	/// Updates the projection matrix
@@ -174,10 +174,10 @@ private:
 	float mFarPlane;
 
 	/// Window size
-	Point2u mWindowSize;
+	Vec2 mWindowSize;
 
 	/// The aspect ratio, i.e. width / height
-	std::optional<float> mAspectRatio;
+	float mAspectRatio;
 
 	/// The projection matrix
 	Mat44 mMatrix;
@@ -196,7 +196,7 @@ public:
 		float fov,
 		float nearPlane,
 		float farPlane,
-		const Point2u& windowSize) noexcept :
+		const Vec2& windowSize) noexcept :
 
 		mView(position, target, up),
 		mProjection(fov, nearPlane, farPlane, windowSize)
@@ -227,6 +227,9 @@ public:
 		return mProjection;
 	}
 
+	/// Converts a screen point to a camera ray in world space
+	[[nodiscard]] Vec3 screenToCameraRay(const Vec2& screenPoint) noexcept;
+
 private:
 	/// The view
 	CameraView mView;
@@ -234,12 +237,5 @@ private:
 	/// The projection
 	CameraProjection mProjection;
 };
-
-/// Converts a screen point to a camera ray in world space
-Vec3 screenToCameraRay(
-	const Point2i& screenPoint,
-	const Point2u& windowSize,
-	const Vec3& cameraPosition,
-	const Mat44& cameraProjectionViewInverse);
 
 } // namespace nph

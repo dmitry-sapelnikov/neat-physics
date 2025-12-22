@@ -9,6 +9,12 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="include\camera">
+      <UniqueIdentifier>{1be41046-e6e1-4972-964f-af7a0db82a23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\camera">
+      <UniqueIdentifier>{5d813347-b6b7-4d60-bb62-993d005e4675}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\Core.h">
@@ -17,22 +23,22 @@
     <ClInclude Include="..\..\framework\Visualization.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\Camera.h">
-      <Filter>include</Filter>
+    <ClInclude Include="..\..\framework\camera\MouseCameraController.h">
+      <Filter>include\camera</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\MouseCameraController.h">
-      <Filter>include</Filter>
+    <ClInclude Include="..\..\framework\camera\Camera.h">
+      <Filter>include\camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\Visualization.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\framework\Camera.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="..\..\framework\camera\MouseCameraController.cpp">
+      <Filter>src\camera</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\framework\MouseCameraController.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="..\..\framework\camera\Camera.cpp">
+      <Filter>src\camera</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

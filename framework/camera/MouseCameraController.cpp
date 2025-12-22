@@ -25,9 +25,9 @@ MouseCameraController::MouseCameraController(
 	mTargetMinDistance(targetMinDistance),
 	mTargetMaxDistance(targetMaxDistance)
 {
-	assert(mMouseSpeed > 0.0F);
-	assert(mZoomSpeed > 0.0F);
-	assert(mTargetMinDistance > 0.0F);
+	assert(mMouseSpeed > 0.0f);
+	assert(mZoomSpeed > 0.0f);
+	assert(mTargetMinDistance > 0.0f);
 	assert(mTargetMaxDistance > mTargetMinDistance);
 
 	const auto& view = camera.getView();
@@ -55,17 +55,14 @@ MouseCameraController::MouseCameraController(
 	mPitch = toDegrees(distanceAzimuthInclination.z);
 }
 
-void MouseCameraController::updateCamera(
-	bool leftMouse,
-	bool midMouse,
-	int mouseWheel) noexcept
+bool MouseCameraController::update(const MouseInput& mouseInput) noexcept
 {
 	auto& camera = getCamera();
 	auto& view = camera.getView();
 
 	mCurrentZoom *= std::pow(
 		2.0f,
-		-mouseWheel * 0.25f * (mZoomSpeed / 100.0f));
+		-static_cast<float>(mouseInput.mouseWheel) * 0.25f * (mZoomSpeed / 100.0f));
 
 	mCurrentZoom = std::clamp(
 		mCurrentZoom,
@@ -77,19 +74,20 @@ void MouseCameraController::updateCamera(
 	{
 		view.setPosition(view.getTarget() - mCurrentZoom * view.getDirection());
 		mPrevZoom = mCurrentZoom;
+		return true;
 	}
 
 	// Rotation
-	if (leftMouse)
+	if (mouseInput.leftMouseDown)
 	{
 		if (!mRotating)
 		{
-			mMouseStart = mMousePosition;
+			mMouseStart = mouseInput.position;
 			mRotating = true;
 		}
 		else
 		{
-			const Point2i mouseDelta = mMousePosition - mMouseStart;
+			const Vec2 mouseDelta = mouseInput.position - mMouseStart;
 
 			mYaw += mouseDelta.x * mMouseSpeed;
 
@@ -105,8 +103,8 @@ void MouseCameraController::updateCamera(
 			const Vec3 direction = mPitchYawBasis * localDir;
 			view.setPosition(view.getTarget() - mCurrentZoom * direction);
 
-			mMouseStart = mMousePosition;
-			return;
+			mMouseStart = mouseInput.position;
+			return true;
 		}
 	}
 	else
@@ -115,46 +113,35 @@ void MouseCameraController::updateCamera(
 	}
 
 	// Translation
-	if (midMouse)
+	if (mouseInput.middleMouseDown)
 	{
 		if (!mTranslating)
 		{
-			mMouseStart = mMousePosition;
+			mMouseStart = mouseInput.position;
 			mTranslating = true;
 			mInitialTarget = view.getTarget();
 			mInitialPosition = view.getPosition();
-			mProjectionViewInv = (camera.getProjection().getMatrix() *
-								  camera.getView().getMatrix())
-									 .getInverse();
 
-			mWindowSize = camera.getProjection().getWindowSize();
-			mDragStart = screenToCameraRay(
-				mMouseStart,
-				mWindowSize,
-				mInitialPosition,
-				mProjectionViewInv);
+			mDragStart = mCamera.screenToCameraRay(mMouseStart);
 		}
 		else
 		{
-			const Vec3 currentDrag = screenToCameraRay(
-				mMousePosition,
-				mWindowSize,
-				mInitialPosition,
-				mProjectionViewInv);
-
+			const Vec3 currentDrag = mCamera.screenToCameraRay(mouseInput.position);
 			const Vec3 distance = mInitialTarget - mInitialPosition;
 			const float proj = dot(distance, currentDrag);
-			assert(proj > 0.0F);
+			assert(proj > 0.0f);
 			const Vec3 deltaWorld = (distance.lengthSquared() / proj) * (mDragStart - currentDrag);
 			view.setTarget(mInitialTarget + deltaWorld);
 			view.setPosition(mInitialPosition + deltaWorld);
 		}
-		return;
+		return true;
 	}
 	else
 	{
 		mTranslating = false;
 	}
+
+	return false;
 }
 
 // End of the namespace nph
