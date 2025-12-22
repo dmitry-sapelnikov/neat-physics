@@ -6,7 +6,7 @@
 #pragma once
 
 // Includes
-#include <cstdint>
+#include "neat_physics/math/Vec3.h"
 
 namespace nph
 {
@@ -20,6 +20,13 @@ template <>
 struct AxisAngleTrait<2>
 {
 	using Type = float;
+};
+
+/// 3D axis-angle trait specialization
+template <>
+struct AxisAngleTrait<3>
+{
+	using Type = Vec3;
 };
 
 /// Axis-angle definition via trait
