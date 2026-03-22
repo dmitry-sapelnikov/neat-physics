@@ -1,0 +1,2 @@
+# Treat txt files as binaries
+*.txt binary

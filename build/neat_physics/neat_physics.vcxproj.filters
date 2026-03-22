@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="include\math">
+      <UniqueIdentifier>{6c39a08e-d313-448e-b762-7be2ddb49af9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\collision">
+      <UniqueIdentifier>{ff919d47-1de2-4236-ad1c-b050cb56e5ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\dynamics">
+      <UniqueIdentifier>{fa99d590-193a-4684-81e2-ce16568ca8f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\collision">
+      <UniqueIdentifier>{e9b26ae8-4243-4da2-8f2e-4d92ac6b67f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\core">
+      <UniqueIdentifier>{06f53ce4-cbd1-45a6-a94e-1fc828b6b9dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\body">
+      <UniqueIdentifier>{bc0369e1-f07d-400b-a2e8-f46cfdb4eca8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\neat_physics\math\Mat.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\Rotation.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\Vec.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\Vec2.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\World.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\collision\Aabb.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\collision\CollisionPoint.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\collision\BroadPhase.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\collision\CollisionManifold.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\collision\CollisionSystem.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\dynamics\ContactPoint.h">
+      <Filter>include\dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\dynamics\ContactManifold.h">
+      <Filter>include\dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\dynamics\ContactSolver.h">
+      <Filter>include\dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\collision\CollisionCallback.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\collision\BroadPhaseCallback.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\AxisAngle.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\collision\NarrowPhase.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\Vec2.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\Vec3.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\Mat22.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\Mat33.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\Mat44.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\MathFunctions.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\Quat.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\collision\BoxGeometry.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\collision\AabbTree.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\collision\CollisionPairMap.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\dynamics\SolverSettings.h">
+      <Filter>include\dynamics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\collision\CollisionSettings.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\core\Platform.h">
+      <Filter>include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\core\AlignedAllocator.h">
+      <Filter>include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\core\Ecs.h">
+      <Filter>include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\Simd.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\core\Compiler.h">
+      <Filter>include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\core\Check.h">
+      <Filter>include\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\body\MassProperties.h">
+      <Filter>include\body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\body\Inertia.h">
+      <Filter>include\body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\body\BodyEcs.h">
+      <Filter>include\body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\body\Body.h">
+      <Filter>include\body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\MathEcs.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\neat_physics\math\Kinematics.h">
+      <Filter>include\math</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\neat_physics\collision\Plane.h">
+      <Filter>include\collision</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\collision\CollisionPairMap.cpp">
+      <Filter>src\collision</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\include\neat_physics\body\Body.inl">
+      <Filter>include\body</Filter>
+    </None>
+  </ItemGroup>
+</Project>

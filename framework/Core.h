@@ -1,0 +1,34 @@
+// A minimalistic 2D and 3D physics engine
+// https://github.com/dmitry-sapelnikov/neat-physics
+// SPDX-FileCopyrightText: 2025-2026 Dmitry Sapelnikov
+// SPDX-License-Identifier: MIT
+
+#pragma once
+
+// Includes
+#include <iostream>
+#include "neat_physics/core/Compiler.h"
+
+// Global macros
+
+namespace nph
+{
+
+// Global functions
+/// Logs an error message, ensuring no exceptions are thrown
+template <typename... Args>
+void logError(Args... args) noexcept
+{
+    try
+    {
+        (std::cerr << ... << args) << std::endl;
+    }
+    catch (...)
+    {
+        // Avoid throwing while handling another exception
+        // Probably we can just let the call of terminate()
+    }
+}
+
+// End of nph namespace
+}
